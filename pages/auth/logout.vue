@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Login from "~/pages/login.vue";
+import Login from "~/pages/auth/login.vue";
 useSeoMeta({
   title: 'Logout',
 

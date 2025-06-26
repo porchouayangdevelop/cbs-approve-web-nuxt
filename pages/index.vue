@@ -1,5 +1,16 @@
 <script setup lang="ts">
 const config = useRuntimeConfig();
+const toast = useToast();
+
+const showToast = ()=>{
+  toast.add({
+    icon: 'i-heroicons-check-circle',
+    title: 'User created successfully!',
+    duration: 3000,
+    type:'foreground',
+    progress: true,
+  })
+}
 </script>
 
 <template>
@@ -10,6 +21,8 @@ const config = useRuntimeConfig();
 
     <p> {{ config.public.webTitle }} </p>
     {{config.public.webDescription}}
+
+    <UButton variant="outline" color="neutral" @click="showToast">show toast</UButton>
   </div>
 </template>
 

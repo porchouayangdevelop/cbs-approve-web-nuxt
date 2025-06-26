@@ -11,12 +11,14 @@
             icon="i-heroicons-arrow-down-tray"
             variant="outline"
             @click="exportUsers"
+            class="cursor-pointer"
         >
           Export
         </UButton>
         <UButton
             icon="i-heroicons-plus"
             @click="createUser"
+            class="cursor-pointer"
         >
           Add User
         </UButton>
@@ -196,37 +198,37 @@
     </div>
 
     <!-- Modals -->
-    <UserCreateModal v-model="showCreateModal" @created="handleUserCreated" />
-    <UserEditModal v-model="showEditModal" :user="selectedUser" @updated="handleUserUpdated" />
-    <UModal v-model="showDeleteModal">
-      <UCard>
-        <template #header>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Deletion</h3>
-        </template>
+<!--    <UserCreateModal v-model="showCreateModal" @created="handleUserCreated" />-->
+<!--    <UserEditModal v-model="showEditModal" :user="selectedUser" @updated="handleUserUpdated" />-->
+<!--    <UModal v-model="showDeleteModal">-->
+<!--      <UCard>-->
+<!--        <template #header>-->
+<!--          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirm Deletion</h3>-->
+<!--        </template>-->
 
-        <div class="space-y-4">
-          <p class="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete <strong>{{ selectedUser?.name }}</strong>? This action cannot be undone.
-          </p>
+<!--        <div class="space-y-4">-->
+<!--          <p class="text-gray-600 dark:text-gray-400">-->
+<!--            Are you sure you want to delete <strong>{{ selectedUser?.name }}</strong>? This action cannot be undone.-->
+<!--          </p>-->
 
-          <div class="flex items-center space-x-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-red-600 dark:text-red-400" />
-            <span class="text-sm text-red-800 dark:text-red-200">This will permanently delete the user and all associated data.</span>
-          </div>
-        </div>
+<!--          <div class="flex items-center space-x-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">-->
+<!--            <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-red-600 dark:text-red-400" />-->
+<!--            <span class="text-sm text-red-800 dark:text-red-200">This will permanently delete the user and all associated data.</span>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <template #footer>
-          <div class="flex justify-end space-x-3">
-            <UButton variant="outline" @click="showDeleteModal = false">
-              Cancel
-            </UButton>
-            <UButton color="error" @click="confirmDelete" :loading="deleting">
-              Delete User
-            </UButton>
-          </div>
-        </template>
-      </UCard>
-    </UModal>
+<!--        <template #footer>-->
+<!--          <div class="flex justify-end space-x-3">-->
+<!--            <UButton variant="outline" @click="showDeleteModal = false">-->
+<!--              Cancel-->
+<!--            </UButton>-->
+<!--            <UButton color="error" @click="confirmDelete" :loading="deleting">-->
+<!--              Delete User-->
+<!--            </UButton>-->
+<!--          </div>-->
+<!--        </template>-->
+<!--      </UCard>-->
+<!--    </UModal>-->
   </div>
 </template>
 
@@ -237,6 +239,8 @@ import UserEditModal from "~/components/modals/UserEditModal.vue";
 definePageMeta({
   layout: 'default',
 })
+
+const router = useRouter()
 
 // Types
 interface User {
@@ -500,7 +504,10 @@ const confirmDelete = async () => {
 }
 
 const createUser = () => {
-  showCreateModal.value = true
+  // showCreateModal.value = true
+
+  router.push({path:'/users/create'});
+
 }
 
 const exportUsers = () => {

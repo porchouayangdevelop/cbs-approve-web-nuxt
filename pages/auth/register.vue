@@ -60,7 +60,7 @@
           <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
           <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
             Already have an account?
-            <NuxtLink to="/login" class="font-medium text-emerald-600 hover:text-emerald-500">
+            <NuxtLink to="/cbs-approve-web-nuxt/pages/auth/login" class="font-medium text-emerald-600 hover:text-emerald-500">
               Sign in here
             </NuxtLink>
           </p>

@@ -18,7 +18,7 @@
 
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-        <div class="max-w-7xl mx-auto">
+        <div class="max-w-9xl mx-auto">
           <!-- Breadcrumbs -->
           <Breadcrumbs class="mb-6" />
 
@@ -41,9 +41,9 @@
 
 <script setup lang="ts">
 // Composables
-import Drawer from "~/components/aside/Drawer.vue";
-import AppBar from "~/components/aside/AppBar.vue";
-import Breadcrumbs from "~/components/aside/Breadcrumbs.vue";
+import Drawer from "~/components/system/aside/Drawer.vue";
+import AppBar from "~/components/system/aside/AppBar.vue";
+import Breadcrumbs from "~/components/system/aside/Breadcrumbs.vue";
 
 const colorMode = useColorMode()
 

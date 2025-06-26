@@ -97,7 +97,7 @@
               Contact Support
             </ULink>
             <ULink
-                to="/help"
+                to="/systems/help"
                 class="flex items-center gap-1 text-primary-600 hover:text-primary-500 dark:text-primary-400"
             >
               <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4" />

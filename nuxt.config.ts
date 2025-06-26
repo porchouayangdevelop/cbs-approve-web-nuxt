@@ -12,8 +12,15 @@ export default defineNuxtConfig({
     head: {
       // title: 'CBS Approve Web',
       titleTemplate: ' CBS Approve Web - %s',
+      meta: [{
+        charset: 'utf-8',
+        content: 'width=device-width, initial-scale=1',
+        media: '(prefers-color-scheme: light)',
+      },
+      ]
+    },
 
-    }
+    pageTransition: {name: 'fade', mode: 'out-in'},
   },
 
   devServer: {
