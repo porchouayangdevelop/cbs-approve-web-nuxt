@@ -231,8 +231,8 @@
 </template>
 
 <script setup lang="ts">
-import UserCreateModal from "~/components/users/UserCreateModal.vue";
-import UserEditModal from "~/components/users/UserEditModal.vue";
+import UserCreateModal from "~/components/modals/UserCreateModal.vue";
+import UserEditModal from "~/components/modals/UserEditModal.vue";
 
 definePageMeta({
   layout: 'default',
