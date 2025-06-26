@@ -1,8 +1,7 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  const {hasRole, handledUnauthorized} = useGuards();
+  const {canAccess,handledUnauthorized} = useGuards();
 
-  if (!hasRole('admin')) {
+  if(!canAccess(to.path)) {
     return handledUnauthorized(to.path);
   }
-
 })

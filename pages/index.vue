@@ -21,6 +21,7 @@ const showToast = ()=>{
 
     <p> {{ config.public.webTitle }} </p>
     {{config.public.webDescription}}
+    {{config.delete_user}}
 
     <UButton variant="outline" color="neutral" @click="showToast">show toast</UButton>
   </div>

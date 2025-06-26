@@ -1,8 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+if(import.meta.server){
+
+}
+
+</script>
 
 <template>
   <div>
-    Page: admin/index
+    <ClientOnly>
+
+    </ClientOnly>
   </div>
 </template>
 

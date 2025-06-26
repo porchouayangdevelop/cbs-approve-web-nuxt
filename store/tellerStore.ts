@@ -1,6 +1,9 @@
 import {defineStore} from 'pinia';
 
-export const useTellerStore = defineStore('tellerStore', {
-  state: () => ({}),
-  actions: {}
+export const useTellerStore = defineStore('tellerStore', () => {
+  // State
+
+  // Getters
+
+  // Actions
 });

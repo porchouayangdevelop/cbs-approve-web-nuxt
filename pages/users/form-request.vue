@@ -2,7 +2,7 @@
 import RequestForm from "~/components/users/RequestForm.vue";
 
 definePageMeta({
-  layout: 'usersession',
+  layout: 'user-session',
   // middleware: ['auth'],
 })
 

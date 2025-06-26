@@ -2,8 +2,7 @@
 
 <template>
   <div>
-    Layout: auth-session
-    <slot />
+    Page: checkers/index
   </div>
 </template>
 

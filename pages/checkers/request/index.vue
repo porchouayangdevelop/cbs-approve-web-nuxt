@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    Page: approve/index
+    Page: checkers/request/index
   </div>
 </template>
 

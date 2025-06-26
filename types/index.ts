@@ -28,3 +28,15 @@ export interface UserCreate {
     id: number;
   }>;
 }
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  department: string
+  permissions: string[]
+  avatar?: string
+  lastLogin?: string
+  createdAt?: string
+}

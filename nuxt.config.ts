@@ -8,6 +8,14 @@ export default defineNuxtConfig({
     autoImport: true
   },
 
+  $production: {
+    routeRules: {
+      '/**': {isr: true}
+    }
+  },
+  $development: {},
+  $env: {},
+
   app: {
     head: {
       // title: 'CBS Approve Web',
@@ -31,6 +39,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     auth_base_url: '',
     api_base_url: '',
+    login: '',
+    logout: '',
+    refreshToken: '',
+    check_token: '',
+    role_list: '',
+    delete_user: '',
+    edit_user: '',
     public: {
       webTitle: '',
       webDescription: '',
