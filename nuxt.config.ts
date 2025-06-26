@@ -4,23 +4,38 @@ export default defineNuxtConfig({
   devtools: {enabled: false},
   ssr: false,
 
-  imports:{
-    autoImport:true
+  imports: {
+    autoImport: true
   },
 
-  app:{
-    head:{
+  app: {
+    head: {
       // title: 'CBS Approve Web',
-      titleTemplate:' CBS Approve Web - %s',
+      titleTemplate: ' CBS Approve Web - %s',
 
     }
   },
 
-  devServer:{
+  devServer: {
     port: 5000,
     host: '0.0.0.0'
   },
 
+  runtimeConfig: {
+    auth_base_url: '',
+    api_base_url: '',
+    public: {
+      webTitle: '',
+      webDescription: '',
+      ogImage: '',
+      ogType: 'website',
+      ogUrl: ''
+    },
+
+  },
+  plugins: [
+    '~/plugins/axios.ts',
+  ],
   modules: [
     '@nuxt/content',
     '@nuxt/fonts',
@@ -38,7 +53,7 @@ export default defineNuxtConfig({
   lucide: {
     namePrefix: 'Icon'
   },
-  css:['~/assets/css/main.css',
+  css: ['~/assets/css/main.css',
     // '~/assets/css/variables.css', '~/assets/css/typography.css', '~/assets/css/scrollbar.css'
   ],
   colorMode: {

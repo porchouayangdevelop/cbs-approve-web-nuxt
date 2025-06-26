@@ -143,11 +143,13 @@ const userMenuItems = [
   [{
     label: 'Logout',
     icon: 'i-heroicons-arrow-right-on-rectangle',
-    click: () => {
-      // Emit logout event to parent
-      const emit = getCurrentInstance()?.emit
-      emit?.('logout')
-    }
+    to: '/logout'
+    // click: () => {
+    //   // Emit logout event to parent
+    //   const emit = getCurrentInstance()?.emit
+    //   emit?.('logout')
+    //
+    // }
   }]
 ]
 </script>
