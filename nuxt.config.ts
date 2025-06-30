@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
-  devtools: {enabled: false},
+  devtools: {enabled: true},
   ssr: false,
 
   imports: {
@@ -13,17 +13,12 @@ export default defineNuxtConfig({
       '/**': {isr: true}
     }
   },
-  $development: {},
-  $env: {},
+  // $development: {},
+  // $env: {},
 
   app: {
     head: {
-      // title: 'CBS Approve Web',
       titleTemplate: 'CBS Approve Web- %s',
-      // meta: [{
-      //   charset: 'utf-8',
-      //   content: 'width=device-width, initial-scale=1',
-      // },],
       link: [
         {
           rel: 'icon',
@@ -31,8 +26,6 @@ export default defineNuxtConfig({
         }
       ]
     },
-
-    // pageTransition: {name: 'fade', mode: 'out-in'},
   },
 
   devServer: {
@@ -61,6 +54,8 @@ export default defineNuxtConfig({
   },
   plugins: [
     '~/plugins/axios.ts',
+    '~/plugins/auth.client.ts',
+    '~/plugins/error-handler.ts'
   ],
   modules: [
     // '@nuxt/content',
@@ -88,13 +83,10 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: [
-        // '@jridgewell/sourcemap-codec',
-        'magic-string'
       ]
     },
     ssr: {
       noExternal: [
-        // '@jridgewell/sourcemap-codec'
       ]
     }
   },
@@ -103,7 +95,6 @@ export default defineNuxtConfig({
       wasm: true,
     }
   },
-  // alias: {
-  //   '@jridgewell/sourcemap-codec': '@jridgewell/sourcemap-codec/dist/sourcemap-codec.mjs'
-  // }
+  alias: {
+  }
 })

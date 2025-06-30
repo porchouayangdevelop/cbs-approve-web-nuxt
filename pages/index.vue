@@ -5,15 +5,15 @@ const config = useRuntimeConfig();
 const toast = useToast();
 
 definePageMeta({
-  layout: 'default',e
+  layout: 'default',
   // middleware: ['auth-guard']
 })
 
 const {canAccess,hasRole,hasPermission} = useGuards();
 
-if(canAccess('/admin')){}
-if(hasRole('admin')){}
-if(hasPermission('admin:access')){}
+// if(canAccess('/admin')){}
+// if(hasRole('admin')){}
+// if(hasPermission('admin:access')){}
 
 const showToast = () => {
   toast.add({
