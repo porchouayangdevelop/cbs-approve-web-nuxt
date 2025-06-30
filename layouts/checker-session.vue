@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-    <!-- Checker Sidebar Drawer -->
+    <!-- Checker Sidebar AdminDrawer -->
     <CheckerDrawer
         :is-open="isSidebarOpen"
         @close="toggleSidebar"

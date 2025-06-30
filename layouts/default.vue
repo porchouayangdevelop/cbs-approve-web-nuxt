@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-    <!-- Sidebar Drawer -->
-    <Drawer
+    <!-- Sidebar AdminDrawer -->
+    <AdminDrawer
         :is-open="isSidebarOpen"
         @close="toggleSidebar"
         @navigate="handleNavigation"
@@ -20,10 +20,10 @@
       <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div class="max-w-9xl mx-auto">
           <!-- Breadcrumbs -->
-          <Breadcrumbs class="mb-6" />
+          <Breadcrumbs class="mb-2" />
 
           <!-- Page Content -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[calc(100vh-200px)]">
+          <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[calc(100vh-200px)]">
             <slot />
           </div>
         </div>
@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 // Composables
-import Drawer from "~/components/system/aside/Drawer.vue";
+import AdminDrawer from "~/components/system/aside/AdminDrawer.vue";
 import AppBar from "~/components/system/aside/AppBar.vue";
 import Breadcrumbs from "~/components/system/aside/Breadcrumbs.vue";
 

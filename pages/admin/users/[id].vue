@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <slot />
+    Page: admin/users/[id]
   </div>
 </template>
 

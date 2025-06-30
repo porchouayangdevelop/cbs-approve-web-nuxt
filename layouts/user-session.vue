@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-    <!-- User Sidebar Drawer -->
+    <!-- User Sidebar AdminDrawer -->
     <UserDrawer
         :is-open="isSidebarOpen"
         @close="toggleSidebar"

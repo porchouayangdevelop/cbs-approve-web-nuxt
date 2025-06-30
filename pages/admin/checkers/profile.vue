@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <slot />
+    Page: admin/checkers/profile
   </div>
 </template>
 

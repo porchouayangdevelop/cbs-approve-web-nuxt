@@ -176,7 +176,7 @@
 
       <!-- User Profile -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <UDropdown
+        <UDropdownMenu
             :items="userMenuItems"
             :popper="{ placement: 'top-start' }"
             class="w-full"
@@ -197,7 +197,7 @@
             </div>
             <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
           </div>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </div>
   </aside>
@@ -249,39 +249,32 @@ const navigationSections = ref<NavigationSection[]>([
     items: [
       {
         label: 'Users',
-        to: '/users',
+        to: '/admin/users',
         icon: 'i-heroicons-users',
         // badge: '12',
         badgeColor: 'blue'
       },
       {
-        label: 'Products',
+        label: 'Checkers',
         icon: 'i-heroicons-cube',
         expanded: false,
         children: [
           {
-            label: 'All Products',
-            to: '/products',
+            label: 'All Checkers',
+            to: '/admin/checkers',
             icon: 'i-heroicons-list-bullet'
           },
           {
-            label: 'Categories',
-            to: '/products/categories',
+            label: 'Stats',
+            to: '/admin/checkers/stats',
             icon: 'i-heroicons-tag'
           },
           {
-            label: 'Inventory',
-            to: '/products/inventory',
-            icon: 'i-heroicons-archive-box'
+            label: 'Profile',
+            to: '/admin/checkers/profile',
+            icon: 'i-heroicons-user'
           }
         ]
-      },
-      {
-        label: 'Orders',
-        to: '/admin/orders',
-        icon: 'i-heroicons-shopping-cart',
-        // badge: '5',
-        badgeColor: 'red'
       },
       {
         label: 'Support',
@@ -360,17 +353,17 @@ const navigationSections = ref<NavigationSection[]>([
         children: [
           {
             label: 'General',
-            to: '/settings/general',
+            to: '/admin/settings/general',
             icon: 'i-heroicons-adjustments-horizontal'
           },
           {
             label: 'Security',
-            to: '/settings/security',
+            to: '/admin/settings/security',
             icon: 'i-heroicons-shield-check'
           },
           {
             label: 'Integrations',
-            to: '/settings/integration',
+            to: '/admin/settings/integration',
             icon: 'i-heroicons-puzzle-piece'
           }
         ]

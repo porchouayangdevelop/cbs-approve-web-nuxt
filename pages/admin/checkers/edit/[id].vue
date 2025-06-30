@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    Page: admin/user/index
+    Page: admin/checkers/edit/[id]
   </div>
 </template>
 
