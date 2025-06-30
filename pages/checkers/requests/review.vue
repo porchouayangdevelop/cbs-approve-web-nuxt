@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import RequestForm from "~/components/users/RequestForm.vue";
 definePageMeta({
-  layout:'user-session'
+  layout:"checker-session"
 })
 </script>
 
 <template>
   <div>
-<!--    <RequestForm/>-->
+    Page: checkers/requests/review
   </div>
 </template>
 
