@@ -1,4 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  layout:"checker-session"
+})
+
+</script>
 
 <template>
   <div>
