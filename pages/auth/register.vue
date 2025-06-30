@@ -253,8 +253,8 @@
 import { z } from 'zod'
 
 definePageMeta({
-  layout: false,
-  middleware: 'auth'
+  layout: 'auth-session',
+  // middleware: ''
 })
 
 // Form state

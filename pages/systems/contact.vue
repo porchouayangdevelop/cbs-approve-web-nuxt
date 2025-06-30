@@ -1,13 +1,13 @@
 <script setup lang="ts">
 definePageMeta({
   layout:false,
-  path:'/help'
+  path:'/contact'
 })
 </script>
 
 <template>
   <div>
-    Page: help
+    Page: Concat support
   </div>
 </template>
 

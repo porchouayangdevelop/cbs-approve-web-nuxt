@@ -19,16 +19,20 @@ export default defineNuxtConfig({
   app: {
     head: {
       // title: 'CBS Approve Web',
-      titleTemplate: ' CBS Approve Web - %s',
-      meta: [{
-        charset: 'utf-8',
-        content: 'width=device-width, initial-scale=1',
-        media: '(prefers-color-scheme: light)',
-      },
+      titleTemplate: 'CBS Approve Web- %s',
+      // meta: [{
+      //   charset: 'utf-8',
+      //   content: 'width=device-width, initial-scale=1',
+      // },],
+      link: [
+        {
+          rel: 'icon',
+          href: '/images.jpg'
+        }
       ]
     },
 
-    pageTransition: {name: 'fade', mode: 'out-in'},
+    // pageTransition: {name: 'fade', mode: 'out-in'},
   },
 
   devServer: {
@@ -59,7 +63,7 @@ export default defineNuxtConfig({
     '~/plugins/axios.ts',
   ],
   modules: [
-    '@nuxt/content',
+    // '@nuxt/content',
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
@@ -80,5 +84,26 @@ export default defineNuxtConfig({
   ],
   colorMode: {
     classSuffix: ''
-  }
+  },
+  vite: {
+    optimizeDeps: {
+      include: [
+        // '@jridgewell/sourcemap-codec',
+        'magic-string'
+      ]
+    },
+    ssr: {
+      noExternal: [
+        // '@jridgewell/sourcemap-codec'
+      ]
+    }
+  },
+  nitro: {
+    experimental: {
+      wasm: true,
+    }
+  },
+  // alias: {
+  //   '@jridgewell/sourcemap-codec': '@jridgewell/sourcemap-codec/dist/sourcemap-codec.mjs'
+  // }
 })

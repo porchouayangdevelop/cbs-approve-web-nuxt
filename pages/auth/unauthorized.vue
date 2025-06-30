@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-950 dark:via-orange-950 dark:to-yellow-950 flex items-center justify-center p-4">
+  <div
+      class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-red-950 dark:via-orange-950 dark:to-yellow-950 flex items-center justify-center p-4">
     <div class="max-w-2xl w-full">
       <div class="text-center space-y-8">
         <!-- Error Code Display -->
@@ -21,7 +22,8 @@
             Access Denied
           </h1>
           <p class="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-            You don't have permission to access this resource. Please contact your administrator if you believe this is an error.
+            You don't have permission to access this resource. Please contact your administrator if you believe this is
+            an error.
           </p>
         </div>
 
@@ -29,7 +31,7 @@
         <UCard class="max-w-md mx-auto text-left">
           <template #header>
             <div class="flex items-center space-x-3">
-              <UIcon name="i-heroicons-user-circle" class="w-6 h-6 text-blue-500" />
+              <UIcon name="i-heroicons-user-circle" class="w-6 h-6 text-blue-500"/>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Current User Info</h3>
             </div>
           </template>
@@ -37,7 +39,9 @@
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Email:</span>
-              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ currentUser?.email || 'Not available' }}</span>
+              <span class="text-sm font-medium text-gray-900 dark:text-white">{{
+                  currentUser?.email || 'Not available'
+                }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Role:</span>
@@ -47,7 +51,9 @@
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">Department:</span>
-              <span class="text-sm font-medium text-gray-900 dark:text-white">{{ currentUser?.department || 'Not assigned' }}</span>
+              <span class="text-sm font-medium text-gray-900 dark:text-white">{{
+                  currentUser?.department || 'Not assigned'
+                }}</span>
             </div>
             <div class="flex items-center justify-between">
               <span class="text-sm text-gray-600 dark:text-gray-400">User ID:</span>
@@ -60,7 +66,7 @@
         <UCard class="max-w-md mx-auto text-left">
           <template #header>
             <div class="flex items-center space-x-3">
-              <UIcon name="i-heroicons-lock-closed" class="w-6 h-6 text-red-500" />
+              <UIcon name="i-heroicons-lock-closed" class="w-6 h-6 text-red-500"/>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Access Details</h3>
             </div>
           </template>
@@ -144,7 +150,7 @@
           <UCard class="text-left max-w-lg mx-auto">
             <template #header>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-code-bracket" class="w-5 h-5 text-orange-500" />
+                <UIcon name="i-heroicons-code-bracket" class="w-5 h-5 text-orange-500"/>
                 <span class="font-semibold">Debug Information (Development)</span>
               </div>
             </template>
@@ -216,21 +222,21 @@
                 href="mailto:admin@company.com"
                 class="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
-              <UIcon name="i-heroicons-envelope" class="w-4 h-4" />
+              <UIcon name="i-heroicons-envelope" class="w-4 h-4"/>
               admin@company.com
             </ULink>
             <ULink
                 href="tel:+1-555-0123"
                 class="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
-              <UIcon name="i-heroicons-phone" class="w-4 h-4" />
+              <UIcon name="i-heroicons-phone" class="w-4 h-4"/>
               +1 (555) 012-3456
             </ULink>
             <ULink
                 to="/systems/help"
                 class="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400"
             >
-              <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4" />
+              <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4"/>
               Help Center
             </ULink>
           </div>
@@ -244,12 +250,13 @@
 import {useGuards} from "~/composables/useGuards";
 
 definePageMeta({
-  layout: false
+  layout: false,
+  path: '/unauthorized'
 })
 
 const route = useRoute()
-const { user } = useAuth()
-const { getMissingPermission, getAccessibleRoutes, redirectToAllowPage } = useGuards();
+const {user} = useAuth()
+const {getMissingPermission, getAccessibleRoutes, redirectToAllowPage} = useGuards();
 
 // Check if we're in development mode
 const isDevelopment = process.dev
@@ -271,7 +278,7 @@ const routeInfo = {
 
 // Get missing access information
 const missingAccess = computed(() => {
-  if (!requestedPath) return { roles: [], permissions: [] }
+  if (!requestedPath) return {roles: [], permissions: []}
   return getMissingPermission(requestedPath)
 })
 

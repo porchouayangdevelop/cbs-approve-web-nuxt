@@ -83,7 +83,7 @@
                   v-model="loginForm.email"
                   type="email"
                   placeholder="Enter your email"
-                  icon="i-heroicons-envelope"
+                  icon="i-heroicons-user"
                   size="lg"
                   :loading="loading"
                   class="my-1 w-full"
@@ -177,7 +177,6 @@ import { z } from 'zod'
 
 definePageMeta({
   layout: false,
-  middleware: 'auth'
 })
 
 // Form state
@@ -254,7 +253,7 @@ const signInWithGithub = async () => {
 
 // SEO
 useSeoMeta({
-  title: 'Sign In - AdminPanel',
+  title: 'Sign In',
   description: 'Sign in to your admin dashboard to manage your business with powerful tools and insights.'
 })
 </script>

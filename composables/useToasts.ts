@@ -1,4 +1,4 @@
-export const useToast = () => {
+export const useToasts = () => {
   const addToast = inject('addToast') as ((options: any) => string) | undefined
   const removeToast = inject('removeToast') as ((id: string) => void) | undefined
   const clearAllToasts = inject('clearAllToasts') as (() => void) | undefined

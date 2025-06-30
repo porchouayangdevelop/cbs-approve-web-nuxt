@@ -9,7 +9,7 @@ useSeoMeta({
 })
 definePageMeta({
   layout: false,
-  middleware: 'auth'
+  middleware: 'session-guard'
 })
 </script>
 
