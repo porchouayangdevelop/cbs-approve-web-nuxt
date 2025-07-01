@@ -1,5 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+  <div
+      class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
     <div class="max-w-2xl w-full">
       <div class="text-center space-y-8">
         <!-- Error Code Display -->
@@ -30,22 +31,28 @@
           <UCard class="text-left">
             <template #header>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-orange-500" />
-                <span class="font-semibold">Error Details (Development)</span>
+                <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-orange-500"/>
+                <span class="font-semibold">Error Details</span>
               </div>
             </template>
 
             <div class="space-y-3">
               <div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message:</p>
-                <p class="text-sm text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-2 rounded">
-                  {{ error.message }}
+<!--                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message:</p>-->
+                <p class="text-sm flex flex-row gap-3 justify-center items-center text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                  <!--                  {{ error.message }}-->
+                  <icon size="50"  name="i-heroicons-hand-raised"/>
+                  <p class="font-bold text-3xl">Good Luck</p>
                 </p>
               </div>
 
-              <div v-if="error.stack">
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stack Trace:</p>
-                <pre class="text-xs bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto text-gray-800 dark:text-gray-200">{{ error.stack }}</pre>
+              <div v-if="error.stack" class="flex flex-col justify-center">
+<!--                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stack Trace:</p>-->
+<!--                <icon size="50"  name="i-heroicons-hand-raised"/>-->
+                <div
+                    class="text-3xl font-bold text-center bg-gray-100 dark:bg-gray-800 p-3 rounded overflow-x-auto text-gray-800 dark:text-gray-200">
+                  Coming soon...
+                </div>
               </div>
             </div>
           </UCard>
@@ -57,7 +64,7 @@
               @click="handleError"
               size="lg"
               icon="i-heroicons-home"
-              class="w-full sm:w-auto"
+              class="w-full sm:w-auto cursor-pointer"
           >
             Go Home
           </UButton>
@@ -67,17 +74,17 @@
               variant="outline"
               size="lg"
               icon="i-heroicons-arrow-path"
-              class="w-full sm:w-auto"
+              class="w-full sm:w-auto cursor-pointer"
           >
             Try Again
           </UButton>
 
           <UButton
               @click="goBack"
-              variant="ghost"
+              variant="outline"
               size="lg"
               icon="i-heroicons-arrow-left"
-              class="w-full sm:w-auto"
+              class="w-full sm:w-auto cursor-pointer"
           >
             Go Back
           </UButton>
@@ -93,21 +100,21 @@
                 to="/contact"
                 class="flex items-center gap-1 text-primary-600 hover:text-primary-500 dark:text-primary-400"
             >
-              <UIcon name="i-heroicons-envelope" class="w-4 h-4" />
+              <UIcon name="i-heroicons-envelope" class="w-4 h-4"/>
               Contact Support
             </ULink>
             <ULink
                 to="/systems/help"
                 class="flex items-center gap-1 text-primary-600 hover:text-primary-500 dark:text-primary-400"
             >
-              <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4" />
+              <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4"/>
               Help Center
             </ULink>
             <ULink
                 to="/status"
                 class="flex items-center gap-1 text-primary-600 hover:text-primary-500 dark:text-primary-400"
             >
-              <UIcon name="i-heroicons-signal" class="w-4 h-4" />
+              <UIcon name="i-heroicons-signal" class="w-4 h-4"/>
               System Status
             </ULink>
           </div>
@@ -118,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NuxtError } from '#app'
+import type {NuxtError} from '#app'
 
 // Define the error prop
 const props = defineProps<{
@@ -184,7 +191,7 @@ const getErrorDescription = (): string => {
 
 // Handle error - clear error and redirect to home
 const handleError = async () => {
-  await clearError({ redirect: '/' })
+  await clearError({redirect: '/'})
 }
 
 // Refresh the page

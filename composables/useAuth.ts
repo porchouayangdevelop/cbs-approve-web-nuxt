@@ -41,7 +41,6 @@ export const useAuth = () => {
         isAuthenticated.value = false;
         return null;
       }
-
       const userData: User = {
         id: "4f7c9819-0acd-4c2f-9161-479a6d442204",
         username: "apb01398",

@@ -12,15 +12,13 @@ export const useAuthStore = defineStore('auth', () => {
   const userRole = computed(() => user.value?.role);
   const userPermissions = computed(() => user.value?.permissions || [])
   const isAdmin = computed(() => userRole.value === 'admin')
-  const isManager = computed(() => userRole.value === 'Manager')
+  const isUser = computed(() => userRole.value === 'User')
   const isChecker = computed(() => userRole.value === 'Checker')
 
   //actions
   const setUser = (userData: User) => {
     user.value = userData;
     isAuthenticated.value = true;
-
-
     updateLastActivity()
   }
 
@@ -78,8 +76,8 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     userPermissions,
     isAdmin,
-    isManager,
     isChecker,
+    isUser,
 
     // Actions
     setUser,

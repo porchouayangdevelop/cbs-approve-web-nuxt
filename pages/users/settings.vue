@@ -2,11 +2,12 @@
 definePageMeta({
   layout:'user-session'
 })
+
 </script>
 
 <template>
   <div>
-    Page: users/requests/update/draft/index
+    Page: users/settings
   </div>
 </template>
 

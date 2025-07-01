@@ -245,7 +245,7 @@ const navigationSections = ref<NavigationSection[]>([
 
   // Approval Management
   {
-    title: 'Approval Management',
+    title: 'Workflow Maintance',
     items: [
       {
         label: 'Pending Requests',
@@ -292,11 +292,11 @@ const navigationSections = ref<NavigationSection[]>([
         to: '/checkers/stats',
         icon: 'i-heroicons-chart-bar'
       },
-      {
-        label: 'Performance Report',
-        to: '/checkers/reports/performance',
-        icon: 'i-heroicons-chart-pie'
-      },
+      // {
+      //   label: 'Performance Report',
+      //   to: '/checkers/reports/performance',
+      //   icon: 'i-heroicons-chart-pie'
+      // },
       {
         label: 'Workflow Analytics',
         to: '/checkers/reports/workflow',

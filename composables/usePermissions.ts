@@ -19,17 +19,7 @@ export const usePermissions = () => {
       'reports:read',
       'reports:create'
     ],
-    // 'Manager': [
-    //   'users:create',
-    //   'users:read',
-    //   'users:edit',
-    //   'dashboard:read',
-    //   'profile:read',
-    //   'profile:edit',
-    //   'reports:read',
-    //   'team:manage'
-    // ],
-    'Checker': [
+    'checker': [
       'approval:access',
       'approval:approve',
       'approval:reject',
@@ -38,7 +28,7 @@ export const usePermissions = () => {
       'profile:edit',
       'requests:review'
     ],
-    'User': [
+    'user': [
       'dashboard:read',
       'profile:read',
       'profile:edit',

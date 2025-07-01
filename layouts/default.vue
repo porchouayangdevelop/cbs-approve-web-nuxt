@@ -71,10 +71,13 @@ const handleNavigation = () => {
 }
 
 const handleLogout = async () => {
-  // Add your logout logic here
-  console.log('Logout clicked')
-  // Example: await $fetch('/api/auth/logout', { method: 'POST' })
-  // await navigateTo('/login')
+  const { logout } = useAuth()
+  try {
+    await logout()
+    await navigateTo('/auth/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
 }
 
 // Close sidebar on route change (mobile)

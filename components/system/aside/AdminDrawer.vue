@@ -176,7 +176,7 @@
 
       <!-- User Profile -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <UDropdown
+        <UDropdownMenu
             :items="userMenuItems"
             :popper="{ placement: 'top-start' }"
             class="w-full"
@@ -197,7 +197,7 @@
             </div>
             <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
           </div>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </div>
   </aside>
@@ -230,7 +230,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 
-// Reactive navigation state
+// Reactive navigation state for Admin
 const navigationSections = ref<NavigationSection[]>([
   // Main Dashboard
   {
@@ -243,67 +243,311 @@ const navigationSections = ref<NavigationSection[]>([
     ]
   },
 
-  // Management Section
+  // User Management Section
   {
-    title: 'Management',
+    title: 'User Management',
     items: [
       {
-        label: 'Users',
-        to: '/users',
+        label: 'All Users',
+        to: '/admin/users',
         icon: 'i-heroicons-users',
-        // badge: '12',
+        badge: '245',
         badgeColor: 'blue'
       },
       {
-        label: 'Products',
-        icon: 'i-heroicons-cube',
+        label: 'User Management',
+        icon: 'i-heroicons-user-group',
         expanded: false,
         children: [
           {
-            label: 'All Products',
-            to: '/products',
-            icon: 'i-heroicons-list-bullet'
+            label: 'Create User',
+            to: '/admin/users/create',
+            icon: 'i-heroicons-user-plus'
           },
           {
-            label: 'Categories',
-            to: '/products/categories',
+            label: 'Bulk Import',
+            to: '/admin/users/import',
+            icon: 'i-heroicons-arrow-up-tray'
+          },
+          {
+            label: 'Active Users',
+            to: '/admin/users/active',
+            icon: 'i-heroicons-check-circle',
+            badge: '198',
+            badgeColor: 'green'
+          },
+          {
+            label: 'Inactive Users',
+            to: '/admin/users/inactive',
+            icon: 'i-heroicons-x-circle',
+            badge: '47',
+            badgeColor: 'red'
+          },
+          {
+            label: 'Pending Approval',
+            to: '/admin/users/pending',
+            icon: 'i-heroicons-clock',
+            badge: '12',
+            badgeColor: 'yellow'
+          }
+        ]
+      },
+      {
+        label: 'Roles & Permissions',
+        icon: 'i-heroicons-shield-check',
+        expanded: false,
+        children: [
+          {
+            label: 'Manage Roles',
+            to: '/admin/roles',
+            icon: 'i-heroicons-key'
+          },
+          {
+            label: 'Permissions',
+            to: '/admin/permissions',
+            icon: 'i-heroicons-lock-closed'
+          },
+          {
+            label: 'Access Control',
+            to: '/admin/access-control',
+            icon: 'i-heroicons-shield-exclamation'
+          }
+        ]
+      }
+    ]
+  },
+
+  // Checker Management Section
+  {
+    title: 'Checker Management',
+    items: [
+      {
+        label: 'All Checkers',
+        to: '/admin/checkers',
+        icon: 'i-heroicons-check-badge',
+        badge: '24',
+        badgeColor: 'blue'
+      },
+      {
+        label: 'Checker Operations',
+        icon: 'i-heroicons-clipboard-document-check',
+        expanded: false,
+        children: [
+          {
+            label: 'Create Checker',
+            to: '/admin/checkers/create',
+            icon: 'i-heroicons-user-plus'
+          },
+          {
+            label: 'Checker Assignments',
+            to: '/admin/checkers/assignments',
+            icon: 'i-heroicons-user-group'
+          },
+          {
+            label: 'Active Checkers',
+            to: '/admin/checkers/active',
+            icon: 'i-heroicons-check-circle',
+            badge: '18',
+            badgeColor: 'green'
+          },
+          {
+            label: 'Checker Performance',
+            to: '/admin/checkers/performance',
+            icon: 'i-heroicons-chart-bar'
+          }
+        ]
+      },
+      {
+        label: 'Approval Workflows',
+        icon: 'i-heroicons-arrow-path',
+        expanded: false,
+        children: [
+          {
+            label: 'Workflow Templates',
+            to: '/admin/workflows/templates',
+            icon: 'i-heroicons-document-duplicate'
+          },
+          {
+            label: 'Approval Rules',
+            to: '/admin/workflows/rules',
+            icon: 'i-heroicons-clipboard-document-list'
+          },
+          {
+            label: 'Escalation Matrix',
+            to: '/admin/workflows/escalation',
+            icon: 'i-heroicons-arrow-trending-up'
+          },
+          {
+            label: 'SLA Management',
+            to: '/admin/workflows/sla',
+            icon: 'i-heroicons-clock'
+          }
+        ]
+      },
+      {
+        label: 'Approval Analytics',
+        to: '/admin/checkers/analytics',
+        icon: 'i-heroicons-chart-pie',
+        badge: 'New',
+        badgeColor: 'purple'
+      }
+    ]
+  },
+
+  // System Maintenance Section
+  {
+    title: 'System Maintenance',
+    items: [
+      {
+        label: 'System Health',
+        to: '/admin/system/health',
+        icon: 'i-heroicons-heart',
+        badge: 'OK',
+        badgeColor: 'green'
+      },
+      {
+        label: 'Database Management',
+        icon: 'i-heroicons-circle-stack',
+        expanded: false,
+        children: [
+          {
+            label: 'Database Status',
+            to: '/admin/database/status',
+            icon: 'i-heroicons-cpu-chip'
+          },
+          {
+            label: 'Backup & Restore',
+            to: '/admin/database/backup',
+            icon: 'i-heroicons-archive-box'
+          },
+          {
+            label: 'Data Migration',
+            to: '/admin/database/migration',
+            icon: 'i-heroicons-arrow-right'
+          },
+          {
+            label: 'Performance Tuning',
+            to: '/admin/database/performance',
+            icon: 'i-heroicons-bolt'
+          }
+        ]
+      },
+      {
+        label: 'Security & Monitoring',
+        icon: 'i-heroicons-shield-check',
+        expanded: false,
+        children: [
+          {
+            label: 'Security Logs',
+            to: '/admin/security/logs',
+            icon: 'i-heroicons-document-text'
+          },
+          {
+            label: 'Access Monitoring',
+            to: '/admin/security/monitoring',
+            icon: 'i-heroicons-eye'
+          },
+          {
+            label: 'Firewall Settings',
+            to: '/admin/security/firewall',
+            icon: 'i-heroicons-shield-exclamation'
+          },
+          {
+            label: 'Vulnerability Scan',
+            to: '/admin/security/scan',
+            icon: 'i-heroicons-bug-ant',
+            badge: '2',
+            badgeColor: 'orange'
+          }
+        ]
+      },
+      {
+        label: 'System Configuration',
+        icon: 'i-heroicons-cog-8-tooth',
+        expanded: false,
+        children: [
+          {
+            label: 'General Settings',
+            to: '/admin/config/general',
+            icon: 'i-heroicons-adjustments-horizontal'
+          },
+          {
+            label: 'Email Settings',
+            to: '/admin/config/email',
+            icon: 'i-heroicons-envelope'
+          },
+          {
+            label: 'Notification Settings',
+            to: '/admin/config/notifications',
+            icon: 'i-heroicons-bell'
+          },
+          {
+            label: 'API Configuration',
+            to: '/admin/config/api',
+            icon: 'i-heroicons-code-bracket'
+          }
+        ]
+      }
+    ]
+  },
+
+  // Content & Operations
+  {
+    title: 'Content & Operations',
+    items: [
+      {
+        label: 'Request Management',
+        icon: 'i-heroicons-document-text',
+        expanded: false,
+        children: [
+          {
+            label: 'All Requests',
+            to: '/admin/requests',
+            icon: 'i-heroicons-list-bullet',
+            badge: '1,234',
+            badgeColor: 'blue'
+          },
+          {
+            label: 'Request Categories',
+            to: '/admin/requests/categories',
             icon: 'i-heroicons-tag'
           },
           {
-            label: 'Inventory',
-            to: '/products/inventory',
+            label: 'Templates',
+            to: '/admin/requests/templates',
+            icon: 'i-heroicons-document-duplicate'
+          },
+          {
+            label: 'Archived Requests',
+            to: '/admin/requests/archived',
             icon: 'i-heroicons-archive-box'
           }
         ]
       },
       {
-        label: 'Orders',
-        to: '/admin/orders',
-        icon: 'i-heroicons-shopping-cart',
-        // badge: '5',
-        badgeColor: 'red'
-      },
-      {
-        label: 'Support',
-        icon: 'i-heroicons-chat-bubble-left-right',
+        label: 'Content Management',
+        icon: 'i-heroicons-document-text',
         expanded: false,
         children: [
           {
-            label: 'Tickets',
-            to: '/admin/support/tickets',
-            icon: 'i-heroicons-ticket',
-            badge: '3',
-            badgeColor: 'orange'
+            label: 'Pages',
+            to: '/admin/content/pages',
+            icon: 'i-heroicons-document'
           },
           {
-            label: 'Live Chat',
-            to: '/admin/support/chat',
-            icon: 'i-heroicons-chat-bubble-oval-left'
+            label: 'Announcements',
+            to: '/admin/content/announcements',
+            icon: 'i-heroicons-megaphone'
           },
           {
-            label: 'Knowledge Base',
-            to: '/admin/support/kb',
-            icon: 'i-heroicons-book-open'
+            label: 'Help Documents',
+            to: '/admin/content/help',
+            icon: 'i-heroicons-question-mark-circle'
+          },
+          {
+            label: 'File Manager',
+            to: '/admin/content/files',
+            icon: 'i-heroicons-folder'
           }
         ]
       }
@@ -315,69 +559,106 @@ const navigationSections = ref<NavigationSection[]>([
     title: 'Analytics & Reports',
     items: [
       {
-        label: 'Reports',
-        to: '/admin/reports',
+        label: 'System Analytics',
+        to: '/admin/analytics',
         icon: 'i-heroicons-chart-bar'
       },
       {
-        label: 'Analytics',
-        to: '/admin/analytics',
-        icon: 'i-heroicons-chart-pie'
-      },
-      {
-        label: 'Marketing',
-        icon: 'i-heroicons-megaphone',
+        label: 'Reports',
+        icon: 'i-heroicons-document-chart-bar',
         expanded: false,
         children: [
           {
-            label: 'Campaigns',
-            to: '/admin/marketing/campaigns',
-            icon: 'i-heroicons-envelope'
+            label: 'User Activity',
+            to: '/admin/reports/user-activity',
+            icon: 'i-heroicons-users'
           },
           {
-            label: 'Promotions',
-            to: '/admin/marketing/promotions',
-            icon: 'i-heroicons-gift'
+            label: 'Approval Reports',
+            to: '/admin/reports/approvals',
+            icon: 'i-heroicons-check-circle'
           },
           {
-            label: 'SEO',
-            to: '/admin/marketing/seo',
-            icon: 'i-heroicons-magnifying-glass'
+            label: 'Performance Reports',
+            to: '/admin/reports/performance',
+            icon: 'i-heroicons-chart-pie'
+          },
+          {
+            label: 'Custom Reports',
+            to: '/admin/reports/custom',
+            icon: 'i-heroicons-document-plus'
           }
         ]
+      },
+      {
+        label: 'Audit Logs',
+        to: '/admin/audit-logs',
+        icon: 'i-heroicons-clipboard-document-list'
       }
     ]
   },
 
-  // System Section
+  // System Administration
   {
-    title: 'System',
+    title: 'System Administration',
     items: [
       {
-        label: 'Settings',
+        label: 'Application Settings',
         icon: 'i-heroicons-cog-6-tooth',
         expanded: false,
         children: [
           {
-            label: 'General',
-            to: '/settings/general',
+            label: 'General Settings',
+            to: '/admin/settings/general',
             icon: 'i-heroicons-adjustments-horizontal'
           },
           {
-            label: 'Security',
-            to: '/settings/security',
+            label: 'Security Settings',
+            to: '/admin/settings/security',
             icon: 'i-heroicons-shield-check'
           },
           {
-            label: 'Integrations',
-            to: '/settings/integration',
+            label: 'Integration Settings',
+            to: '/admin/settings/integrations',
             icon: 'i-heroicons-puzzle-piece'
+          },
+          {
+            label: 'Backup Settings',
+            to: '/admin/settings/backup',
+            icon: 'i-heroicons-cloud-arrow-up'
           }
         ]
       },
       {
-        label: 'Help Center',
-        to: '/help',
+        label: 'Maintenance Tasks',
+        icon: 'i-heroicons-wrench-screwdriver',
+        expanded: false,
+        children: [
+          {
+            label: 'Scheduled Tasks',
+            to: '/admin/maintenance/tasks',
+            icon: 'i-heroicons-calendar'
+          },
+          {
+            label: 'System Cleanup',
+            to: '/admin/maintenance/cleanup',
+            icon: 'i-heroicons-trash'
+          },
+          {
+            label: 'Cache Management',
+            to: '/admin/maintenance/cache',
+            icon: 'i-heroicons-server'
+          },
+          {
+            label: 'Log Rotation',
+            to: '/admin/maintenance/logs',
+            icon: 'i-heroicons-arrow-path'
+          }
+        ]
+      },
+      {
+        label: 'Help & Support',
+        to: '/admin/help',
         icon: 'i-heroicons-question-mark-circle'
       }
     ]
@@ -438,30 +719,45 @@ const handleDirectNavigation = () => {
 
 const userMenuItems = [
   [{
-    label: 'View Profile',
+    label: 'Admin Profile',
     icon: 'i-heroicons-user',
     to: '/admin/profile'
   }],
   [{
-    label: 'Account Settings',
-    icon: 'i-heroicons-cog-6-tooth',
-    to: '/admin/account'
+    label: 'System Status',
+    icon: 'i-heroicons-server',
+    to: '/admin/system/status'
   }],
   [{
-    label: 'Preferences',
+    label: 'Quick Settings',
+    icon: 'i-heroicons-cog-6-tooth',
+    to: '/admin/settings/quick'
+  }],
+  [{
+    label: 'Admin Preferences',
     icon: 'i-heroicons-adjustments-horizontal',
     to: '/admin/preferences'
   }],
   [{
-    label: 'Switch Organization',
-    icon: 'i-heroicons-building-office',
-    click: () => console.log('Switch organization')
+    label: 'Switch to User View',
+    icon: 'i-heroicons-arrow-right-circle',
+    click: () => console.log('Switch to user view')
+  }],
+  [{
+    label: 'Emergency Mode',
+    icon: 'i-heroicons-exclamation-triangle',
+    click: () => console.log('Enable emergency mode')
+  }],
+  [{
+    label: 'Admin Help',
+    icon: 'i-heroicons-question-mark-circle',
+    to: '/admin/help'
   }],
   [{
     label: 'Sign Out',
     icon: 'i-heroicons-arrow-right-on-rectangle',
     click: () => {
-      console.log('Logout clicked')
+      console.log('Admin logout clicked')
       emit('navigate')
     }
   }]

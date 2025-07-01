@@ -322,11 +322,11 @@ const navigationSections = ref<NavigationSection[]>([
         to: '/users/history',
         icon: 'i-heroicons-clock'
       },
-      {
-        label: 'Performance Report',
-        to: '/users/reports',
-        icon: 'i-heroicons-chart-pie'
-      }
+      // {
+      //   label: 'Performance Report',
+      //   to: '/users/reports',
+      //   icon: 'i-heroicons-chart-pie'
+      // }
     ]
   },
 
@@ -382,11 +382,11 @@ const navigationSections = ref<NavigationSection[]>([
         badge: '4',
         badgeColor: 'red'
       },
-      {
-        label: 'Preferences',
-        to: '/users/preferences',
-        icon: 'i-heroicons-adjustments-horizontal'
-      },
+      // {
+      //   label: 'Preferences',
+      //   to: '/users/preferences',
+      //   icon: 'i-heroicons-adjustments-horizontal'
+      // },
       {
         label: 'Help & Support',
         to: '/help',

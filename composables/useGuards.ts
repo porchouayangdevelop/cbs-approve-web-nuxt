@@ -59,46 +59,46 @@ export const useGuards = () => {
         permissions: ['admin:access']
       },
       '/admin/users': {
-        roles: ['Admin'],
+        roles: ['admin'],
         permissions: ['admin:access', 'users:manage']
       },
       '/admin/settings': {
-        roles: ['Admin'],
+        roles: ['admin'],
         permissions: ['admin:access', 'settings:manage']
       },
 
-      // User management routes
+      // user management routes
       '/users': {
-        roles: ['Admin', 'Manager'],
+        roles: ['admin', 'Manager'],
         permissions: ['users:read']
       },
       '/users/create': {
-        roles: ['Admin', 'Manager'],
+        roles: ['admin', 'Manager'],
         permissions: ['users:create']
       },
       '/users/edit': {
-        roles: ['Admin', 'Manager'],
+        roles: ['admin', 'Manager'],
         permissions: ['users:edit']
       },
 
 
       // Approval routes
       '/checkers': {
-        roles: ['Admin', 'Checker'],
+        roles: ['admin', 'checker'],
         permissions: ['checker:access']
       },
       '/checkers/requests': {
-        roles: ['Admin', 'Checker'],
+        roles: ['admin', 'checker'],
         permissions: ['checker:access', 'requests:review']
       },
 
       // General routes
       '/dashboard': {
-        roles: ['Admin', 'Checker', 'User'],
+        roles: ['admin', 'checker', 'user'],
         permissions: ['dashboard:read']
       },
       '/profile': {
-        roles: ['Admin', 'Checker', 'User'],
+        roles: ['admin', 'checker', 'user'],
         permissions: ['profile:read']
       }
     }
@@ -110,7 +110,7 @@ export const useGuards = () => {
 
     // Check role-based access
     if (access.roles && !hasRole(access.roles)) {
-      return false; // User does not have required role
+      return false; // user does not have required role
     }
 
     // Check permission-based access
@@ -118,7 +118,7 @@ export const useGuards = () => {
       return false
     }
 
-    return true; // User has required role or permission
+    return true; // user has required role or permission
   }
 
   const canPerform = (action: string, resource?: string): boolean => {
@@ -150,14 +150,14 @@ export const useGuards = () => {
     const routePermissions: Record<string, RouteAccess> = {
       '/admin': {roles: ['admin'], permissions: ['admin:access']},
       '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
-      '/admin/settings': {roles: ['Admin'], permissions: ['admin:access', 'settings:manage']},
+      '/admin/settings': {roles: ['admin'], permissions: ['admin:access', 'settings:manage']},
       '/users': {roles: ['admin', 'Manager'], permissions: ['users:read']},
       '/users/create': {roles: ['admin', 'Manager'], permissions: ['users:create']},
       '/users/edit': {roles: ['admin', 'Manager'], permissions: ['users:edit']},
-      '/checkers': {roles: ['admin', 'Checker'], permissions: ['checker:access']},
-      '/checkers/requests': {roles: ['admin', 'Checker'], permissions: ['checker:access', 'requests:review']},
-      '/dashboard': {roles: ['admin', 'Checker', 'User'], permissions: ['dashboard:read']},
-      '/profile': {roles: ['admin', 'Checker', 'User'], permissions: ['profile:read']}
+      '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
+      '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
+      '/profile': {roles: ['admin', 'checker', 'user'], permissions: ['profile:read']}
     }
 
     const access = routePermissions[routePath];
@@ -183,9 +183,9 @@ export const useGuards = () => {
     switch (role) {
       case 'admin':
         return navigateTo('/admin');
-      case 'Checker':
+      case 'checker':
         return navigateTo('/checkers');
-      case 'User':
+      case 'user':
         return navigateTo('/users');
       default:
         return navigateTo('/dashboard');
