@@ -52,7 +52,7 @@
                         ? 'border-l-primary-500 bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300'
                         : 'border-l-transparent hover:border-l-gray-300 dark:hover:border-l-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                     ]"
-                      @click="$emit('navigate')"
+                      @click="$emit('navigate'); handleDirectNavigation()"
                   >
                     <UIcon
                         :name="item.icon"
@@ -143,7 +143,7 @@
                               ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
                           ]"
-                            @click="$emit('navigate')"
+                            @click="$emit('navigate'); handleDirectNavigation()"
                         >
                           <UIcon
                               :name="child.icon"
@@ -176,7 +176,7 @@
 
       <!-- User Profile -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <UDropdownMenu
+        <UDropdown
             :items="userMenuItems"
             :popper="{ placement: 'top-start' }"
             class="w-full"
@@ -197,7 +197,7 @@
             </div>
             <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
           </div>
-        </UDropdownMenu>
+        </UDropdown>
       </div>
     </div>
   </aside>
@@ -249,32 +249,39 @@ const navigationSections = ref<NavigationSection[]>([
     items: [
       {
         label: 'Users',
-        to: '/admin/users',
+        to: '/users',
         icon: 'i-heroicons-users',
         // badge: '12',
         badgeColor: 'blue'
       },
       {
-        label: 'Checkers',
+        label: 'Products',
         icon: 'i-heroicons-cube',
         expanded: false,
         children: [
           {
-            label: 'All Checkers',
-            to: '/admin/checkers',
+            label: 'All Products',
+            to: '/products',
             icon: 'i-heroicons-list-bullet'
           },
           {
-            label: 'Stats',
-            to: '/admin/checkers/stats',
+            label: 'Categories',
+            to: '/products/categories',
             icon: 'i-heroicons-tag'
           },
           {
-            label: 'Profile',
-            to: '/admin/checkers/profile',
-            icon: 'i-heroicons-user'
+            label: 'Inventory',
+            to: '/products/inventory',
+            icon: 'i-heroicons-archive-box'
           }
         ]
+      },
+      {
+        label: 'Orders',
+        to: '/admin/orders',
+        icon: 'i-heroicons-shopping-cart',
+        // badge: '5',
+        badgeColor: 'red'
       },
       {
         label: 'Support',
@@ -353,17 +360,17 @@ const navigationSections = ref<NavigationSection[]>([
         children: [
           {
             label: 'General',
-            to: '/admin/settings/general',
+            to: '/settings/general',
             icon: 'i-heroicons-adjustments-horizontal'
           },
           {
             label: 'Security',
-            to: '/admin/settings/security',
+            to: '/settings/security',
             icon: 'i-heroicons-shield-check'
           },
           {
             label: 'Integrations',
-            to: '/admin/settings/integration',
+            to: '/settings/integration',
             icon: 'i-heroicons-puzzle-piece'
           }
         ]
@@ -377,7 +384,7 @@ const navigationSections = ref<NavigationSection[]>([
   }
 ])
 
-// Helper functions
+// Helper functions - Updated for exact route matching and proper menu behavior
 const isActiveRoute = (to?: string): boolean => {
   if (!to) return false
   return route.path === to
@@ -385,25 +392,49 @@ const isActiveRoute = (to?: string): boolean => {
 
 const isActiveParent = (item: NavigationItem): boolean => {
   if (!item.children) return false
-  return item.children.some(child => child.to && route.path.startsWith(child.to))
+  return item.children.some(child => child.to && route.path === child.to)
 }
 
 const toggleSubmenu = (item: NavigationItem) => {
   if (item.children) {
+    // Close all other expanded menus first
+    navigationSections.value.forEach(section => {
+      section.items.forEach(menuItem => {
+        if (menuItem.children && menuItem !== item) {
+          menuItem.expanded = false
+        }
+      })
+    })
+    // Toggle current menu
     item.expanded = !item.expanded
   }
 }
 
-// Auto-expand active parent menus
+// Auto-expand active parent menus and close others
 watch(() => route.path, () => {
   navigationSections.value.forEach(section => {
     section.items.forEach(item => {
-      if (item.children && isActiveParent(item)) {
-        item.expanded = true
+      if (item.children) {
+        if (isActiveParent(item)) {
+          item.expanded = true
+        } else {
+          item.expanded = false
+        }
       }
     })
   })
 }, { immediate: true })
+
+// Close expanded menus when navigating to a direct route
+const handleDirectNavigation = () => {
+  navigationSections.value.forEach(section => {
+    section.items.forEach(item => {
+      if (item.children && !isActiveParent(item)) {
+        item.expanded = false
+      }
+    })
+  })
+}
 
 const userMenuItems = [
   [{

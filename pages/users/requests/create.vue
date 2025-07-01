@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import RequestForm from "~/components/users/RequestForm.vue";
+
 definePageMeta({
   layout:'user-session'
 })
+
 </script>
 
 <template>
   <div>
-    Page: users/[id]/edit
+    <RequestForm />
   </div>
 </template>
 

@@ -5,13 +5,12 @@
       isOpen ? 'translate-x-0' : '-translate-x-full'
     ]"
   >
-    <div
-        class="flex h-full flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg lg:shadow-none">
+    <div class="flex h-full flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg lg:shadow-none">
       <!-- Logo -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-white"/>
+            <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-white" />
           </div>
           <span class="text-xl font-bold text-gray-900 dark:text-white">
             Checker Portal
@@ -53,7 +52,7 @@
                         ? 'border-l-blue-500 bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300'
                         : 'border-l-transparent hover:border-l-gray-300 dark:hover:border-l-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                     ]"
-                      @click="$emit('navigate')"
+                      @click="$emit('navigate'); handleDirectNavigation()"
                   >
                     <UIcon
                         :name="item.icon"
@@ -144,7 +143,7 @@
                               ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
                               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
                           ]"
-                            @click="$emit('navigate')"
+                            @click="$emit('navigate'); handleDirectNavigation()"
                         >
                           <UIcon
                               :name="child.icon"
@@ -177,13 +176,12 @@
 
       <!-- User Profile -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <UDropdownMenu
+        <UDropdown
             :items="userMenuItems"
             :popper="{ placement: 'top-start' }"
             class="w-full"
         >
-          <div
-              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
+          <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
             <UAvatar
                 src="https://avatars.githubusercontent.com/u/739984?v=4"
                 alt="Checker Avatar"
@@ -197,9 +195,9 @@
                 checker@example.com
               </p>
             </div>
-            <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400"/>
+            <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
           </div>
-        </UDropdownMenu>
+        </UDropdown>
       </div>
     </div>
   </aside>
@@ -371,30 +369,54 @@ const navigationSections = ref<NavigationSection[]>([
 // Helper functions
 const isActiveRoute = (to?: string): boolean => {
   if (!to) return false
-  return route.path === to || route.path.startsWith(to + '/')
+  return route.path === to
 }
 
 const isActiveParent = (item: NavigationItem): boolean => {
   if (!item.children) return false
-  return item.children.some(child => child.to && (route.path === child.to || route.path.startsWith(child.to + '/')))
+  return item.children.some(child => child.to && route.path === child.to)
 }
 
 const toggleSubmenu = (item: NavigationItem) => {
   if (item.children) {
+    // Close all other expanded menus first
+    navigationSections.value.forEach(section => {
+      section.items.forEach(menuItem => {
+        if (menuItem.children && menuItem !== item) {
+          menuItem.expanded = false
+        }
+      })
+    })
+    // Toggle current menu
     item.expanded = !item.expanded
   }
 }
 
-// Auto-expand active parent menus
+// Auto-expand active parent menus and close others
 watch(() => route.path, () => {
   navigationSections.value.forEach(section => {
     section.items.forEach(item => {
-      if (item.children && isActiveParent(item)) {
-        item.expanded = true
+      if (item.children) {
+        if (isActiveParent(item)) {
+          item.expanded = true
+        } else {
+          item.expanded = false
+        }
       }
     })
   })
-}, {immediate: true})
+}, { immediate: true })
+
+// Close expanded menus when navigating to a direct route
+const handleDirectNavigation = () => {
+  navigationSections.value.forEach(section => {
+    section.items.forEach(item => {
+      if (item.children && !isActiveParent(item)) {
+        item.expanded = false
+      }
+    })
+  })
+}
 
 const userMenuItems = [
   [{

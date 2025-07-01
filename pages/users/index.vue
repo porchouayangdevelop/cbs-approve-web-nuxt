@@ -237,7 +237,7 @@ import UserCreateModal from "~/components/modals/UserCreateModal.vue";
 import UserEditModal from "~/components/modals/UserEditModal.vue";
 
 definePageMeta({
-  layout: 'default',
+  layout: 'user-session',
 })
 
 const router = useRouter()

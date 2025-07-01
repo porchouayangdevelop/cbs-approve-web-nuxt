@@ -1,6 +1,6 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-    <!-- User Sidebar AdminDrawer -->
+    <!-- User Sidebar Drawer -->
     <UserDrawer
         :is-open="isSidebarOpen"
         @close="toggleSidebar"
@@ -20,10 +20,10 @@
       <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div class="max-w-9xl mx-auto">
           <!-- Breadcrumbs -->
-          <Breadcrumbs class="mb-6" />
+          <Breadcrumbs class="mb-2" />
 
           <!-- Page Content -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[calc(100vh-200px)]">
+          <div class="p-5 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[calc(100vh-200px)]">
             <slot />
           </div>
         </div>
@@ -70,8 +70,13 @@ const handleNavigation = () => {
 }
 
 const handleLogout = async () => {
-  console.log('Logout clicked')
-  // Add logout logic here
+  const { logout } = useAuth()
+  try {
+    await logout()
+    await navigateTo('/auth/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
 }
 
 // Close sidebar on route change (mobile)

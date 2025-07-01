@@ -1,12 +1,14 @@
 <script setup lang="ts">
+
 definePageMeta({
   layout:'user-session'
 })
+
 </script>
 
 <template>
   <div>
-    Page: users/[id]/edit
+    Page: users/requests/draft/index
   </div>
 </template>
 

@@ -6,7 +6,7 @@ definePageMeta({
 
 <template>
   <div>
-    Page: users/[id]/edit
+    Page: users/bulk/index
   </div>
 </template>
 

@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    Page: products/index
+    Page: users/requests/update/draft/index
   </div>
 </template>
 
