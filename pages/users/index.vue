@@ -238,6 +238,7 @@ import UserEditModal from "~/components/modals/UserEditModal.vue";
 
 definePageMeta({
   layout: 'user-session',
+  // middleware: ['auth-guard', 'user-guard']
 })
 
 const router = useRouter()

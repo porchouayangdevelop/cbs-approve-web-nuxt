@@ -177,7 +177,7 @@ const getErrorDescription = (): string => {
 
   switch (statusCode) {
     case 404:
-      return 'The page you\'re looking for doesn\'t exist. It might have been moved, deleted, or you entered the wrong URL.'
+      return 'The pages you\'re looking for doesn\'t exist. It might have been moved, deleted, or you entered the wrong URL.'
     case 403:
       return 'You don\'t have permission to access this resource. Please check your credentials or contact support.'
     case 500:
@@ -185,7 +185,7 @@ const getErrorDescription = (): string => {
     case 503:
       return 'The service is temporarily unavailable. Please try again in a few moments.'
     default:
-      return 'An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.'
+      return 'An unexpected error occurred. Please try refreshing the pages or contact support if the problem persists.'
   }
 }
 
@@ -194,12 +194,12 @@ const handleError = async () => {
   await clearError({redirect: '/'})
 }
 
-// Refresh the page
+// Refresh the pages
 const refresh = () => {
   window.location.reload()
 }
 
-// Go back to previous page
+// Go back to previous pages
 const goBack = () => {
   if (window.history.length > 1) {
     window.history.back()
@@ -208,7 +208,7 @@ const goBack = () => {
   }
 }
 
-// Set page meta
+// Set pages meta
 useSeoMeta({
   title: `${props.error.statusCode || 500} - ${getErrorTitle()}`,
   description: getErrorDescription(),

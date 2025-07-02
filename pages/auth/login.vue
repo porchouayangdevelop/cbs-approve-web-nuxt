@@ -177,6 +177,7 @@ import { z } from 'zod'
 
 definePageMeta({
   layout: false,
+  middleware: []
 })
 
 // Form state

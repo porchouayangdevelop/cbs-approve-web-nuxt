@@ -1,5 +1,6 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  const {checkAuth} = useGuards();
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  const {getCurrentUser} = useAuth();
+  const {checkAuth, handledUnauthorized, canAccess} = useGuards();
 
   const publicRoutes: string[] = [
     '/auth/login',
@@ -15,5 +16,15 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
   if (!checkAuth()) {
     return navigateTo('/auth/login');
+  }
+
+  try {
+    await getCurrentUser();
+  } catch (e) {
+    return navigateTo('/auth/login')
+  }
+
+  if (!canAccess(to.path)) {
+    return handledUnauthorized(to.path);
   }
 })

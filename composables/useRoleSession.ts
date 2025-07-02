@@ -51,7 +51,7 @@ export const useRoleSession = () => {
   const {user} = useAuth();
   const route = useRoute();
 
-  const currentRole = computed(() => user.value?.role || 'user');
+  const currentRole = computed(() => user.value?.role || 'admin');
 
   // Role configurations
   const roleConfigs: Record<string, RoleConfig> = {
@@ -469,7 +469,7 @@ export const useRoleSession = () => {
     return roleConfigs[currentRole.value] || roleConfigs.user
   })
 
-  // Get page title based on current route
+  // Get pages title based on current route
   const pageTitle = computed(() => {
     const titleMap: Record<string, string> = {
       '/': 'Dashboard',

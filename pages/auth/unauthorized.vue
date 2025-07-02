@@ -344,7 +344,7 @@ const requestAccess = () => {
   window.open(`mailto:admin@company.com?subject=${subject}&body=${body}`)
 }
 
-// Set page meta
+// Set pages meta
 useSeoMeta({
   title: '403 - Access Denied',
   description: 'You do not have permission to access this resource.',

@@ -17,23 +17,23 @@
           <div class="flex items-center space-x-2">
             <div :class="[
               'w-8 h-8 rounded-lg flex items-center justify-center',
-              roleConfig.logoColor
+              currentConfig.logoColor
             ]">
-              <UIcon :name="roleConfig.icon" class="w-5 h-5 text-white" />
+              <UIcon :name="currentConfig.icon" class="w-5 h-5 text-white" />
             </div>
             <div>
               <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-                {{ roleConfig.title }}
+                {{ currentConfig.title }}
               </h1>
               <p class="text-xs text-gray-500 dark:text-gray-400">
-                {{ roleConfig.subtitle }}
+                {{ currentConfig.subtitle }}
               </p>
             </div>
           </div>
 
           <!-- Role Badge -->
           <UBadge
-              :color="roleConfig.badgeColor"
+              :color="currentConfig.badgeColor"
               variant="soft"
               size="sm"
           >
@@ -44,7 +44,7 @@
         <!-- Mobile Title -->
         <div class="md:hidden">
           <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ roleConfig.shortTitle }}
+            {{ currentConfig.shortTitle }}
           </h1>
         </div>
       </div>
@@ -55,7 +55,7 @@
         <div class="hidden md:block">
           <UInput
               v-model="searchQuery"
-              :placeholder="roleConfig.searchPlaceholder"
+              :placeholder="currentConfig.searchPlaceholder"
               icon="i-heroicons-magnifying-glass"
               size="sm"
               class="w-64"
@@ -65,7 +65,7 @@
         <!-- Quick Actions (Role-specific) -->
         <div class="hidden lg:flex items-center space-x-2">
           <UButton
-              v-for="action in roleConfig.quickActions"
+              v-for="action in currentConfig.quickActions"
               :key="action.label"
               variant="ghost"
               size="sm"
@@ -82,8 +82,8 @@
         <UDropdownMenu :items="notificationItems" :popper="{ placement: 'bottom-end' }">
           <UButton variant="ghost" size="sm" class="relative">
             <UIcon name="i-heroicons-bell" class="w-5 h-5" />
-            <span v-if="roleConfig.notificationCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {{ roleConfig.notificationCount }}
+            <span v-if="currentConfig.notificationCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {{ currentConfig.notificationCount }}
             </span>
           </UButton>
         </UDropdownMenu>
@@ -108,7 +108,7 @@
               <span class="text-sm font-medium text-gray-700 dark:text-gray-300 leading-tight">
                 {{ userProfile.name }}
               </span>
-              <span class="text-xs leading-tight" :class="roleConfig.roleTextColor">
+              <span class="text-xs leading-tight" :class="currentConfig.roleTextColor">
                 {{ userProfile.roleTitle }}
               </span>
             </div>
@@ -122,7 +122,7 @@
     <div v-if="showMobileSearch" class="md:hidden px-4 pb-3 border-t border-gray-200 dark:border-gray-700">
       <UInput
           v-model="searchQuery"
-          :placeholder="roleConfig.searchPlaceholder"
+          :placeholder="currentConfig.searchPlaceholder"
           icon="i-heroicons-magnifying-glass"
           size="sm"
           class="w-full"
@@ -133,7 +133,7 @@
     <div class="lg:hidden flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
       <div class="flex items-center space-x-2">
         <UButton
-            v-for="action in roleConfig.quickActions.slice(0, 3)"
+            v-for="action in currentConfig.quickActions.slice(0, 3)"
             :key="action.label"
             variant="ghost"
             size="xs"
@@ -153,6 +153,9 @@
 </template>
 
 <script setup lang="ts">
+import { useRoleSession } from '~/composables/useRoleSession'
+import { useAuth } from '~/composables/useAuth'
+
 defineEmits<{
   'toggle-sidebar': []
   'toggle-theme': []
@@ -163,229 +166,38 @@ const colorMode = useColorMode()
 const route = useRoute()
 const { user } = useAuth()
 
+// Use role session composable
+const {
+  currentConfig,
+  userProfile,
+  currentRole: userRole,
+  getNotifications
+} = useRoleSession()
+
 // Reactive states
 const isDark = computed(() => colorMode.value === 'dark')
 const searchQuery = ref('')
 const showMobileSearch = ref(false)
 
-// User profile information
-const userProfile = computed(() => ({
-  name: user.value?.firstName && user.value?.lastName
-      ? `${user.value.firstName} ${user.value.lastName}`
-      : user.value?.username || 'Mr Porchouayang',
-  avatar: user.value?.avatar || 'https://avatars.githubusercontent.com/u/739984?v=4',
-  email: user.value?.email || 'porchouayang.vaj@apb.com.la',
-  roleTitle: getRoleTitle(user.value?.role)
-}))
-
-// Get user role
-const userRole = computed(() => user.value?.role || 'admin')
-
-// Role-based configuration
-const roleConfig = computed(() => {
-  const configs = {
-    admin: {
-      title: 'Admin Dashboard',
-      shortTitle: 'Admin',
-      subtitle: 'System Administration',
-      icon: 'i-heroicons-squares-2x2',
-      logoColor: 'bg-primary-600',
-      badgeColor: 'primary',
-      roleTextColor: 'text-primary-600 dark:text-primary-400',
-      searchPlaceholder: 'Search users, orders, products...',
-      notificationCount: 5,
-      quickActions: [
-        {
-          label: 'Add User',
-          icon: 'i-heroicons-user-plus',
-          to: '/users/create',
-          class: 'text-primary-600'
-        },
-        {
-          label: 'System Stats',
-          icon: 'i-heroicons-chart-bar',
-          to: '/admin/analytics',
-          class: 'text-blue-600'
-        },
-        {
-          label: 'Settings',
-          icon: 'i-heroicons-cog-6-tooth',
-          to: '/admin/settings',
-          class: 'text-gray-600'
-        }
-      ]
-    },
-    Checker: {
-      title: 'Checker Portal',
-      shortTitle: 'Checker',
-      subtitle: 'Approval Management',
-      icon: 'i-heroicons-check-circle',
-      logoColor: 'bg-blue-600',
-      badgeColor: 'blue',
-      roleTextColor: 'text-blue-600 dark:text-blue-400',
-      searchPlaceholder: 'Search requests, approvals...',
-      notificationCount: 12,
-      quickActions: [
-        {
-          label: 'Pending',
-          icon: 'i-heroicons-clock',
-          to: '/checkers/requests/pending',
-          class: 'text-orange-600'
-        },
-        {
-          label: 'Review',
-          icon: 'i-heroicons-eye',
-          to: '/checkers/requests/review',
-          class: 'text-blue-600'
-        },
-        {
-          label: 'Stats',
-          icon: 'i-heroicons-chart-pie',
-          to: '/checkers/stats',
-          class: 'text-green-600'
-        }
-      ]
-    },
-    User: {
-      title: 'User Portal',
-      shortTitle: 'Portal',
-      subtitle: 'Request Management',
-      icon: 'i-heroicons-user',
-      logoColor: 'bg-green-600',
-      badgeColor: 'green',
-      roleTextColor: 'text-green-600 dark:text-green-400',
-      searchPlaceholder: 'Search my requests, templates...',
-      notificationCount: 3,
-      quickActions: [
-        {
-          label: 'New Request',
-          icon: 'i-heroicons-plus-circle',
-          to: '/users/requests/create',
-          class: 'text-green-600'
-        },
-        {
-          label: 'My Requests',
-          icon: 'i-heroicons-document-text',
-          to: '/users/requests',
-          class: 'text-blue-600'
-        },
-        {
-          label: 'Templates',
-          icon: 'i-heroicons-document-duplicate',
-          to: '/users/templates',
-          class: 'text-purple-600'
-        }
-      ]
-    }
-  }
-
-  return configs[userRole.value as keyof typeof configs] || configs.User
-})
-
-// Helper function to get role title
-const getRoleTitle = (role?: string) => {
-  const titles = {
-    admin: 'System Administrator',
-    Checker: 'Approval Specialist',
-    User: 'Standard User',
-    Manager: 'Department Manager'
-  }
-  return titles[role as keyof typeof titles] || 'User'
-}
-
-// Page title based on current route
-const pageTitle = computed(() => {
-  const titles: Record<string, string> = {
-    '/': 'Dashboard',
-    '/users': 'User Management',
-    '/users/create': 'Create User',
-    '/reports': 'Reports',
-    '/analytics': 'Analytics',
-    '/settings': 'Settings',
-    '/checkers': 'Approval Dashboard',
-    '/checkers/requests': 'Request Management',
-    '/checkers/requests/pending': 'Pending Requests',
-    '/checkers/requests/review': 'Review Queue',
-    '/checkers/stats': 'Approval Statistics',
-    '/users/requests': 'My Requests',
-    '/users/requests/create': 'Create Request',
-    '/users/profile': 'My Profile'
-  }
-  return titles[route.path] || roleConfig.value.subtitle
-})
-
-// Role-specific notifications
+// Get role-specific notifications
 const notificationItems = computed(() => {
-  const notifications = {
-    admin: [
-      [{
-        label: 'New user registration',
-        icon: 'i-heroicons-user-plus',
-        to: '/users'
-      }],
-      [{
-        label: 'System alert: High CPU usage',
-        icon: 'i-heroicons-exclamation-triangle',
-        to: '/admin/system'
-      }],
-      [{
-        label: 'Monthly report ready',
-        icon: 'i-heroicons-document-text',
-        to: '/admin/reports'
-      }],
-      [{
-        label: 'View all notifications',
-        to: '/admin/notifications'
-      }]
-    ],
-    Checker: [
-      [{
-        label: '12 requests pending approval',
-        icon: 'i-heroicons-clock',
-        to: '/checkers/requests/pending'
-      }],
-      [{
-        label: 'Priority request needs review',
-        icon: 'i-heroicons-exclamation-circle',
-        to: '/checkers/requests/review'
-      }],
-      [{
-        label: 'Weekly approval summary',
-        icon: 'i-heroicons-chart-bar',
-        to: '/checkers/stats'
-      }],
-      [{
-        label: 'View all notifications',
-        to: '/checkers/notifications'
-      }]
-    ],
-    User: [
-      [{
-        label: 'Request approved',
-        icon: 'i-heroicons-check-circle',
-        to: '/users/requests'
-      }],
-      [{
-        label: 'Document upload required',
-        icon: 'i-heroicons-paper-clip',
-        to: '/users/requests/pending'
-      }],
-      [{
-        label: 'New template available',
-        icon: 'i-heroicons-document-plus',
-        to: '/users/templates'
-      }],
-      [{
-        label: 'View all notifications',
-        to: '/users/notifications'
-      }]
-    ]
-  }
+  const notifications = getNotifications()
 
-  return notifications[userRole.value as keyof typeof notifications] || notifications.User
+  return [
+    ...notifications.map(notification => [{
+      label: notification.title,
+      description: notification.description,
+      icon: notification.icon,
+      click: () => console.log('Notification clicked:', notification.title)
+    }]),
+    [{
+      label: 'View all notifications',
+      to: `/${userRole.value.toLowerCase()}/notifications`
+    }]
+  ]
 })
 
-// Role-specific user menu
+// Role-specific user menu with access control
 const userMenuItems = computed(() => {
   const baseItems = [
     [{
@@ -407,19 +219,19 @@ const userMenuItems = computed(() => {
       icon: 'i-heroicons-server',
       to: '/admin/system'
     }],
-    Checker: [{
+    checker: [{
       label: 'Approval History',
       icon: 'i-heroicons-clock',
       to: '/checkers/history'
     }],
-    User: [{
+    user: [{
       label: 'My Requests',
       icon: 'i-heroicons-document-text',
       to: '/users/requests'
     }]
   }
 
-  const specificItems = roleSpecificItems[userRole.value as keyof typeof roleSpecificItems]
+  const specificItems = roleSpecificItems[userRole.value.toLowerCase() as keyof typeof roleSpecificItems]
   if (specificItems) {
     baseItems.splice(1, 0, specificItems)
   }
@@ -435,15 +247,33 @@ const userMenuItems = computed(() => {
     icon: 'i-heroicons-arrow-right-on-rectangle',
     click: () => {
       console.log('Logout clicked')
-      // Handle logout
+      handleLogout()
     }
   }])
 
   return baseItems
 })
 
+// Methods
+const handleLogout = async () => {
+  try {
+    const { logout } = useAuth()
+    await logout()
+    await navigateTo('/auth/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
+}
+
 // Watch for route changes to close mobile search
 watch(() => route.path, () => {
   showMobileSearch.value = false
 })
+
+// Watch for user role changes
+watch(() => user.value?.role, (newRole) => {
+  if (newRole) {
+    console.log('User role changed to:', newRole)
+  }
+}, { immediate: true })
 </script>

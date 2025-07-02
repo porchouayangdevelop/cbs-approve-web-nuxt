@@ -1,4 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  layout: 'admin-session',
+  middleware: ['auth-guard', 'admin-guard', 'permission-guard']
+})
+
+</script>
 
 <template>
   <div>

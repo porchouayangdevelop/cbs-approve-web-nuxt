@@ -1,15 +1,16 @@
 <script setup lang="ts">
-if(import.meta.server){
 
-}
+definePageMeta({
+  layout: 'admin-session',
+  middleware: ['auth-guard', 'admin-guard']
+})
+
 
 </script>
 
 <template>
   <div>
-    <ClientOnly>
 
-    </ClientOnly>
   </div>
 </template>
 

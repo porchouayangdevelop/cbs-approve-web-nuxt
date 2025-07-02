@@ -1040,10 +1040,10 @@ const previewRequest = async () => {
       }
     }
 
-    // Store preview data in session storage for the preview page
+    // Store preview data in session storage for the preview pages
     sessionStorage.setItem('requestPreviewData', JSON.stringify(previewData))
 
-    // Navigate to preview page
+    // Navigate to preview pages
     await navigateTo('/users/request-preview')
 
     // toast.success('Opening preview...', {
@@ -1065,7 +1065,7 @@ const previewRequest = async () => {
 
 // Add new method for viewing existing requests
 const viewExistingRequest = (requestId: string) => {
-  // Navigate to request view page
+  // Navigate to request view pages
   navigateTo(`/users/requests/${requestId}`)
 }
 

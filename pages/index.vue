@@ -6,14 +6,19 @@ const toast = useToast();
 
 definePageMeta({
   layout: 'default',
-  // middleware: ['auth-guard']
+  // middleware: ['auth-guard','role-base-redirect']
 })
 
 const {canAccess,hasRole,hasPermission} = useGuards();
+const {currentRole} = useRoleSession();
 
-// if(canAccess('/admin')){}
-// if(hasRole('admin')){}
-// if(hasPermission('admin:access')){}
+onMounted(() => {
+  console.log('Current role:', currentRole.value)
+  console.log('Can access admin:', canAccess('/admin'))
+  console.log('Has admin role:', hasRole('admin'))
+  console.log('Has admin permission:', hasPermission('admin:access'))
+})
+
 
 const showToast = () => {
   toast.add({
@@ -32,9 +37,6 @@ const showToast = () => {
       Welcome to CBS Approve Web Nuxt
     </h1>
 
-    <p> {{ config.public.webTitle }} </p>
-    {{ config.public.webDescription }}
-    {{ config.delete_user }}
 
     <UButton variant="outline" color="neutral" @click="showToast">show toast</UButton>
   </div>

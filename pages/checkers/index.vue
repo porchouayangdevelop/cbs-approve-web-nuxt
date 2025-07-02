@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  layout:"checker-session"
+  layout: 'checker-session',
+  // middleware: ['auth-guard', 'checker-guard']
 })
 
 </script>
