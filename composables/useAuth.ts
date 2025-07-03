@@ -64,6 +64,25 @@ export const useAuth = () => {
     }
   }
 
+  const loginWithRole = async (credential: Credentials & { role?: string }) => {
+    try {
+      isLoading.value = true;
+      const response = await login(credential);
+
+      const userRole = user.value?.role?.toLowerCase();
+      const selectRole = credential.role?.toLowerCase();
+
+      if (selectRole && userRole !== selectRole) {
+        throw new Error(`Error while login with role "${credential.role}"`);
+      }
+    } catch (e) {
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
   const login = async (credentials: Credentials) => {
     try {
       isLoading.value = true;

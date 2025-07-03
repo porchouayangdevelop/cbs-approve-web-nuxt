@@ -10,31 +10,42 @@
             <div class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4">
               <UIcon name="i-heroicons-squares-2x2" class="w-7 h-7 text-white" />
             </div>
-            <h1 class="text-2xl font-bold">AdminPanel</h1>
+            <h1 class="text-2xl font-bold">CBS Approve Web</h1>
           </div>
 
           <!-- Hero Content -->
           <h2 class="text-4xl font-bold mb-6 leading-tight">
-            Welcome back to your
-            <span class="text-primary-200">admin dashboard</span>
+<!--            ยินดีต้อนรับสู่ระบบ-->
+            Welcome to the system
+            <span class="text-primary-200">Approve</span>
           </h2>
           <p class="text-xl text-primary-100 mb-8 leading-relaxed">
-            Manage your business with powerful tools and insights. Sign in to continue your journey.
+<!--            ระบบบริหารจัดการการอนุมัติงานแบบครบวงจร สำหรับองค์กรที่ต้องการประสิทธิภาพสูงสุด-->
+            Complete approval management system For organizations that need the most efficiency
           </p>
 
           <!-- Features -->
           <div class="space-y-4">
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
-              <span class="text-primary-100">Advanced Analytics & Reporting</span>
+              <span class="text-primary-100">
+<!--                ระบบรายงานและวิเคราะห์ข้อมูลขั้นสูง-->
+              Advanced data reporting and analysis system
+              </span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
-              <span class="text-primary-100">Team Collaboration Tools</span>
+              <span class="text-primary-100">
+<!--                เครื่องมือทำงานร่วมกันของทีม-->
+                Team work tools
+              </span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
-              <span class="text-primary-100">Enterprise-grade Security</span>
+              <span class="text-primary-100">
+<!--                ความปลอดภัยระดับองค์กร-->
+                Corporate safety
+              </span>
             </div>
           </div>
         </div>
@@ -53,119 +64,65 @@
           <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center mr-3">
             <UIcon name="i-heroicons-squares-2x2" class="w-6 h-6 text-white" />
           </div>
-          <h1 class="text-xl font-bold text-gray-900 dark:text-white">AdminPanel</h1>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white">CBS Approve Web</h1>
         </div>
 
-        <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Sign in to your account</h2>
-          <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            Or
-            <NuxtLink to="/auth/register" class="font-medium text-primary-600 hover:text-primary-500">
-              create a new account
-            </NuxtLink>
-          </p>
+        <!-- Role Selector -->
+        <div class="text-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Choose the type of user</h2>
+          <div class="grid grid-cols-3 gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <button
+                v-for="role in availableRoles"
+                :key="role.key"
+                @click="selectedRole = role.key"
+                :class="[
+                'py-2 px-3 text-sm font-medium rounded-md transition-all duration-200',
+                selectedRole === role.key
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              ]"
+            >
+              <UIcon :name="role.icon" class="w-4 h-4 mx-auto mb-1" />
+              <div class="text-xs">{{ role.label }}</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Role Info -->
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center px-3 py-1 rounded-full text-sm" :class="getCurrentRoleStyle().class">
+            <UIcon :name="getCurrentRoleStyle().icon" class="w-4 h-4 mr-2" />
+            <span>{{ getCurrentRoleStyle().description }}</span>
+          </div>
         </div>
       </div>
 
+      <!-- Login Form Component -->
+      <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <LoginForm
+            ref="loginFormRef"
+            :title="getLoginTitle()"
+            :subtitle="getLoginSubtitle()"
+            :username-placeholder="getUsernamePlaceholder()"
+            :show-register-link="selectedRole === 'admin'"
+            @login="handleLogin"
+            @forgot-password="handleForgotPassword"
+            @register="handleRegister"
+            @help="handleHelp"
+            @contact="handleContact"
+        />
+      </div>
+
+      <!-- Role Information -->
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <UCard class="shadow-xl">
-          <template #header>
-            <div class="text-center">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Welcome Back</h3>
-              <p class="text-sm text-gray-600 dark:text-gray-400">Please sign in to continue</p>
+        <UCard v-if="selectedRole" class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+          <div class="flex items-start space-x-3">
+            <UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-blue-500 mt-0.5" />
+            <div class="text-sm text-blue-700 dark:text-blue-300">
+              <p class="font-medium mb-1">System login information:</p>
+              <p>{{ getRoleInfo() }}</p>
             </div>
-          </template>
-
-          <UForm :schema="loginSchema" :state="loginForm" @submit="handleLogin" class="space-y-6">
-            <!-- Email Field -->
-            <UFormGroup label="Email" name="email" required>
-              <UInput
-                  v-model="loginForm.email"
-                  type="text"
-                  placeholder="Enter your userId or username"
-                  icon="i-heroicons-user"
-                  size="lg"
-                  :loading="loading"
-                  class="my-1 w-full"
-              />
-            </UFormGroup>
-
-            <!-- Password Field -->
-            <UFormGroup label="Password" name="password" required>
-              <UInput class="my-1 w-full"
-                  v-model="loginForm.password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="Enter your password"
-                  icon="i-heroicons-lock-closed"
-                  size="lg"
-                  :loading="loading"
-              >
-                <template #trailing>
-                  <UButton
-                      variant="ghost"
-                      size="xs"
-                      :icon="showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                      @click="showPassword = !showPassword"
-                  />
-                </template>
-              </UInput>
-            </UFormGroup>
-
-            <!-- Remember & Forgot -->
-            <div class="flex items-center justify-between my-2">
-              <UCheckbox v-model="loginForm.remember" label="Remember me" class="cursor-pointer" />
-              <NuxtLink to="/auth/forgot-password" class="text-sm text-primary-600 hover:text-primary-500">
-                Forgot password?
-              </NuxtLink>
-            </div>
-
-            <!-- Submit Button -->
-            <UButton
-                type="submit"
-                block
-                size="lg"
-                :loading="loading"
-                :disabled="loading"
-                class="cursor-pointer bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              <span v-if="!loading">Sign In</span>
-              <span v-else>Signing in...</span>
-            </UButton>
-          </UForm>
-
-          <!-- Divider -->
-<!--          <div class="mt-6">-->
-<!--            <div class="relative">-->
-<!--              <div class="absolute inset-0 flex items-center">-->
-<!--                <div class="w-full border-t border-gray-300 dark:border-gray-600" />-->
-<!--              </div>-->
-<!--              <div class="relative flex justify-center text-sm">-->
-<!--                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or continue with comming soon...</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-
-<!--          &lt;!&ndash; Social Login &ndash;&gt;-->
-<!--          <div class="mt-6 grid grid-cols-2 gap-3">-->
-<!--            <UButton variant="outline" disabled block @click="signInWithGoogle" :loading="socialLoading.google">-->
-<!--              <template #leading>-->
-<!--                <svg class="w-5 h-5" viewBox="0 0 24 24">-->
-<!--                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>-->
-<!--                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>-->
-<!--                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>-->
-<!--                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>-->
-<!--                </svg>-->
-<!--              </template>-->
-<!--              Google-->
-<!--            </UButton>-->
-
-<!--            <UButton variant="outline" disabled block @click="signInWithGithub" :loading="socialLoading.github">-->
-<!--              <template #leading>-->
-<!--                <UIcon name="i-simple-icons-github" class="w-5 h-5" />-->
-<!--              </template>-->
-<!--              GitHub-->
-<!--            </UButton>-->
-<!--          </div>-->
+          </div>
         </UCard>
       </div>
     </div>
@@ -173,90 +130,220 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import LoginForm from '~/components/auth/LoginForm.vue'
 
 definePageMeta({
   layout: false,
-  // middleware: []
+  middleware: []
 })
 
-// Form state
-const loginForm = ref({
-  username: '',
-  password: '',
-  remember: false
-})
+// Types
+interface LoginCredentials {
+  username: string
+  password: string
+  remember: boolean
+}
 
-const loading = ref(false)
-const showPassword = ref(false)
-const socialLoading = ref({
-  google: false,
-  github: false
-})
+interface UserRole {
+  key: string
+  label: string
+  icon: string
+  description: string
+  redirectPath: string
+}
 
-// Validation schema
-const loginSchema = z.object({
-  username: z.string().toUpperCase(),
-  password: z.string().min(6, 'Password must be at least 6 characters')
-})
+// State
+const selectedRole = ref('user')
+const loginFormRef = ref()
+
+// Available roles
+const availableRoles: UserRole[] = [
+  {
+    key: 'admin',
+    label: 'admin',
+    icon: 'i-heroicons-shield-check',
+    description: 'Manage systems and users',
+    redirectPath: '/admin'
+  },
+  {
+    key: 'checker',
+    label: 'checker',
+    icon: 'i-heroicons-check-circle',
+    description: 'Approve and check the request',
+    redirectPath: '/checkers'
+  },
+  {
+    key: 'user',
+    label: 'user',
+    icon: 'i-heroicons-user',
+    description: 'Send a request and follow up the status',
+    redirectPath: '/users'
+  }
+]
 
 // Methods
-const handleLogin = async (data: any) => {
-  loading.value = true
+const getCurrentRoleStyle = () => {
+  const role = availableRoles.find(r => r.key === selectedRole.value)
+  const styles = {
+    admin: {
+      class: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+      icon: 'i-heroicons-shield-check',
+      description: role?.description || ''
+    },
+    checker: {
+      class: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+      icon: 'i-heroicons-check-circle',
+      description: role?.description || ''
+    },
+    user: {
+      class: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+      icon: 'i-heroicons-user',
+      description: role?.description || ''
+    }
+  }
+  return styles[selectedRole.value as keyof typeof styles] || styles.user
+}
 
+const getLoginTitle = () => {
+  const titles = {
+    admin: 'Log in the administrator system',
+    checker: 'Log in the approval system',
+    user: 'Enter the user system'
+  }
+  return titles[selectedRole.value as keyof typeof titles] || 'เข้าสู่ระบบ'
+}
 
+const getLoginSubtitle = () => {
+  const subtitles = {
+    admin: 'Management and control system',
+    checker: 'Approval system and inspection',
+    user: 'Request and follow -up system'
+  }
+  return subtitles[selectedRole.value as keyof typeof subtitles] || 'Please login to proceed.'
+}
 
+const getUsernamePlaceholder = () => {
+  const placeholders = {
+    admin: 'Username',
+    checker: 'Username',
+    user: 'Username'
+  }
+  return placeholders[selectedRole.value as keyof typeof placeholders] || 'Username'
+}
+
+const getRoleInfo = () => {
+  const info = {
+    // admin: 'สามารถเข้าถึงระบบจัดการผู้ใช้ การตั้งค่าระบบ และสร้างบัญชีผู้ใช้ใหม่',
+    admin: 'Can access the user management system System settings And create a new user account',
+    // checker: 'สามารถดูและอนุมัติคำขอต่างๆ ตรวจสอบเอกสาร และจัดการขั้นตอนการอนุมัติ',
+    checker: 'Can see and approve various requests Check documents And manage the approval process',
+    // user: 'สามารถส่งคำขอใหม่ ติดตามสถานะคำขอ และจัดการข้อมูลส่วนตัว'
+    user: 'Can send a new request Follow the request status And manage personal information'
+  }
+  return info[selectedRole.value as keyof typeof info] || ''
+}
+
+// Event handlers
+const handleLogin = async (credentials: LoginCredentials) => {
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    loginFormRef.value?.setLoading(true)
 
-    console.log('Login data:', data)
+    // Add role to credentials
+    const loginData = {
+      ...credentials,
+      role: selectedRole.value
+    }
 
-    // Success - redirect to admin dashboard
-    await navigateTo('/')
+    console.log('Login attempt:', loginData)
 
-    // Show success notification
-    // You can add toast notification here
+    // Call authentication service
+    const { login } = useAuth()
+    const response = await login({
+      username: credentials.username,
+      password: credentials.password
+    })
 
-  } catch (error) {
+    // Get redirect path based on role
+    const role = availableRoles.find(r => r.key === selectedRole.value)
+    const redirectPath = role?.redirectPath || '/'
+
+    // Redirect to appropriate dashboard
+    await navigateTo(redirectPath)
+
+    // Show success message
+    const toast = useToast()
+    toast.add({
+      icon: 'i-heroicons-check-circle',
+      title: 'login success',
+      description: `Welcome ${role?.label}`,
+      // timeout: 3000
+    })
+
+  } catch (error: any) {
     console.error('Login error:', error)
-    // Show error notification
+
+    // Show error message
+    let errorMessage = 'There was an error in logging.'
+
+    if (error?.response?.status === 401) {
+      errorMessage = 'Username or password is incorrect'
+    } else if (error?.response?.status === 403) {
+      errorMessage = `No right to access as${getLoginTitle()}`
+    } else if (error?.response?.status === 429) {
+      errorMessage = 'Trying to log in too much please wait a moment่'
+    }
+
+    loginFormRef.value?.setError(errorMessage)
   } finally {
-    loading.value = false
+    loginFormRef.value?.setLoading(false)
   }
 }
 
-const signInWithGoogle = async () => {
-  socialLoading.value.google = true
+const handleForgotPassword = () => {
+  navigateTo('/auth/forgot-password')
+}
 
-  try {
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    console.log('Google sign in')
-    await navigateTo('/admin')
-  } catch (error) {
-    console.error('Google sign in error:', error)
-  } finally {
-    socialLoading.value.google = false
+const handleRegister = () => {
+  // Only allow admin registration
+  if (selectedRole.value === 'admin') {
+    navigateTo('/auth/register')
+  } else {
+    const toast = useToast()
+    toast.add({
+      icon: 'i-heroicons-exclamation-circle',
+      title: 'Not allowed',
+      description: 'Only the system administrator can apply for membership.',
+      color: 'error',
+      // timeout: 5000
+    })
   }
 }
 
-const signInWithGithub = async () => {
-  socialLoading.value.github = true
-
-  try {
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    console.log('GitHub sign in')
-    await navigateTo('/admin')
-  } catch (error) {
-    console.error('GitHub sign in error:', error)
-  } finally {
-    socialLoading.value.github = false
-  }
+const handleHelp = () => {
+  navigateTo('/help')
 }
+
+const handleContact = () => {
+  navigateTo('/contact')
+}
+
+// Set default role on mount
+onMounted(() => {
+  // Check if there's a preferred role in localStorage
+  const savedRole = localStorage.getItem('preferredRole')
+  if (savedRole && availableRoles.some(role => role.key === savedRole)) {
+    selectedRole.value = savedRole
+  }
+})
+
+// Save role preference when changed
+watch(selectedRole, (newRole) => {
+  localStorage.setItem('preferredRole', newRole)
+})
 
 // SEO
 useSeoMeta({
-  title: 'Sign In',
-  description: 'Sign in to your admin dashboard to manage your business with powerful tools and insights.'
+  title: 'Login - CBS Approve Web',
+  description: 'Enter the online approval system. For system administrators, approval and general users'
 })
 </script>
