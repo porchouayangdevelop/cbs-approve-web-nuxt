@@ -5,7 +5,7 @@ const config = useRuntimeConfig();
 const toast = useToast();
 
 definePageMeta({
-  layout: 'default',
+  layout: 'custom',
   // middleware: ['auth-guard','role-base-redirect']
 })
 

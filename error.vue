@@ -42,7 +42,7 @@
                 <p class="text-sm flex flex-row gap-3 justify-center items-center text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-2 rounded">
                   <!--                  {{ error.message }}-->
                   <icon size="50"  name="i-heroicons-hand-raised"/>
-                  <p class="font-bold text-3xl">Good Luck</p>
+                  <span class="font-bold text-3xl">Good Luck</span>
                 </p>
               </div>
 

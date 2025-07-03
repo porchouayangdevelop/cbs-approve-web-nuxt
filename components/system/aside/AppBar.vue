@@ -19,7 +19,7 @@
               'w-8 h-8 rounded-lg flex items-center justify-center',
               currentConfig.logoColor
             ]">
-              <UIcon :name="currentConfig.icon" class="w-5 h-5 text-white" />
+              <UIcon :name="currentConfig.icon" class="w-5 h-5 text-white"/>
             </div>
             <div>
               <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
@@ -81,8 +81,9 @@
         <!-- Notifications -->
         <UDropdownMenu :items="notificationItems" :popper="{ placement: 'bottom-end' }">
           <UButton variant="ghost" size="sm" class="relative">
-            <UIcon name="i-heroicons-bell" class="w-5 h-5" />
-            <span v-if="currentConfig.notificationCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <UIcon name="i-heroicons-bell" class="w-5 h-5"/>
+            <span v-if="currentConfig.notificationCount > 0"
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {{ currentConfig.notificationCount }}
             </span>
           </UButton>
@@ -112,7 +113,7 @@
                 {{ userProfile.roleTitle }}
               </span>
             </div>
-            <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400" />
+            <UIcon name="i-heroicons-chevron-down" class="w-4 h-4 text-gray-400"/>
           </UButton>
         </UDropdownMenu>
       </div>
@@ -130,7 +131,8 @@
     </div>
 
     <!-- Mobile Quick Actions -->
-    <div class="lg:hidden flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+    <div
+        class="lg:hidden flex items-center justify-between px-4 py-2 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
       <div class="flex items-center space-x-2">
         <UButton
             v-for="action in currentConfig.quickActions.slice(0, 3)"
@@ -153,8 +155,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRoleSession } from '~/composables/useRoleSession'
-import { useAuth } from '~/composables/useAuth'
+import {useRoleSession} from '~/composables/useRoleSession'
+import {useAuth} from '~/composables/useAuth'
 
 defineEmits<{
   'toggle-sidebar': []
@@ -164,7 +166,7 @@ defineEmits<{
 
 const colorMode = useColorMode()
 const route = useRoute()
-const { user } = useAuth()
+const {user} = useAuth()
 
 // Use role session composable
 const {
@@ -257,7 +259,7 @@ const userMenuItems = computed(() => {
 // Methods
 const handleLogout = async () => {
   try {
-    const { logout } = useAuth()
+    const {logout} = useAuth()
     await logout()
     await navigateTo('/auth/login')
   } catch (error) {
@@ -275,5 +277,5 @@ watch(() => user.value?.role, (newRole) => {
   if (newRole) {
     console.log('User role changed to:', newRole)
   }
-}, { immediate: true })
+}, {immediate: true})
 </script>

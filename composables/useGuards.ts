@@ -37,17 +37,17 @@ export const useGuards = () => {
     return permissions.some(perm => user.value?.permissions.includes(perm));
   }
 
-  const hasAnyPermission = (permission: string[]): boolean => {
-    if (!user.value || !user.value.permissions) return false;
-
-    return permission.some(perm => user.value?.permissions.includes(perm));
-  }
-
-  const hasAllPermission = (permission: string[]): boolean => {
-    if (!user.value || !user.value.permissions) return false;
-
-    return permission.every(perm => user.value?.permissions.includes(perm));
-  }
+  // const hasAnyPermission = (permission: string[]): boolean => {
+  //   if (!user.value || !user.value.permissions) return false;
+  //
+  //   return permission.some(perm => user.value?.permissions.includes(perm));
+  // }
+  //
+  // const hasAllPermission = (permission: string[]): boolean => {
+  //   if (!user.value || !user.value.permissions) return false;
+  //
+  //   return permission.every(perm => user.value?.permissions.includes(perm));
+  // }
 
   const canAccess = (route: string) => {
 
@@ -138,64 +138,110 @@ export const useGuards = () => {
 
       // checker routes
       '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
-      '/checkers/delegation': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/notifications': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/schedule': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/settings': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/stats': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/checkers/delegation': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'delegation:review', 'delegation:manage']
+      },
+      '/checkers/notifications': {roles: ['admin', 'checker'], permissions: ['checker:access', 'notifications:review']},
+      '/checkers/schedule': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'schedule:review', 'schedule:manage']
+      },
+      '/checkers/settings': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'settings:review', 'settings:manage']
+      },
+      '/checkers/stats': {roles: ['admin', 'checker'], permissions: ['checker:access', 'stats:review']},
 
       // Request of checkers
-      '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/requests/approved': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/requests/pending': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/requests/rejected': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/requests/review': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/checkers/requests': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'requests:review', 'requests:manage']
+      },
+      '/checkers/requests/approved': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'requests:review', 'requests:manage']
+      },
+      '/checkers/requests/pending': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'requests:review', 'requests:manage']
+      },
+      '/checkers/requests/rejected': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'requests:review', 'requests:manage']
+      },
+      '/checkers/requests/review': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'requests:review', 'requests:manage']
+      },
 
       // workflows of checker
-      '/checkers/workflows': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/workflows/batch': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/workflows/priority': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/workflows/standard': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/checkers/workflows': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'workflows:review', 'workflows:manage']
+      },
+      '/checkers/workflows/batch': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'workflows:review', 'workflows:manage']
+      },
+      '/checkers/workflows/priority': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'workflows:review', 'workflows:manage']
+      },
+      '/checkers/workflows/standard': {
+        roles: ['admin', 'checker'],
+        permissions: ['checker:access', 'workflows:review', 'workflows:manage']
+      },
 
       // history of checkers
-      '/checkers/history': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/checkers/history': {roles: ['admin', 'checker'], permissions: ['checker:access', 'history:review']},
 
       // reports of checkers
-      '/checkers/reports': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/checkers/reports/workflow': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/checkers/reports': {roles: ['admin', 'checker'], permissions: ['checker:access', 'reports:review']},
+      '/checkers/reports/workflow': {roles: ['admin', 'checker'], permissions: ['checker:access', 'reports:review']},
 
 
       // User management routes
       '/users': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
-      '/users/create': {roles: ['admin', 'checker', 'user'], permissions: ['users:create']},
+      // '/users/create': {roles: ['admin', 'checker', 'user'], permissions: ['users:create']},
       '/users/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
       '/users/settings': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
       '/users/stats': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
       '/users/profile': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
 
       // requests of user
-      '/users/requests': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/approved': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/approved/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/changes': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/changes/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/documents': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/documents/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/draft': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/draft/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/pending': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
+      '/users/requests': {roles: ['admin', 'checker', 'user'], permissions: ['users:read', 'users:create']},
+      '/users/requests/create': {roles: ['admin', 'checker', 'user'], permissions: ['users:create']},
+      '/users/requests/approved': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/approved/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/changes': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/changes/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/documents': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/documents/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/draft': {roles: ['admin', 'checker', 'user'], permissions: ['users:read', 'users:delete']},
+      '/users/requests/draft/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/pending': {roles: ['admin', 'checker', 'user'], permissions: ['users:']},
       '/users/requests/pending/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/rejected': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/rejected/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/review': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/review/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/update/documents': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/requests/update/documents/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/request/update/draft': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
-      '/users/request/update/draft/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
+      '/users/requests/rejected': {roles: ['admin', 'checker', 'user'], permissions: ['users:read', 'users:review']},
+      '/users/requests/rejected/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/review': {roles: ['admin', 'checker', 'user'], permissions: ['users:review']},
+      '/users/requests/review/[id]': {roles: ['admin', 'checker', 'user'], permissions: ['users:read']},
+      '/users/requests/update/documents': {
+        roles: ['admin', 'checker', 'user'],
+        permissions: ['users:review', 'users:delete']
+      },
+      '/users/requests/update/documents/[id]': {
+        roles: ['admin', 'checker', 'user'],
+        permissions: ['users:edit', 'users:read']
+      },
+      '/users/request/update/draft': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit', 'users:delete']},
+      '/users/request/update/draft/[id]': {
+        roles: ['admin', 'checker', 'user'],
+        permissions: ['users:edit', 'users:read']
+      },
 
       // templates
-      '/users/templates': {roles: ['admin', 'checker', 'user'], permissions: ['users:edit']},
+      '/users/templates': {roles: ['admin', 'checker', 'user'], permissions: ['templates:read']},
 
       // General routes
       '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
@@ -203,9 +249,8 @@ export const useGuards = () => {
     }
 
     const access = routePermissions[route];
-    if (!access) {
-      return true; // If route not defined, allow access for authenticated users
-    }
+    if (!access) return true; // If route not defined, allow access for authenticated users
+
 
     // Check role-based access
     if (access.roles && !hasRole(access.roles)) {
@@ -213,71 +258,71 @@ export const useGuards = () => {
     }
 
     // Check permission-based access
-    if (access.permissions && !hasAnyPermission(access.permissions)) {
+    if (access.permissions && !hasPermission(access.permissions)) {
       return false
     }
 
     return true; // user has required role or permission
   }
 
-  const canPerform = (action: string, resource?: string): boolean => {
-    if (!checkAuth()) return false;
-    const permissions = resource ? `${action}:${resource}` : action;
-    return hasPermission(permissions);
-  }
+  // const canPerform = (action: string, resource?: string): boolean => {
+  //   if (!checkAuth()) return false;
+  //   const permissions = resource ? `${action}:${resource}` : action;
+  //   return hasPermission(permissions);
+  // }
+  //
+  // const getAccessibleRoutes = (): string[] => {
+  //   if (!checkAuth()) return [];
+  //
+  //   const allRoutes: string[] = [
+  //     '/admin',
+  //     '/admin/users',
+  //     '/admin/settings',
+  //     '/users',
+  //     '/users/create',
+  //     '/users/edit',
+  //     '/checkers',
+  //     '/checkers/requests',
+  //     '/dashboard',
+  //     '/profile'
+  //   ]
+  //
+  //   return allRoutes.filter(route => canAccess(route));
+  // }
 
-  const getAccessibleRoutes = (): string[] => {
-    if (!checkAuth()) return [];
-
-    const allRoutes: string[] = [
-      '/admin',
-      '/admin/users',
-      '/admin/settings',
-      '/users',
-      '/users/create',
-      '/users/edit',
-      '/checkers',
-      '/checkers/requests',
-      '/dashboard',
-      '/profile'
-    ]
-
-    return allRoutes.filter(route => canAccess(route));
-  }
-
-  const getMissingPermission = (routePath: string): MissingAccess => {
-    const routePermissions: Record<string, RouteAccess> = {
-      '/admin': {roles: ['admin'], permissions: ['admin:access']},
-      '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
-      '/admin/settings': {roles: ['admin'], permissions: ['admin:access', 'settings:manage']},
-      '/users': {roles: ['admin', 'Manager'], permissions: ['users:read']},
-      '/users/create': {roles: ['admin', 'Manager'], permissions: ['users:create']},
-      '/users/edit': {roles: ['admin', 'Manager'], permissions: ['users:edit']},
-      '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
-      '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-      '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
-      '/profile': {roles: ['admin', 'checker', 'user'], permissions: ['profile:read']}
-    }
-
-    const access = routePermissions[routePath];
-    if (!access) return {roles: [], permissions: []}; // No specific access defined for this route
-
-    const missingRoles = access.roles ? access.roles.filter(role => !hasRole(role)) : [];
-
-    const missingPermissions = access.permissions ? access.permissions.filter(permission => !hasPermission(permission)) : [];
-    return {
-      roles: missingRoles,
-      permissions: missingPermissions
-    }
-
-  }
+  // const getMissingPermission = (routePath: string): MissingAccess => {
+  //   const routePermissions: Record<string, RouteAccess> = {
+  //     '/admin': {roles: ['admin'], permissions: ['admin:access']},
+  //     '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
+  //     '/admin/settings': {roles: ['admin'], permissions: ['admin:access', 'settings:manage']},
+  //     '/users': {roles: ['admin', 'Manager'], permissions: ['users:read']},
+  //     '/users/create': {roles: ['admin', 'Manager'], permissions: ['users:create']},
+  //     '/users/edit': {roles: ['admin', 'Manager'], permissions: ['users:edit']},
+  //     '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
+  //     '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+  //     '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
+  //     '/profile': {roles: ['admin', 'checker', 'user'], permissions: ['profile:read']}
+  //   }
+  //
+  //   const access = routePermissions[routePath];
+  //   if (!access) return {roles: [], permissions: []}; // No specific access defined for this route
+  //
+  //   const missingRoles = access.roles ? access.roles.filter(role => !hasRole(role)) : [];
+  //
+  //   const missingPermissions = access.permissions ? access.permissions.filter(permission => !hasPermission(permission)) : [];
+  //   return {
+  //     roles: missingRoles,
+  //     permissions: missingPermissions
+  //   }
+  //
+  // }
 
   const redirectToAllowPage = async () => {
     if (!checkAuth()) {
       return navigateTo('/auth/login')
     }
 
-    const role = user.value?.role || '';
+    const role: string = user.value?.role.toLowerCase() as string;
 
     switch (role) {
       case 'admin':
@@ -293,21 +338,21 @@ export const useGuards = () => {
 
   const handledUnauthorized = async (routePath: string) => {
     console.warn(`Unauthorized access to ${routePath}. Redirecting...`);
-    // Log the attempt (in real app, send to analytics/security system)
-    // await $fetch('/api/security/log-unauthorized-access', {
-    //   method: 'POST',
-    //   body: {
-    //     route,
-    //     userId: user.value?.id,
-    //     timestamp: new Date().toISOString(),
-    //     userAgent: navigator.userAgent
-    //   }
-    // })
+
+    if (process.client) {
+      console.log('Security Event:', {
+        type: 'unauthorized_access',
+        route: routePath,
+        userId: user.value?.id,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+      })
+    }
 
     return navigateTo({
       path: '/auth/unauthorized',
       query: {
-        routePath,
+        route: routePath,
         reason: `Insufficient permissions to access ${routePath}.`
       }
     })
@@ -317,12 +362,12 @@ export const useGuards = () => {
     checkAuth,
     hasRole,
     hasPermission,
-    hasAnyPermission,
-    hasAllPermission,
+    // hasAnyPermission,
+    // hasAllPermission,
     canAccess,
-    canPerform,
-    getAccessibleRoutes,
-    getMissingPermission,
+    // canPerform,
+    // getAccessibleRoutes,
+    // getMissingPermission,
     redirectToAllowPage,
     handledUnauthorized
   }

@@ -44,14 +44,14 @@ interface RoleSessionData {
   role: string
   config: RoleConfig
   permissions: readonly string[]
-  accessibleRoutes: string[]
+  // accessibleRoutes: string[]
 }
 
 export const useRoleSession = () => {
   const {user} = useAuth();
   const route = useRoute();
 
-  const currentRole = computed(() => user.value?.role || 'admin');
+  const currentRole = computed(() => user.value?.role || 'checker');
 
   // Role configurations
   const roleConfigs: Record<string, RoleConfig> = {
@@ -645,7 +645,7 @@ export const useRoleSession = () => {
       user: 'Standard User',
       manager: 'Department Manager'
     }
-    return titles[role as keyof typeof titles] || 'User'
+    return titles[role as keyof typeof titles]
   }
 
   // Session management
@@ -653,14 +653,14 @@ export const useRoleSession = () => {
     role: currentRole.value,
     config: currentConfig.value,
     permissions: user.value?.permissions || [],
-    accessibleRoutes: getAccessibleRoutes()
+    // accessibleRoutes: getAccessibleRoutes()
   }))
 
   // Get accessible routes based on a role and permissions
-  const getAccessibleRoutes = (): string[] => {
-    const {getAccessibleRoutes} = useGuards()
-    return getAccessibleRoutes()
-  }
+  // const getAccessibleRoutes = (): string[] => {
+  //   const {getAccessibleRoutes} = useGuards()
+  //   return getAccessibleRoutes()
+  // }
 
   return {
     // Current state
@@ -680,7 +680,7 @@ export const useRoleSession = () => {
     // Data getters
     getNotifications,
     getRoleTitle,
-    getAccessibleRoutes,
+    // getAccessibleRoutes,
 
     // Role configs (for reference)
     roleConfigs: readonly(roleConfigs)
