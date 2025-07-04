@@ -15,26 +15,27 @@
 
           <!-- Hero Content -->
           <h2 class="text-4xl font-bold mb-6 leading-tight">
-            สร้างบัญชี
-            <span class="text-red-200">ผู้ดูแลระบบ</span>
+            Create account
+            <span class="text-red-200">Administrator</span>
           </h2>
           <p class="text-xl text-red-100 mb-8 leading-relaxed">
-            สร้างบัญชีผู้ใช้งานใหม่สำหรับระบบ CBS Approve Web ด้วยสิทธิ์การเข้าถึงที่เหมาะสม
+            <!--            สร้างบัญชีผู้ใช้งานใหม่สำหรับระบบ CBS Approve Web ด้วยสิทธิ์การเข้าถึงที่เหมาะสม-->
+            Create a new user account for the CBS Approve Web system with appropriate access rights.
           </p>
 
           <!-- Admin Features -->
           <div class="space-y-4">
             <div class="flex items-center">
               <UIcon name="i-heroicons-shield-check" class="w-5 h-5 text-red-200 mr-3"/>
-              <span class="text-red-100">จัดการผู้ใช้และสิทธิ์การเข้าถึง</span>
+              <span class="text-red-100">Manage users and access rights</span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-red-200 mr-3"/>
-              <span class="text-red-100">ควบคุมการตั้งค่าระบบ</span>
+              <span class="text-red-100">Control system settings</span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-chart-bar" class="w-5 h-5 text-red-200 mr-3"/>
-              <span class="text-red-100">ติดตามและรายงานผล</span>
+              <span class="text-red-100">Track and report results</span>
             </div>
           </div>
         </div>
@@ -60,17 +61,17 @@
 
         <!-- Header -->
         <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">สร้างบัญชีผู้ใช้งาน</h2>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Create a user account</h2>
           <div class="mt-2 flex items-center justify-center">
             <UBadge color="error" variant="soft" size="sm">
               <UIcon name="i-heroicons-shield-check" class="w-3 h-3 mr-1"/>
-              สำหรับผู้ดูแลระบบเท่านั้น
+              For Administrators only
             </UBadge>
           </div>
           <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            มีบัญชีอยู่แล้ว?
+            Already have an account??
             <NuxtLink to="/auth/login" class="font-medium text-red-600 hover:text-red-500">
-              เข้าสู่ระบบที่นี่
+              Login here
             </NuxtLink>
           </p>
         </div>
@@ -83,22 +84,23 @@
             <template #header>
               <div class="flex items-center space-x-2">
                 <UIcon name="i-heroicons-shield-exclamation" class="w-5 h-5 text-red-500"/>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">ยืนยันสิทธิ์ผู้ดูแลระบบ</h3>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Verify Administrator</h3>
               </div>
             </template>
 
             <div class="space-y-4">
               <p class="text-sm text-gray-600 dark:text-gray-400">
-                กรุณาป้อนรหัสผู้ดูแลระบบเพื่อยืนยันสิทธิ์ในการสร้างบัญชีใหม่
+                Please enter your admin password to confirm your permission to create a new account.
               </p>
 
-              <UFormGroup label="รหัสผู้ดูแลระบบ" required>
+              <UFormGroup label="adminCode" required>
                 <UInput
                     v-model="adminCode"
                     type="password"
-                    placeholder="ป้อนรหัสผู้ดูแลระบบ"
+                    placeholder="Enter admin code"
                     icon="i-heroicons-key"
                     :loading="verifyingAdmin"
+                    class="mb-2"
                 />
               </UFormGroup>
 
@@ -110,109 +112,121 @@
                   color="error"
                   class="cursor-pointer"
               >
-                ยืนยันสิทธิ์
+                Confirm rights
               </UButton>
 
               <div class="text-xs text-gray-500 dark:text-gray-400 text-center">
-                ติดต่อผู้ดูแลระบบหลักหากต้องการรหัสผู้ดูแลระบบ
+                Contact the primary administrator for an administrator code.
               </div>
             </div>
           </UCard>
         </div>
 
         <!-- Registration Form (Show only after admin verification) -->
-        <div v-else>
+        <div>
           <UCard class="shadow-xl">
             <template #header>
               <div class="text-center">
                 <div class="flex items-center justify-center mb-2">
                   <UIcon name="i-heroicons-check-circle" class="w-6 h-6 text-green-500 mr-2"/>
-                  <span class="text-green-600 font-medium">สิทธิ์ได้รับการยืนยันแล้ว</span>
+                  <span class="text-green-600 font-medium">The rights have been confirmed.</span>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">สร้างบัญชีผู้ใช้งาน</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">กรอกข้อมูลผู้ใช้งานใหม่</p>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create a user account</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Fill in new user information</p>
               </div>
             </template>
 
             <UForm :schema="registerSchema" :state="registerForm" @submit="handleRegister" class="space-y-6">
               <!-- User Type Selection -->
-              <UFormGroup label="ประเภทผู้ใช้งาน" name="userType" required>
+              <UFormGroup label="User type" name="userType" required>
                 <USelectMenu
                     v-model="registerForm.userType"
                     :options="userTypeOptions"
-                    placeholder="เลือกประเภทผู้ใช้งาน"
-                    size="lg"
+                    :items="userTypeOptions"
+                    placeholder="Select user type"
+                    icon="i-heroicons-shield-check"
+                    size="md"
+                    class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Personal Information -->
-              <div class="grid grid-cols-2 gap-4">
-                <UFormGroup label="ชื่อ" name="firstName" required>
+              <div class="grid grid-cols-2 gap-1">
+                <UFormGroup label="Firstname" name="firstName" required>
                   <UInput
-                      v-model="registerForm.firstName"
-                      placeholder="ชื่อ"
+                      v-model="registerForm.firstname"
+                      placeholder="Firstname"
                       icon="i-heroicons-user"
                       :loading="loading"
+                      class="w-full mb-[.2rem]"
                   />
                 </UFormGroup>
 
-                <UFormGroup label="นามสกุล" name="lastName" required>
+                <UFormGroup label="Lastname" name="lastName" required>
                   <UInput
-                      v-model="registerForm.lastName"
-                      placeholder="นามสกุล"
+                      v-model="registerForm.lastname"
+                      placeholder="Lastname"
                       :loading="loading"
+                      class="w-full mb-[.2rem]"
                   />
                 </UFormGroup>
               </div>
 
               <!-- Username -->
-              <UFormGroup label="ชื่อผู้ใช้งาน" name="username" required>
+              <UFormGroup label="Username" name="username" required>
                 <UInput
                     v-model="registerForm.username"
-                    placeholder="ชื่อผู้ใช้งานสำหรับเข้าสู่ระบบ"
+                    placeholder="Username for login"
                     icon="i-heroicons-at-symbol"
                     :loading="loading"
+                    class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Email -->
-              <UFormGroup label="อีเมล" name="email" required>
+              <UFormGroup label="email" name="email" required>
                 <UInput
                     v-model="registerForm.email"
                     type="email"
                     placeholder="example@company.com"
                     icon="i-heroicons-envelope"
                     :loading="loading"
+                    class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Department -->
-              <UFormGroup label="แผนก" name="department" required>
+              <UFormGroup label="department" name="department" required>
                 <USelectMenu
                     v-model="registerForm.department"
                     :options="departmentOptions"
-                    placeholder="เลือกแผนก"
+                    :items="departmentOptions"
+                    icon="i-heroicons-academic-cap"
+                    placeholder="select department"
+                    class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Phone -->
-              <UFormGroup label="หมายเลขโทรศัพท์" name="phone">
+              <UFormGroup label="phone" name="phone">
                 <UInput
                     v-model="registerForm.phone"
                     placeholder="08X-XXX-XXXX"
                     icon="i-heroicons-phone"
                     :loading="loading"
+                    class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Password -->
-              <UFormGroup label="รหัสผ่าน" name="password" required>
+              <UFormGroup label="password" name="password" required>
                 <UInput
-                    v-model="registerForm.password"
+                    v-model="passwordValue"
                     :type="showPassword ? 'text' : 'password'"
-                    placeholder="สร้างรหัสผ่านที่แข็งแกร่ง"
+                    placeholder="password"
                     icon="i-heroicons-lock-closed"
                     :loading="loading"
+                    class="w-full mb-[.2rem]"
                 >
                   <template #trailing>
                     <UButton
@@ -226,29 +240,30 @@
               </UFormGroup>
 
               <!-- Confirm Password -->
-              <UFormGroup label="ยืนยันรหัสผ่าน" name="confirmPassword" required>
-                <UInput
-                    v-model="registerForm.confirmPassword"
-                    :type="showConfirmPassword ? 'text' : 'password'"
-                    placeholder="ยืนยันรหัสผ่าน"
-                    icon="i-heroicons-lock-closed"
-                    :loading="loading"
-                >
-                  <template #trailing>
-                    <UButton
-                        variant="ghost"
-                        size="xs"
-                        :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
-                        @click="showConfirmPassword = !showConfirmPassword"
-                    />
-                  </template>
-                </UInput>
-              </UFormGroup>
+              <!--              <UFormGroup label="confirmPassword" name="confirmPassword" required>-->
+              <!--                <UInput-->
+              <!--                    v-model="registerForm.confirmPassword"-->
+              <!--                    :type="showConfirmPassword ? 'text' : 'password'"-->
+              <!--                    placeholder="confirm password"-->
+              <!--                    icon="i-heroicons-lock-closed"-->
+              <!--                    :loading="loading"-->
+              <!--                    class="w-full mb-[.2rem]"-->
+              <!--                >-->
+              <!--                  <template #trailing>-->
+              <!--                    <UButton-->
+              <!--                        variant="ghost"-->
+              <!--                        size="xs"-->
+              <!--                        :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"-->
+              <!--                        @click="showConfirmPassword = !showConfirmPassword"-->
+              <!--                    />-->
+              <!--                  </template>-->
+              <!--                </UInput>-->
+              <!--              </UFormGroup>-->
 
               <!-- Password Strength Indicator -->
-              <div v-if="registerForm.password" class="space-y-2">
+              <div v-if="passwordValue" class="space-y-2">
                 <div class="flex justify-between items-center">
-                  <span class="text-xs text-gray-600 dark:text-gray-400">ความแข็งแกร่งของรหัสผ่าน</span>
+                  <span class="text-xs text-gray-600 dark:text-gray-400">Password strength</span>
                   <span :class="[
                     'text-xs font-medium',
                     passwordStrength.score >= 3 ? 'text-green-600' :
@@ -270,13 +285,13 @@
               </div>
 
               <!-- Terms & Conditions -->
-              <UFormGroup name="acceptTerms">
-                <UCheckbox
-                    v-model="registerForm.acceptTerms"
-                    label="ยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว"
-                    required
-                />
-              </UFormGroup>
+              <!--              <UFormGroup name="acceptTerms">-->
+              <!--                <UCheckbox class="my-[.5rem] cursor-pointer"-->
+              <!--                           v-model="registerForm.acceptTerms"-->
+              <!--                           label="Accept the Terms of Use and Privacy Policy."-->
+              <!--                           required-->
+              <!--                />-->
+              <!--              </UFormGroup>-->
 
               <!-- Submit Button -->
               <UButton
@@ -291,8 +306,8 @@
                 <template #leading>
                   <UIcon v-if="!loading" name="i-heroicons-user-plus"/>
                 </template>
-                <span v-if="!loading">สร้างบัญชีผู้ใช้งาน</span>
-                <span v-else>กำลังสร้างบัญชี...</span>
+                <span v-if="!loading">Create a user account</span>
+                <span v-else>Creating an account...</span>
               </UButton>
             </UForm>
           </UCard>
@@ -304,11 +319,11 @@
             <div class="flex items-start space-x-3">
               <UIcon name="i-heroicons-shield-exclamation" class="w-5 h-5 text-yellow-500 mt-0.5"/>
               <div class="text-sm text-yellow-700 dark:text-yellow-300">
-                <p class="font-medium mb-1">ข้อควรระวัง:</p>
+                <p class="font-medium mb-1">Cautions:</p>
                 <ul class="list-disc list-inside space-y-1 text-xs">
-                  <li>บัญชีที่สร้างขึ้นจะได้รับสิทธิ์ตามประเภทที่เลือก</li>
-                  <li>ผู้ดูแลระบบสามารถแก้ไขสิทธิ์ได้ภายหลัง</li>
-                  <li>ข้อมูลทั้งหมดจะถูกเข้ารหัสและป้องกันอย่างปลอดภัย</li>
+                  <li>The created account will be given the privileges according to the selected category.</li>
+                  <li>Administrators can change the permissions later.</li>
+                  <li>All data is encrypted and securely protected.</li>
                 </ul>
               </div>
             </div>
@@ -321,6 +336,25 @@
 
 <script setup lang="ts">
 import {z} from 'zod'
+
+interface Credential {
+  type: string;
+  value: string;
+  temporary: boolean;
+}
+
+interface UserRequest {
+  userType: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  email?: string;
+  department: string;
+  phone: string;
+  enabled: boolean;
+  emailVerified: boolean;
+  credentials: Credential[];
+}
 
 definePageMeta({
   layout: false,
@@ -335,52 +369,83 @@ const loading = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
+
 // Form data
-const registerForm = ref({
+const registerForm = ref<UserRequest>({
   userType: '',
-  firstName: '',
-  lastName: '',
+  firstname: '',
+  lastname: '',
   username: '',
   email: '',
   department: '',
   phone: '',
-  password: '',
-  confirmPassword: '',
-  acceptTerms: false
+  enabled: true,
+  emailVerified: false,
+  credentials: [
+    {
+      type: 'password',
+      value: '',
+      temporary: false
+    }
+  ],
+  // password: '',
+  // confirmPassword: '',
+  // acceptTerms: false
 })
+
+const passwordValue = computed({
+  get: () => {
+    const passwordCredential = registerForm.value.credentials.find((cred: Credential) => cred.type === 'password');
+    return passwordCredential?.value || ''
+  },
+  set: (newPassword: string) => {
+    const passwordCredential = registerForm.value.credentials.find((cred: Credential) => cred.type === 'password');
+    if (passwordCredential) {
+      passwordCredential.value = newPassword;
+    } else {
+      registerForm.value.credentials.push({
+        type: 'password',
+        value: newPassword,
+        temporary: false
+      })
+    }
+  }
+})
+
+const getPasswordCredential = (): Credential | undefined => registerForm.value.credentials.find(cred => cred.type === 'password');
 
 // Options
 const userTypeOptions = [
-  {label: 'ผู้ดูแลระบบ (Admin)', value: 'admin'},
-  {label: 'ผู้อนุมัติ (Checker)', value: 'checker'},
-  {label: 'ผู้ใช้งานทั่วไป (User)', value: 'user'}
+  {label: 'Admin', value: 'admin'},
+  {label: 'Checker', value: 'checker'},
+  {label: 'User', value: 'user'}
 ]
 
 const departmentOptions = [
-  'เทคโนโลยีสารสนเทศ',
-  'ทรัพยากรบุคคล',
-  'การเงินและบัญชี',
-  'การตลาด',
-  'การขาย',
-  'ปฏิบัติการ',
-  'กฎหมายและกำกับดูแล',
-  'อื่นๆ'
+  'Information Technology',
+  'Human Resources',
+  'Finance and Accounting',
+  'marketing',
+  'Sales',
+  'Operation',
+  'Law and Regulation',
+  'other'
 ]
 
 // Validation schema
 const registerSchema = z.object({
-  userType: z.string().min(1, 'กรุณาเลือกประเภทผู้ใช้งาน'),
-  firstName: z.string().min(2, 'ชื่อต้องมีอย่างน้อย 2 ตัวอักษร'),
-  lastName: z.string().min(2, 'นามสกุลต้องมีอย่างน้อย 2 ตัวอักษร'),
-  username: z.string().min(3, 'ชื่อผู้ใช้งานต้องมีอย่างน้อย 3 ตัวอักษร'),
-  email: z.string().email('กรุณาป้อนอีเมลที่ถูกต้อง'),
-  department: z.string().min(1, 'กรุณาเลือกแผนก'),
+  userType: z.string().min(1, 'Please select user type.'),
+  firstName: z.string().min(2, 'Name must contain at least 2 characters.'),
+  lastName: z.string().min(2, 'Last name must be at least 2 characters long.'),
+  username: z.string().min(3, 'Username must contain at least 3 characters.'),
+  email: z.string().email('Please enter a valid email address.'),
+  department: z.string().min(1, 'Please select a department.'),
   phone: z.string().optional(),
-  password: z.string().min(8, 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร'),
-  confirmPassword: z.string(),
-  acceptTerms: z.boolean().refine(val => val === true, 'กรุณายอมรับเงื่อนไขการใช้งาน')
+  password: z.string().min(8, 'Password must contain at least 8 characters.'),
+  // confirmPassword: z.string(),
+  // acceptTerms: z.boolean().refine(val => val === true, 'Please accept the terms of use.')
 }).refine(data => data.password === data.confirmPassword, {
-  message: "รหัสผ่านไม่ตรงกัน",
+  message: "Passwords do not match",
   path: ["confirmPassword"]
 })
 
@@ -395,7 +460,7 @@ const isFormValid = computed(() => {
 })
 
 const passwordStrength = computed(() => {
-  const password = registerForm.value.password
+  const password = passwordValue.value
   let score = 0
 
   if (password.length >= 8) score++
@@ -403,10 +468,10 @@ const passwordStrength = computed(() => {
   if (/\d/.test(password)) score++
   if (/[^a-zA-Z\d]/.test(password)) score++
 
-  const labels = ['อ่อนมาก', 'อ่อน', 'ปานกลาง', 'แข็งแกร่ง', 'แข็งแกร่งมาก']
+  const labels = ['Very soft', 'weak', 'middle', 'Strong', 'Very strong']
   return {
     score,
-    label: labels[score] || 'อ่อนมาก'
+    label: labels[score] || 'Very soft'
   }
 })
 
@@ -425,21 +490,21 @@ const verifyAdminCode = async () => {
       const toast = useToast()
       toast.add({
         icon: 'i-heroicons-check-circle',
-        title: 'ยืนยันสิทธิ์สำเร็จ',
-        description: 'คุณสามารถสร้างบัญชีผู้ใช้งานได้แล้ว',
+        title: 'Successfully confirmed',
+        description: 'You can now create an account.',
         color: 'success',
         // timeout: 3000
       })
     } else {
-      throw new Error('รหัสผู้ดูแลระบบไม่ถูกต้อง')
+      throw new Error('Administrator code is invalid.')
     }
 
   } catch (error: any) {
     const toast = useToast()
     toast.add({
       icon: 'i-heroicons-exclamation-circle',
-      title: 'ไม่สามารถยืนยันสิทธิ์ได้',
-      description: error.message || 'รหัสผู้ดูแลระบบไม่ถูกต้อง',
+      title: 'Unable to verify eligibility',
+      description: error.message || 'Administrator code is invalid.',
       color: 'error',
       // timeout: 5000
     })
@@ -466,8 +531,8 @@ const handleRegister = async (data: any) => {
     const toast = useToast()
     toast.add({
       icon: 'i-heroicons-check-circle',
-      title: 'สร้างบัญชีสำเร็จ',
-      description: `สร้างบัญชี ${validatedData.userType} สำหรับ ${validatedData.firstName} ${validatedData.lastName} เรียบร้อยแล้ว`,
+      title: 'Account created successfully',
+      description: `Create an account ${validatedData.userType} สำหรับ ${validatedData.firstName} ${validatedData.lastName} finished`,
       color: 'success',
       // timeout: 5000
     })
@@ -483,8 +548,8 @@ const handleRegister = async (data: any) => {
     const toast = useToast()
     toast.add({
       icon: 'i-heroicons-exclamation-circle',
-      title: 'ไม่สามารถสร้างบัญชีได้',
-      description: error.message || 'เกิดข้อผิดพลาดในการสร้างบัญชี กรุณาลองใหม่อีกครั้ง',
+      title: 'Unable to create account',
+      description: error.message || 'An error occurred while creating your account. Please try again.',
       color: 'error',
       // timeout: 5000
     })
@@ -501,12 +566,14 @@ onMounted(async () => {
   if (user.value && user.value.role === 'admin') {
     isAdminVerified.value = true
   }
+
+  console.log(`Password Credential`, getPasswordCredential())
 })
 
 // SEO
 useSeoMeta({
-  title: 'สร้างบัญชีผู้ใช้งาน - CBS Approve Web',
-  description: 'สร้างบัญชีผู้ใช้งานใหม่สำหรับระบบ CBS Approve Web (เฉพาะผู้ดูแลระบบ)',
+  title: 'Create a user account',
+  description: 'Create a new user account for the CBS Approve Web system (administrators only)',
   robots: 'noindex,nofollow'
 })
 </script>
