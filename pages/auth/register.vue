@@ -19,7 +19,6 @@
             <span class="text-red-200">Administrator</span>
           </h2>
           <p class="text-xl text-red-100 mb-8 leading-relaxed">
-            <!--            สร้างบัญชีผู้ใช้งานใหม่สำหรับระบบ CBS Approve Web ด้วยสิทธิ์การเข้าถึงที่เหมาะสม-->
             Create a new user account for the CBS Approve Web system with appropriate access rights.
           </p>
 
@@ -69,7 +68,7 @@
             </UBadge>
           </div>
           <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-            Already have an account??
+            Already have an account?
             <NuxtLink to="/auth/login" class="font-medium text-red-600 hover:text-red-500">
               Login here
             </NuxtLink>
@@ -79,7 +78,8 @@
 
       <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <!-- Admin Verification -->
-        <div v-if="!isAdminVerified" class="mb-6">
+        <!--        v-if="!isAdminVerified"-->
+        <div class="mb-6"  v-if="!isAdminVerified">
           <UCard class="border-red-200 dark:border-red-800">
             <template #header>
               <div class="flex items-center space-x-2">
@@ -93,7 +93,7 @@
                 Please enter your admin password to confirm your permission to create a new account.
               </p>
 
-              <UFormGroup label="adminCode" required>
+              <UFormGroup label="Admin Code" required>
                 <UInput
                     v-model="adminCode"
                     type="password"
@@ -123,7 +123,8 @@
         </div>
 
         <!-- Registration Form (Show only after admin verification) -->
-        <div>
+        <!--        v-if="isAdminVerified"-->
+        <div  v-if="isAdminVerified">
           <UCard class="shadow-xl">
             <template #header>
               <div class="text-center">
@@ -136,11 +137,11 @@
               </div>
             </template>
 
-            <UForm :schema="registerSchema" :state="registerForm" @submit="handleRegister" class="space-y-6">
+            <UForm :schema="registerSchema" :state="form" @submit="handleRegister" class="space-y-4">
               <!-- User Type Selection -->
               <UFormGroup label="User type" name="userType" required>
                 <USelectMenu
-                    v-model="registerForm.userType"
+                    v-model="form.userType"
                     :options="userTypeOptions"
                     :items="userTypeOptions"
                     placeholder="Select user type"
@@ -151,21 +152,21 @@
               </UFormGroup>
 
               <!-- Personal Information -->
-              <div class="grid grid-cols-2 gap-1">
-                <UFormGroup label="Firstname" name="firstName" required>
+              <div class="grid grid-cols-2 gap-4">
+                <UFormGroup label="First Name" name="firstName" required>
                   <UInput
-                      v-model="registerForm.firstname"
-                      placeholder="Firstname"
+                      v-model="form.firstName"
+                      placeholder="First name"
                       icon="i-heroicons-user"
                       :loading="loading"
                       class="w-full mb-[.2rem]"
                   />
                 </UFormGroup>
 
-                <UFormGroup label="Lastname" name="lastName" required>
+                <UFormGroup label="Last Name" name="lastName" required>
                   <UInput
-                      v-model="registerForm.lastname"
-                      placeholder="Lastname"
+                      v-model="form.lastName"
+                      placeholder="Last name"
                       :loading="loading"
                       class="w-full mb-[.2rem]"
                   />
@@ -175,18 +176,18 @@
               <!-- Username -->
               <UFormGroup label="Username" name="username" required>
                 <UInput
-                    v-model="registerForm.username"
+                    v-model="form.username"
                     placeholder="Username for login"
                     icon="i-heroicons-at-symbol"
                     :loading="loading"
-                    class="w-full mb-[.2rem]"
+                    class="w-full mb-[.2rem] normal-case"
                 />
               </UFormGroup>
 
               <!-- Email -->
-              <UFormGroup label="email" name="email" required>
+              <UFormGroup label="Email" name="email" required>
                 <UInput
-                    v-model="registerForm.email"
+                    v-model="form.email"
                     type="email"
                     placeholder="example@company.com"
                     icon="i-heroicons-envelope"
@@ -196,22 +197,22 @@
               </UFormGroup>
 
               <!-- Department -->
-              <UFormGroup label="department" name="department" required>
+              <UFormGroup label="Department" name="department" required>
                 <USelectMenu
-                    v-model="registerForm.department"
+                    v-model="form.department"
                     :options="departmentOptions"
                     :items="departmentOptions"
                     icon="i-heroicons-academic-cap"
-                    placeholder="select department"
+                    placeholder="Select department"
                     class="w-full mb-[.2rem]"
                 />
               </UFormGroup>
 
               <!-- Phone -->
-              <UFormGroup label="phone" name="phone">
+              <UFormGroup label="Phone" name="phone">
                 <UInput
-                    v-model="registerForm.phone"
-                    placeholder="08X-XXX-XXXX"
+                    v-model="form.phone"
+                    placeholder="020-XX-XXX-XXX"
                     icon="i-heroicons-phone"
                     :loading="loading"
                     class="w-full mb-[.2rem]"
@@ -219,11 +220,11 @@
               </UFormGroup>
 
               <!-- Password -->
-              <UFormGroup label="password" name="password" required>
+              <UFormGroup label="Password" name="password" required>
                 <UInput
-                    v-model="passwordValue"
+                    v-model="form.password"
                     :type="showPassword ? 'text' : 'password'"
-                    placeholder="password"
+                    placeholder="Password"
                     icon="i-heroicons-lock-closed"
                     :loading="loading"
                     class="w-full mb-[.2rem]"
@@ -240,28 +241,28 @@
               </UFormGroup>
 
               <!-- Confirm Password -->
-              <!--              <UFormGroup label="confirmPassword" name="confirmPassword" required>-->
-              <!--                <UInput-->
-              <!--                    v-model="registerForm.confirmPassword"-->
-              <!--                    :type="showConfirmPassword ? 'text' : 'password'"-->
-              <!--                    placeholder="confirm password"-->
-              <!--                    icon="i-heroicons-lock-closed"-->
-              <!--                    :loading="loading"-->
-              <!--                    class="w-full mb-[.2rem]"-->
-              <!--                >-->
-              <!--                  <template #trailing>-->
-              <!--                    <UButton-->
-              <!--                        variant="ghost"-->
-              <!--                        size="xs"-->
-              <!--                        :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"-->
-              <!--                        @click="showConfirmPassword = !showConfirmPassword"-->
-              <!--                    />-->
-              <!--                  </template>-->
-              <!--                </UInput>-->
-              <!--              </UFormGroup>-->
+              <UFormGroup label="Confirm Password" name="confirmPassword" required>
+                <UInput
+                    v-model="form.confirmPassword"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    placeholder="Confirm password"
+                    icon="i-heroicons-lock-closed"
+                    :loading="loading"
+                    class="w-full mb-[.2rem]"
+                >
+                  <template #trailing>
+                    <UButton
+                        variant="ghost"
+                        size="xs"
+                        :icon="showConfirmPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'"
+                        @click="showConfirmPassword = !showConfirmPassword"
+                    />
+                  </template>
+                </UInput>
+              </UFormGroup>
 
               <!-- Password Strength Indicator -->
-              <div v-if="passwordValue" class="space-y-2">
+              <div v-if="form.password" class="space-y-2">
                 <div class="flex justify-between items-center">
                   <span class="text-xs text-gray-600 dark:text-gray-400">Password strength</span>
                   <span :class="[
@@ -285,13 +286,14 @@
               </div>
 
               <!-- Terms & Conditions -->
-              <!--              <UFormGroup name="acceptTerms">-->
-              <!--                <UCheckbox class="my-[.5rem] cursor-pointer"-->
-              <!--                           v-model="registerForm.acceptTerms"-->
-              <!--                           label="Accept the Terms of Use and Privacy Policy."-->
-              <!--                           required-->
-              <!--                />-->
-              <!--              </UFormGroup>-->
+              <UFormGroup name="acceptTerms">
+                <UCheckbox
+                    v-model="form.acceptTerms"
+                    label="Accept the Terms of Use and Privacy Policy."
+                    required
+                    class="cursor-pointer my-1"
+                />
+              </UFormGroup>
 
               <!-- Submit Button -->
               <UButton
@@ -302,12 +304,13 @@
                   :disabled="loading || !isFormValid"
                   color="error"
                   class="cursor-pointer"
+                  variant="outline"
               >
                 <template #leading>
                   <UIcon v-if="!loading" name="i-heroicons-user-plus"/>
                 </template>
-                <span v-if="!loading">Create a user account</span>
-                <span v-else>Creating an account...</span>
+                <span v-if="!loading">Create User Account</span>
+                <span v-else>Creating account...</span>
               </UButton>
             </UForm>
           </UCard>
@@ -336,30 +339,42 @@
 
 <script setup lang="ts">
 import {z} from 'zod'
-
-interface Credential {
-  type: string;
-  value: string;
-  temporary: boolean;
-}
-
-interface UserRequest {
-  userType: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  email?: string;
-  department: string;
-  phone: string;
-  enabled: boolean;
-  emailVerified: boolean;
-  credentials: Credential[];
-}
-
+import {useDepartmentWithSignUp} from "~/composables/useDepartmentWithSignUp";
 definePageMeta({
   layout: false,
   middleware: ['auth-guard'] // Require authentication to access
 })
+
+// Interfaces
+interface RegisterForm {
+  userType: string
+  firstName: string
+  lastName: string
+  username: string
+  email: string
+  department: string
+  phone: string
+  password: string
+  confirmPassword: string
+  acceptTerms: boolean
+}
+
+interface UserCreateRequest {
+  userType: string
+  username: string
+  firstName: string
+  lastName: string
+  email: string
+  department: string
+  phone: string
+  enabled: boolean
+  emailVerified: boolean
+  credentials: Array<{
+    type: string
+    value: string
+    temporary: boolean
+  }>
+}
 
 // State
 const isAdminVerified = ref(false)
@@ -369,50 +384,20 @@ const loading = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-
-// Form data
-const registerForm = ref<UserRequest>({
+// Form data - using simple reactive object
+const form = ref<RegisterForm>({
   userType: '',
-  firstname: '',
-  lastname: '',
+  firstName: '',
+  lastName: '',
   username: '',
   email: '',
   department: '',
   phone: '',
-  enabled: true,
-  emailVerified: false,
-  credentials: [
-    {
-      type: 'password',
-      value: '',
-      temporary: false
-    }
-  ],
-  // password: '',
-  // confirmPassword: '',
-  // acceptTerms: false
+  password: '',
+  confirmPassword: '',
+  acceptTerms: false
 })
 
-const passwordValue = computed({
-  get: () => {
-    const passwordCredential = registerForm.value.credentials.find((cred: Credential) => cred.type === 'password');
-    return passwordCredential?.value || ''
-  },
-  set: (newPassword: string) => {
-    const passwordCredential = registerForm.value.credentials.find((cred: Credential) => cred.type === 'password');
-    if (passwordCredential) {
-      passwordCredential.value = newPassword;
-    } else {
-      registerForm.value.credentials.push({
-        type: 'password',
-        value: newPassword,
-        temporary: false
-      })
-    }
-  }
-})
-
-const getPasswordCredential = (): Credential | undefined => registerForm.value.credentials.find(cred => cred.type === 'password');
 
 // Options
 const userTypeOptions = [
@@ -421,38 +406,30 @@ const userTypeOptions = [
   {label: 'User', value: 'user'}
 ]
 
-const departmentOptions = [
-  'Information Technology',
-  'Human Resources',
-  'Finance and Accounting',
-  'marketing',
-  'Sales',
-  'Operation',
-  'Law and Regulation',
-  'other'
-]
+const departmentOptions = useDepartmentWithSignUp();
 
 // Validation schema
 const registerSchema = z.object({
   userType: z.string().min(1, 'Please select user type.'),
-  firstName: z.string().min(2, 'Name must contain at least 2 characters.'),
+  firstName: z.string().min(2, 'First name must contain at least 2 characters.'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters long.'),
-  username: z.string().min(3, 'Username must contain at least 3 characters.'),
+  username: z.string().min(8, 'Username must contain at least 8 characters.'),
   email: z.string().email('Please enter a valid email address.'),
   department: z.string().min(1, 'Please select a department.'),
   phone: z.string().optional(),
   password: z.string().min(8, 'Password must contain at least 8 characters.'),
-  // confirmPassword: z.string(),
-  // acceptTerms: z.boolean().refine(val => val === true, 'Please accept the terms of use.')
+  confirmPassword: z.string(),
+  acceptTerms: z.boolean().refine(val => val === true, 'Please accept the terms of use.')
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"]
 })
 
+
 // Computed
 const isFormValid = computed(() => {
   try {
-    registerSchema.parse(registerForm.value)
+    registerSchema.parse(form.value)
     return true
   } catch {
     return false
@@ -460,7 +437,7 @@ const isFormValid = computed(() => {
 })
 
 const passwordStrength = computed(() => {
-  const password = passwordValue.value
+  const password = form.value.password
   let score = 0
 
   if (password.length >= 8) score++
@@ -468,7 +445,7 @@ const passwordStrength = computed(() => {
   if (/\d/.test(password)) score++
   if (/[^a-zA-Z\d]/.test(password)) score++
 
-  const labels = ['Very soft', 'weak', 'middle', 'Strong', 'Very strong']
+  const labels = ['Very soft', 'Weak', 'Medium', 'Strong', 'Very strong']
   return {
     score,
     label: labels[score] || 'Very soft'
@@ -476,6 +453,7 @@ const passwordStrength = computed(() => {
 })
 
 // Methods
+
 const verifyAdminCode = async () => {
   verifyingAdmin.value = true
 
@@ -493,7 +471,6 @@ const verifyAdminCode = async () => {
         title: 'Successfully confirmed',
         description: 'You can now create an account.',
         color: 'success',
-        // timeout: 3000
       })
     } else {
       throw new Error('Administrator code is invalid.')
@@ -506,7 +483,6 @@ const verifyAdminCode = async () => {
       title: 'Unable to verify eligibility',
       description: error.message || 'Administrator code is invalid.',
       color: 'error',
-      // timeout: 5000
     })
 
     adminCode.value = ''
@@ -515,29 +491,70 @@ const verifyAdminCode = async () => {
   }
 }
 
-const handleRegister = async (data: any) => {
-  loading.value = true
+const transformFormToRequest = (formData: RegisterForm): UserCreateRequest => {
+  return {
+    userType: formData.userType,
+    username: formData.username,
+    firstName: formData.firstName,
+    lastName: formData.lastName,
+    email: formData.email,
+    department: formData.department,
+    phone: formData.phone || '',
+    enabled: true,
+    emailVerified: false,
+    credentials: [
+      {
+        type: 'password',
+        value: formData.password,
+        temporary: false
+      }
+    ]
+  }
+}
+
+const handleRegister = async () => {
+  loading.value = true;
+  const toast = useToast();
+  toast.add({title:'HandleRegistered'})
+
 
   try {
     // Validate form data
-    const validatedData = registerSchema.parse(data)
+    const validatedData = registerSchema.parse(form.value)
+    console.log(validatedData)
+
+    // Transform form data to API request format
+    const requestData = transformFormToRequest(validatedData)
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000))
 
-    console.log('Creating user:', validatedData)
+    console.log('Creating user:', requestData)
 
     // Show success message
-    const toast = useToast()
+
     toast.add({
       icon: 'i-heroicons-check-circle',
       title: 'Account created successfully',
-      description: `Create an account ${validatedData.userType} สำหรับ ${validatedData.firstName} ${validatedData.lastName} finished`,
+      description: `Created account ${validatedData.userType} for ${validatedData.firstName} ${validatedData.lastName}`,
       color: 'success',
-      // timeout: 5000
     })
 
-    // Redirect to login
+    // Reset form
+    form.value = {
+      userType: '',
+      firstName: '',
+      lastName: '',
+      username: '',
+      email: '',
+      department: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false
+    }
+
+    // Redirect to login after delay
     setTimeout(() => {
       navigateTo('/auth/login')
     }, 2000)
@@ -546,13 +563,22 @@ const handleRegister = async (data: any) => {
     console.error('Registration error:', error)
 
     const toast = useToast()
-    toast.add({
-      icon: 'i-heroicons-exclamation-circle',
-      title: 'Unable to create account',
-      description: error.message || 'An error occurred while creating your account. Please try again.',
-      color: 'error',
-      // timeout: 5000
-    })
+    if (error instanceof z.ZodError) {
+      const firstError = error.errors[0]
+      toast.add({
+        icon: 'i-heroicons-exclamation-circle',
+        title: 'Validation Error',
+        description: firstError.message,
+        color: 'error',
+      })
+    } else {
+      toast.add({
+        icon: 'i-heroicons-exclamation-circle',
+        title: 'Unable to create account',
+        description: error.message || 'An error occurred while creating your account. Please try again.',
+        color: 'error',
+      })
+    }
   } finally {
     loading.value = false
   }
@@ -566,8 +592,6 @@ onMounted(async () => {
   if (user.value && user.value.role === 'admin') {
     isAdminVerified.value = true
   }
-
-  console.log(`Password Credential`, getPasswordCredential())
 })
 
 // SEO
@@ -577,3 +601,12 @@ useSeoMeta({
   robots: 'noindex,nofollow'
 })
 </script>
+<style scoped>
+.normal-case input {
+  text-transform: none !important;
+}
+
+.u-input input {
+  text-transform: none !important;
+}
+</style>
