@@ -14,7 +14,7 @@
 
       <UForm :schema="loginSchema" :state="loginForm" @submit="handleLogin" class="space-y-6">
         <!-- Username/Email Field -->
-        <UFormGroup label="username" name="username" required>
+        <UFormField label="username" name="username" required>
           <UInput
               v-model="loginForm.username"
               type="text"
@@ -24,10 +24,10 @@
               :loading="loading"
               class="w-full"
           />
-        </UFormGroup>
+        </UFormField>
 
         <!-- Password Field -->
-        <UFormGroup label="password" name="password" required>
+        <UFormField label="password" name="password" required>
           <UInput
               v-model="loginForm.password"
               :type="showPassword ? 'text' : 'password'"
@@ -46,7 +46,7 @@
               />
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
 
         <!-- Remember & Forgot -->
         <div class="flex items-center justify-between">
@@ -91,31 +91,31 @@
       </UForm>
 
       <!-- Register Link (Only for Admin) -->
-      <div v-if="showRegisterLink" class="mt-6 text-center">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300 dark:border-gray-600" />
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-              For system administrators
-            </span>
-          </div>
-        </div>
-        <div class="mt-4">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            Want to create a new user account?
-          </p>
-          <UButton
-              variant="link"
-              size="sm"
-              @click="$emit('register')"
-              class="mt-1 text-primary-600 hover:text-primary-500"
-          >
-            Create Account (Admin only)
-          </UButton>
-        </div>
-      </div>
+<!--      <div v-if="showRegisterLink" class="mt-6 text-center">-->
+<!--        <div class="relative">-->
+<!--          <div class="absolute inset-0 flex items-center">-->
+<!--            <div class="w-full border-t border-gray-300 dark:border-gray-600" />-->
+<!--          </div>-->
+<!--          <div class="relative flex justify-center text-sm">-->
+<!--            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">-->
+<!--              For system administrators-->
+<!--            </span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="mt-4">-->
+<!--          <p class="text-sm text-gray-600 dark:text-gray-400">-->
+<!--            Want to create a new user account?-->
+<!--          </p>-->
+<!--          <UButton-->
+<!--              variant="link"-->
+<!--              size="sm"-->
+<!--              @click="$emit('register')"-->
+<!--              class="mt-1 text-primary-600 hover:text-primary-500"-->
+<!--          >-->
+<!--            Create Account (Admin only)-->
+<!--          </UButton>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <!-- Additional Links -->
       <div v-if="showHelpLinks" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">

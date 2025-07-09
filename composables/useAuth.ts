@@ -1,3 +1,5 @@
+
+
 interface User {
   id: string;
   username: string;
@@ -84,6 +86,7 @@ export const useAuth = () => {
 
 
   const login = async (credentials: Credentials) => {
+    alert(JSON.stringify(credentials));
     try {
       isLoading.value = true;
       const {$authApi} = useNuxtApp();

@@ -15,12 +15,10 @@
 
           <!-- Hero Content -->
           <h2 class="text-4xl font-bold mb-6 leading-tight">
-<!--            ยินดีต้อนรับสู่ระบบ-->
             Welcome to the system
             <span class="text-primary-200">Approve</span>
           </h2>
           <p class="text-xl text-primary-100 mb-8 leading-relaxed">
-<!--            ระบบบริหารจัดการการอนุมัติงานแบบครบวงจร สำหรับองค์กรที่ต้องการประสิทธิภาพสูงสุด-->
             Complete approval management system For organizations that need the most efficiency
           </p>
 
@@ -29,21 +27,18 @@
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
               <span class="text-primary-100">
-<!--                ระบบรายงานและวิเคราะห์ข้อมูลขั้นสูง-->
               Advanced data reporting and analysis system
               </span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
               <span class="text-primary-100">
-<!--                เครื่องมือทำงานร่วมกันของทีม-->
                 Team work tools
               </span>
             </div>
             <div class="flex items-center">
               <UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-primary-200 mr-3" />
               <span class="text-primary-100">
-<!--                ความปลอดภัยระดับองค์กร-->
                 Corporate safety
               </span>
             </div>
@@ -107,7 +102,6 @@
             :show-register-link="selectedRole === 'admin'"
             @login="handleLogin"
             @forgot-password="handleForgotPassword"
-            @register="handleRegister"
             @help="handleHelp"
             @contact="handleContact"
         />

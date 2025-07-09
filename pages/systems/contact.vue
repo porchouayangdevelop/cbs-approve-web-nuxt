@@ -3,6 +3,16 @@ definePageMeta({
   layout:false,
   path:'/contact'
 })
+
+useSeoMeta({
+  title:'Contact us',
+  ogImage:'/images/contact.png',
+  ogTitle() {
+    return 'Contact us'
+  },
+
+})
+
 </script>
 
 <template>

@@ -12,8 +12,8 @@ export const useAuthStore = defineStore('auth', () => {
   const userRole = computed(() => user.value?.role);
   const userPermissions = computed(() => user.value?.permissions || [])
   const isAdmin = computed(() => userRole.value === 'admin')
-  const isUser = computed(() => userRole.value === 'User')
-  const isChecker = computed(() => userRole.value === 'Checker')
+  const isChecker = computed(() => userRole.value === 'checker')
+  const isUser = computed(() => userRole.value === 'user')
 
   //actions
   const setUser = (userData: User) => {

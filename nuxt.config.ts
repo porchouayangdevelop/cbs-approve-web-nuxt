@@ -54,8 +54,9 @@ export default defineNuxtConfig({
   },
   plugins: [
     '~/plugins/axios.ts',
-    '~/plugins/auth.client.ts',
-    '~/plugins/error-handler.ts'
+    '~/plugins/error-handler.ts',
+    '~/plugins/network-error.ts',
+    // '~/plugins/ckeditor.ts'
   ],
   modules: [
     // '@nuxt/content',
@@ -82,12 +83,10 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: [
-      ]
+      include: []
     },
     ssr: {
-      noExternal: [
-      ]
+      noExternal: []
     }
   },
   nitro: {
@@ -95,6 +94,5 @@ export default defineNuxtConfig({
       wasm: true,
     }
   },
-  alias: {
-  }
+  alias: {}
 })
