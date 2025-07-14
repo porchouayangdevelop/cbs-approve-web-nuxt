@@ -51,7 +51,9 @@ export const useRoleSession = () => {
   const {user} = useAuth();
   const route = useRoute();
 
-  const currentRole = computed(() => user.value?.role || 'checker');
+  const currentRole = computed(() => user.value?.role);
+
+  console.log(currentRole.value)
 
   // Role configurations
   const roleConfigs: Record<string, RoleConfig> = {

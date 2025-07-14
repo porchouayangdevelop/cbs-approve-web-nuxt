@@ -1,3 +1,5 @@
+import type {AxiosResponse} from "axios";
+import {useJWTDecoder} from "~/composables/useJWTDecoder";
 
 
 interface User {
@@ -13,8 +15,11 @@ interface User {
 }
 
 export interface Credentials {
+  grant_type?: string;
+  client_id?: string;
   username: string;
   password: string;
+  client_secret?: string;
 }
 
 export interface AuthResponse {
@@ -34,6 +39,7 @@ export const useAuth = () => {
   const isAuthenticated = useState<boolean>('auth.isAuthenticated', () => false);
   const isLoading = useState<boolean>('auth.isLoading', () => false);
 
+
   const getCurrentUser = async () => {
     try {
       isLoading.value = true;
@@ -49,7 +55,7 @@ export const useAuth = () => {
         firstName: "Por",
         lastName: "Yang",
         email: "apb.por@hotmail.com",
-        role: "admin",
+        role: "ss",
         department: "IT",
         permissions: ['read:dashboard', 'manage:users', 'view:reports', 'read:settings'],
         avatar: 'https://avatars.githubusercontent.com/u/739984?v=4'
@@ -86,24 +92,36 @@ export const useAuth = () => {
 
 
   const login = async (credentials: Credentials) => {
-    alert(JSON.stringify(credentials));
     try {
       isLoading.value = true;
       const {$authApi} = useNuxtApp();
-      const config = useRuntimeConfig();
-      const {data} = await $authApi.post<AuthResponse>(`${config.login}`, credentials);
+      // const config = useRuntimeConfig();
 
-      const response = data as AuthResponse;
+      const params = new URLSearchParams();
+      params.append('grant_type', 'password');
+      params.append('client_id', 'apb_teller_security');
+      params.append('username', credentials.username);
+      params.append('password', credentials.password);
+      params.append('client_secret', '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC');
 
-      const token = useCookie('access_token', {
-        maxAge: 1000 * 60 * 60 * 1000,
-        secure: true,
-        httpOnly: true,
-        sameSite: 'lax'
-      });
+      const config = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+
+      const {data} = await $authApi.post<AuthResponse>(`realms/apb_teller/protocol/openid-connect/token`, params, config);
+
+      const response = data;
+
+      const token = useCookie('access_token');
       token.value = data.access_token;
 
+      const {decodeToken} = useJWTDecoder()
+
       isAuthenticated.value = true;
+
+      const decoder = decodeToken(token.value)
 
       return response;
 

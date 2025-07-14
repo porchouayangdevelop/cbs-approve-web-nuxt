@@ -147,7 +147,7 @@ interface UserRole {
 }
 
 // State
-const selectedRole = ref('user')
+const selectedRole = ref()
 const loginFormRef = ref()
 
 // Available roles
@@ -247,9 +247,6 @@ const handleLogin = async (credentials: LoginCredentials) => {
       ...credentials,
       role: selectedRole.value
     }
-
-    console.log('Login attempt:', loginData)
-
     // Call authentication service
     const { login } = useAuth()
     const response = await login({

@@ -1,0 +1,140 @@
+{
+  "app": {
+    "name": "CBS Approve Web",
+    "title": "CBS Approve Web Nuxt",
+    "description": "Complete approval management system for organizations"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "admin": "Admin",
+    "checker": "Checker",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "help": "Help",
+    "viewAllNotifications": "View all notifications"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "loginTitle": "Choose User Type",
+    "welcomeBack": "Welcome back",
+    "enterCredentials": "Please enter your credentials",
+    "systemDescription": "Complete approval management system for organizations that need efficiency",
+    "rememberLogin": "Remember login",
+    "createAccount": "Create Account"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "confirm": "Confirm",
+    "retry": "Retry"
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "draft": "Draft",
+    "completed": "Completed",
+    "inReview": "In Review"
+  },
+  "user": {
+    "management": "User Management",
+    "createUser": "Create User",
+    "editUser": "Edit User",
+    "userList": "User List",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "department": "Department",
+    "role": "Role",
+    "phone": "Phone",
+    "location": "Location",
+    "createdAt": "Created At",
+    "lastLogin": "Last Login",
+    "userDetails": "User Details"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "checker": "Approval Specialist",
+    "user": "Standard User",
+    "manager": "Manager"
+  },
+  "requests": {
+    "management": "Request Management",
+    "createRequest": "Create Request",
+    "myRequests": "My Requests",
+    "allRequests": "All Requests",
+    "pendingRequests": "Pending Requests",
+    "approvedRequests": "Approved Requests",
+    "rejectedRequests": "Rejected Requests",
+    "requestDetails": "Request Details",
+    "requestType": "Request Type",
+    "requestStatus": "Request Status",
+    "submittedBy": "Submitted By",
+    "submittedOn": "Submitted On",
+    "approvedBy": "Approved By",
+    "approvedOn": "Approved On"
+  },
+  "forms": {
+    "required": "Required",
+    "optional": "Optional",
+    "pleaseSelect": "Please select",
+    "enterValue": "Enter value",
+    "chooseFile": "Choose file",
+    "uploadFile": "Upload file",
+    "fileUploaded": "File uploaded",
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email",
+      "minLength": "Minimum {count} characters required",
+      "maxLength": "Maximum {count} characters allowed",
+      "passwordMatch": "Passwords do not match"
+    }
+  },
+  "messages": {
+    "success": "Operation completed successfully",
+    "error": "An error occurred",
+    "warning": "Warning",
+    "info": "Information",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "noData": "No data available",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "accessDenied": "You don't have permission to perform this action",
+    "networkError": "Network error. Please check your connection.",
+    "operationSuccess": "Operation completed successfully",
+    "operationFailed": "Operation failed. Please try again."
+  },
+  "table": {
+    "actions": "Actions",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noRecords": "No records found",
+    "showing": "Showing",
+    "of": "of",
+    "entries": "entries",
+    "previous": "Previous",
+    "next": "Next"
+  }
+}

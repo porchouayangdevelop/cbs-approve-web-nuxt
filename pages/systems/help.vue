@@ -18,7 +18,6 @@ useSeoMeta({
 <template>
   <div>
     <pre>
-      {{data}}
     </pre>
   </div>
 </template>

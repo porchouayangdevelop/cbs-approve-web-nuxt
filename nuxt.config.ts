@@ -34,16 +34,17 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    auth_base_url: '',
-    api_base_url: '',
-    login: '',
-    logout: '',
-    refreshToken: '',
-    check_token: '',
-    role_list: '',
-    delete_user: '',
-    edit_user: '',
+
     public: {
+      auth_url: '',
+      api_url: '',
+      login: '',
+      logout: '',
+      refresh_token: '',
+      check_token: '',
+      role_list: '',
+      delete_user: '',
+      edit_user: '',
       webTitle: '',
       webDescription: '',
       ogImage: '',
@@ -58,19 +59,9 @@ export default defineNuxtConfig({
     '~/plugins/network-error.ts',
     // '~/plugins/ckeditor.ts'
   ],
-  modules: [
-    // '@nuxt/content',
-    '@nuxt/fonts',
-    '@nuxt/icon',
-    '@nuxt/image',
-    '@nuxt/scripts',
-    '@nuxt/test-utils',
-    '@nuxt/ui',
-    '@pinia/nuxt',
-    '@vueuse/nuxt',
-    'nuxt-swiper',
-    'nuxt-lucide-icons',
-    '@nuxtjs/color-mode'
+  modules: [// '@nuxt/content',
+    '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', '@nuxtjs/color-mode',
+    // '@nuxtjs/i18n'
   ],
   lucide: {
     namePrefix: 'Icon'
@@ -81,6 +72,46 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: ''
   },
+
+  // i18n: {
+  //   locales: [
+  //     {
+  //       code: 'en',
+  //       name: 'English',
+  //       file: 'en.json',
+  //       iso: 'en-US'
+  //     },
+  //     {
+  //       code: 'lo',
+  //       name: 'ລາວ',
+  //       file: 'lo.json',
+  //       iso: 'lo-LA'
+  //     }
+  //   ],
+  //   bundle: {
+  //     optimizeTranslationDirective: false,
+  //   },
+  //   lazy: true,
+  //   langDir: '../locales', // This should point to your locales directory
+  //   defaultLocale: 'en',
+  //   strategy: 'prefix_except_default',
+  //   detectBrowserLanguage: {
+  //     useCookie: true,
+  //     cookieKey: 'i18n_redirected',
+  //     cookieSecure: true,
+  //     // cookieSameSite: 'lax',
+  //     redirectOn: 'root',
+  //     alwaysRedirect: false,
+  //     fallbackLocale: 'en'
+  //   },
+  //   compilation: {
+  //     strictMessage: false // Allow missing translations
+  //   },
+  //   debug: process.env.NODE_ENV === 'development',
+  //   vueI18n: '../i18n.config.ts' // Optional: for advanced configuration
+  // },
+
+
   vite: {
     optimizeDeps: {
       include: []

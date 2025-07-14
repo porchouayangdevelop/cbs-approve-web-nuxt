@@ -77,6 +77,7 @@
             <span class="hidden xl:inline">{{ action.label }}</span>
           </UButton>
         </div>
+<!--        <LanguageSwitcher/>-->
 
         <!-- Notifications -->
         <UDropdownMenu :items="notificationItems" :popper="{ placement: 'bottom-end' }">
@@ -157,6 +158,7 @@
 <script setup lang="ts">
 import {useRoleSession} from '~/composables/useRoleSession'
 import {useAuth} from '~/composables/useAuth'
+import LanguageSwitcher from "~/components/LanguageSwitcher.vue";
 
 defineEmits<{
   'toggle-sidebar': []
@@ -194,7 +196,7 @@ const notificationItems = computed(() => {
     }]),
     [{
       label: 'View all notifications',
-      to: `/${userRole.value.toLowerCase()}/notifications`
+      to: `/${userRole.value}/notifications`
     }]
   ]
 })
@@ -205,12 +207,12 @@ const userMenuItems = computed(() => {
     [{
       label: 'Profile',
       icon: 'i-heroicons-user',
-      to: `/${userRole.value.toLowerCase()}/profile`
+      to: `/${userRole.value}/profile`
     }],
     [{
       label: 'Settings',
       icon: 'i-heroicons-cog-6-tooth',
-      to: `/${userRole.value.toLowerCase()}/settings`
+      to: `/${userRole.value}/settings`
     }]
   ]
 
@@ -233,7 +235,7 @@ const userMenuItems = computed(() => {
     }]
   }
 
-  const specificItems = roleSpecificItems[userRole.value.toLowerCase() as keyof typeof roleSpecificItems]
+  const specificItems = roleSpecificItems[userRole.value as keyof typeof roleSpecificItems]
   if (specificItems) {
     baseItems.splice(1, 0, specificItems)
   }

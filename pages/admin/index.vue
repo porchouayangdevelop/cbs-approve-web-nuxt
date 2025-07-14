@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
 definePageMeta({
-  layout: 'admin-session',
-  middleware: ['auth-guard', 'admin-guard']
+  layout: 'custom',
+  // middleware: ['auth-guard', 'admin-guard']
 })
 
 

@@ -1,0 +1,140 @@
+{
+  "app": {
+    "name": "CBS Approve Web",
+    "title": "CBS Approve Web Nuxt",
+    "description": "ລະບົບການຈັດການການອະນຸມັດທີ່ສົມບູນແບບສຳລັບອົງກອນທີ່ຕ້ອງການປະສິດທິພາບ"
+  },
+  "nav": {
+    "dashboard": "ໜ້າຫຼັກ",
+    "users": "ຜູ້ໃຊ້ງານ",
+    "admin": "ຜູ້ດູແລລະບົບ",
+    "checker": "ຜູ້ກວດສອບ",
+    "settings": "ການຕັ້ງຄ່າ",
+    "profile": "ຂໍ້ມູນສ່ວນຕົວ",
+    "logout": "ອອກຈາກລະບົບ",
+    "help": "ຊ່ວຍເຫຼືອ",
+    "viewAllNotifications": "ເບິ່ງການແຈ້ງເຕືອນທັງໝົດ"
+  },
+  "auth": {
+    "login": "ເຂົ້າສູ່ລະບົບ",
+    "register": "ລົງທະບຽນ",
+    "username": "ຊື່ຜູ້ໃຊ້",
+    "password": "ລະຫັດຜ່ານ",
+    "confirmPassword": "ຢືນຢັນລະຫັດຜ່ານ",
+    "forgotPassword": "ລືມລະຫັດຜ່ານ?",
+    "loginTitle": "ເລືອກປະເພດຜູ້ໃຊ້",
+    "welcomeBack": "ຍິນດີຕ້ອນຮັບກັບຄືນ",
+    "enterCredentials": "ກະລຸນາໃສ່ຂໍ້ມູນການເຂົ້າສູ່ລະບົບ",
+    "systemDescription": "ລະບົບການຈັດການການອະນຸມັດທີ່ສົມບູນແບບສຳລັບອົງກອນທີ່ຕ້ອງການປະສິດທິພາບ",
+    "rememberLogin": "ຈື່ການເຂົ້າສູ່ລະບົບ",
+    "createAccount": "ສ້າງບັນຊີ"
+  },
+  "buttons": {
+    "submit": "ສົ່ງ",
+    "cancel": "ຍົກເລີກ",
+    "save": "ບັນທຶກ",
+    "edit": "ແກ້ໄຂ",
+    "delete": "ລຶບ",
+    "back": "ກັບຄືນ",
+    "next": "ຕໍ່ໄປ",
+    "create": "ສ້າງ",
+    "update": "ອັບເດດ",
+    "close": "ປິດ",
+    "confirm": "ຢືນຢັນ",
+    "retry": "ລອງໃໝ່"
+  },
+  "common": {
+    "loading": "ກຳລັງໂຫລດ...",
+    "search": "ຄົ້ນຫາ",
+    "filter": "ກັ່ນຕອງ",
+    "actions": "ການດຳເນີນການ",
+    "status": "ສະຖານະ",
+    "active": "ເປີດໃຊ້ງານ",
+    "inactive": "ປິດໃຊ້ງານ",
+    "pending": "ລໍຖ້າ",
+    "approved": "ອະນຸມັດແລ້ວ",
+    "rejected": "ປະຕິເສດ",
+    "draft": "ຮ່າງ",
+    "completed": "ສຳເລັດແລ້ວ",
+    "inReview": "ກຳລັງກວດສອບ"
+  },
+  "user": {
+    "management": "ການຈັດການຜູ້ໃຊ້ງານ",
+    "createUser": "ສ້າງຜູ້ໃຊ້ງານໃໝ່",
+    "editUser": "ແກ້ໄຂຜູ້ໃຊ້ງານ",
+    "userList": "ລາຍການຜູ້ໃຊ້ງານ",
+    "firstName": "ຊື່",
+    "lastName": "ນາມສະກຸນ",
+    "email": "ອີເມວ",
+    "department": "ພະແນກ",
+    "role": "ຕຳແໜ່ງ",
+    "phone": "ໂທລະສັບ",
+    "location": "ທີ່ຢູ່",
+    "createdAt": "ວັນທີ່ສ້າງ",
+    "lastLogin": "ເຂົ້າສູ່ລະບົບຄັ້ງສຸດທ້າຍ",
+    "userDetails": "ລາຍລະອຽດຜູ້ໃຊ້ງານ"
+  },
+  "roles": {
+    "admin": "ຜູ້ດູແລລະບົບ",
+    "checker": "ຜູ້ຊ່ຽວຊານດ້ານການອະນຸມັດ",
+    "user": "ຜູ້ໃຊ້ງານທົ່ວໄປ",
+    "manager": "ຜູ້ຈັດການ"
+  },
+  "requests": {
+    "management": "ການຈັດການຄຳຂໍ",
+    "createRequest": "ສ້າງຄຳຂໍໃໝ່",
+    "myRequests": "ຄຳຂໍຂອງຂ້ອຍ",
+    "allRequests": "ຄຳຂໍທັງໝົດ",
+    "pendingRequests": "ຄຳຂໍທີ່ລໍຖ້າ",
+    "approvedRequests": "ຄຳຂໍທີ່ອະນຸມັດແລ້ວ",
+    "rejectedRequests": "ຄຳຂໍທີ່ປະຕິເສດ",
+    "requestDetails": "ລາຍລະອຽດຄຳຂໍ",
+    "requestType": "ປະເພດຄຳຂໍ",
+    "requestStatus": "ສະຖານະຄຳຂໍ",
+    "submittedBy": "ສົ່ງໂດຍ",
+    "submittedOn": "ສົ່ງເມື່ອ",
+    "approvedBy": "ອະນຸມັດໂດຍ",
+    "approvedOn": "ອະນຸມັດເມື່ອ"
+  },
+  "forms": {
+    "required": "ຈຳເປັນ",
+    "optional": "ທາງເລືອກ",
+    "pleaseSelect": "ກະລຸນາເລືອກ",
+    "enterValue": "ໃສ່ຄ່າ",
+    "chooseFile": "ເລືອກໄຟລ໌",
+    "uploadFile": "ອັບໂຫລດໄຟລ໌",
+    "fileUploaded": "ອັບໂຫລດໄຟລ໌ແລ້ວ",
+    "validation": {
+      "required": "ຊ່ອງນີ້ຈຳເປັນ",
+      "email": "ກະລຸນາໃສ່ອີເມວທີ່ຖືກຕ້ອງ",
+      "minLength": "ຕ້ອງການຢ່າງໜ້ອຍ {count} ໂຕອັກສອນ",
+      "maxLength": "ສູງສຸດ {count} ໂຕອັກສອນ",
+      "passwordMatch": "ລະຫັດຜ່ານບໍ່ກົງກັນ"
+    }
+  },
+  "messages": {
+    "success": "ດຳເນີນການສຳເລັດແລ້ວ",
+    "error": "ເກີດຂໍ້ຜິດພາດ",
+    "warning": "ການເຕືອນ",
+    "info": "ຂໍ້ມູນ",
+    "confirmDelete": "ທ່ານແນ່ໃຈວ່າຕ້ອງການລຶບລາຍການນີ້?",
+    "noData": "ບໍ່ມີຂໍ້ມູນ",
+    "sessionExpired": "ເຊັດຊັນຂອງທ່ານໝົດອາຍຸແລ້ວ ກະລຸນາເຂົ້າສູ່ລະບົບໃໝ່",
+    "accessDenied": "ທ່ານບໍ່ມີສິດທິໃນການດຳເນີນການນີ້",
+    "networkError": "ຂໍ້ຜິດພາດເຄືອຂ່າຍ ກະລຸນາກວດສອບການເຊື່ອມຕໍ່",
+    "operationSuccess": "ດຳເນີນການສຳເລັດແລ້ວ",
+    "operationFailed": "ການດຳເນີນການລົ້ມເຫຼວ ກະລຸນາລອງໃໝ່"
+  },
+  "table": {
+    "actions": "ການດຳເນີນການ",
+    "view": "ເບິ່ງ",
+    "edit": "ແກ້ໄຂ",
+    "delete": "ລຶບ",
+    "noRecords": "ບໍ່ພົບບັນທຶກ",
+    "showing": "ສະແດງ",
+    "of": "ຈາກ",
+    "entries": "ລາຍການ",
+    "previous": "ກ່ອນໜ້າ",
+    "next": "ຕໍ່ໄປ"
+  }
+}

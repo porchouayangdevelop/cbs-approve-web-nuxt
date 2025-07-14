@@ -1,4 +1,4 @@
-export const useLocale = () => {
+export const locale = () => {
 
   return useState<string>('locale', () => useDefaultLocale().value);
 }
@@ -20,7 +20,7 @@ export const useDefaultLocale = (fallback = 'en-US') => {
 }
 
 export const useLocales = () => {
-  const locale = useLocale()
+  const locale = locale()
   const locales = ref([
     'en-US',
     'en-GB',
@@ -33,6 +33,6 @@ export const useLocales = () => {
   return locales
 }
 
-export const useLocaleDate = (date: Ref<Date> | Date, locale = useLocale()) => {
+export const useLocaleDate = (date: Ref<Date> | Date, locale = locale()) => {
   return computed(() => new Intl.DateTimeFormat(locale.value, {dateStyle: 'full'}).format(unref(date)))
 }

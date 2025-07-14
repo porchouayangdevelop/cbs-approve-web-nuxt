@@ -1,19 +1,20 @@
-import axios, {type AxiosError, type InternalAxiosRequestConfig} from 'axios';
+import axios, {type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig} from 'axios';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-  const authApiInstance = axios.create({
-    baseURL: useRuntimeConfig().auth_base_url,
+  const config = useRuntimeConfig();
+  const authApiInstance: AxiosInstance = axios.create({
+    baseURL: config.public.auth_url,
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      // 'Allow-Origin': '*',
+      'Content-Type': 'application/x-www-form-urlencoded',
     }
   });
 
   const apiInstance = axios.create({
-    baseURL: useRuntimeConfig().api_base_url,
+    baseURL: config.public.api_url,
     headers: {
+      'Allow-Origin': '*',
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
       // 'Authorization': `Bearer ${useCookie('access_token')?.value || ''}`
     }
   });

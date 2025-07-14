@@ -12,6 +12,7 @@ definePageMeta({
 const {canAccess,hasRole,hasPermission} = useGuards();
 const {currentRole} = useRoleSession();
 
+
 onMounted(() => {
   console.log('Current role:', currentRole.value)
   console.log('Can access admin:', canAccess('/admin'))
@@ -36,7 +37,6 @@ const showToast = () => {
     <h1>
       Welcome to CBS Approve Web Nuxt
     </h1>
-
 
     <UButton variant="outline" color="neutral" @click="showToast">show toast</UButton>
   </div>
