@@ -1,6 +1,7 @@
 import type {AxiosResponse} from "axios";
 import {useJWTDecoder} from "~/composables/useJWTDecoder";
 
+import type {TokenPayload} from "~/composables/useJWTDecoder";
 
 interface User {
   id: string;
@@ -15,11 +16,8 @@ interface User {
 }
 
 export interface Credentials {
-  grant_type?: string;
-  client_id?: string;
   username: string;
   password: string;
-  client_secret?: string;
 }
 
 export interface AuthResponse {
@@ -43,27 +41,37 @@ export const useAuth = () => {
   const getCurrentUser = async () => {
     try {
       isLoading.value = true;
-      const token = useCookie('access_token');
 
-      if (!token.value) {
-        isAuthenticated.value = false;
-        return null;
-      }
-      const userData: User = {
-        id: "4f7c9819-0acd-4c2f-9161-479a6d442204",
-        username: "apb01398",
-        firstName: "Por",
-        lastName: "Yang",
-        email: "apb.por@hotmail.com",
-        role: "ss",
-        department: "IT",
-        permissions: ['read:dashboard', 'manage:users', 'view:reports', 'read:settings'],
-        avatar: 'https://avatars.githubusercontent.com/u/739984?v=4'
+      const {checkRole} = useCheckAuth();
+
+      const userProfile: User = {
+        id: checkRole.value?.sub ? checkRole.value?.sub : '',
+        username: checkRole.value?.preferred_username ? checkRole.value?.preferred_username : '',
+        firstName: checkRole.value?.given_name ? checkRole.value?.given_name : '',
+        lastName: checkRole.value?.family_name ? checkRole.value?.family_name : '',
+        email: checkRole.value?.email ? checkRole.value?.email : '',
+        role: checkRole.value?.realm_access?.roles?.[0] || '',
+        department: '',
+        permissions: [],
+        avatar: ''
       }
 
-      user.value = userData;
+      user.value = userProfile;
+      if (!user.value) {
+        throw new Error('User not found');
+      }
+
+      // Check if the user has a valid role
+      const validRoles = ['admin', 'checker', 'user']; // Define valid roles here
+      if (!validRoles.includes(user.value.role.toLowerCase())) {
+        throw new Error(`Invalid role: ${user.value.role}`);
+      }
+
       isAuthenticated.value = true;
-      return userData ? userData : null;
+
+      console.log(user.value);
+
+      return userProfile ? userProfile : null;
     } catch (e) {
       console.log(`Error fetching user data: ${e}`);
       await logout();

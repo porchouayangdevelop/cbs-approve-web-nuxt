@@ -53,7 +53,7 @@ export const useRoleSession = () => {
 
   const currentRole = computed(() => user.value?.role);
 
-  console.log(currentRole.value)
+  console.log(user.value)
 
   // Role configurations
   const roleConfigs: Record<string, RoleConfig> = {

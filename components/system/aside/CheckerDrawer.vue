@@ -176,7 +176,7 @@
 
       <!-- User Profile -->
       <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-        <UDropdown
+        <UDropdownMenu
             :items="userMenuItems"
             :popper="{ placement: 'top-start' }"
             class="w-full"
@@ -197,7 +197,7 @@
             </div>
             <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
           </div>
-        </UDropdown>
+        </UDropdownMenu>
       </div>
     </div>
   </aside>
