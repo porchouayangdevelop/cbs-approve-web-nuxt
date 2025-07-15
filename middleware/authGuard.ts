@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const {getCurrentUser} = useAuth();
+  const {getCurrentUser,user,isAuthenticated} = useAuth();
   const {checkAuth, handledUnauthorized, canAccess} = useGuards();
 
   const publicRoutes: string[] = [
@@ -18,10 +18,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/auth/login');
   }
 
-  try {
-    await getCurrentUser();
-  } catch (e) {
-    return navigateTo('/auth/login')
+  if(!user.value) {
+    try {
+      await getCurrentUser();
+    }catch(err) {
+      console.error('Error fetching user data:', err);
+      return handledUnauthorized(to.path);
+    }
+  }
+
+  if (!user.value) {
+    console.log('User data still not available after fetching');
+    return handledUnauthorized(to.path);
   }
 
   if (!canAccess(to.path)) {

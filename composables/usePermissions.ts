@@ -75,26 +75,6 @@ export const usePermissions = () => {
       'stats:read',
       'bulk:manage'
     ],
-    'manager': [
-      'users:read',
-      'users:create',
-      'users:edit',
-      'users:manage',
-      'dashboard:read',
-      'profile:read',
-      'profile:edit',
-      'requests:create',
-      'requests:read',
-      'requests:review',
-      'requests:approve',
-      'approval:access',
-      'approval:approve',
-      'approval:reject',
-      'reports:read',
-      'analytics:read',
-      'team:manage',
-      'workflows:review'
-    ]
   };
 
   // Get user permissions from both JWT token and role-based matrix

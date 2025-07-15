@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'admin-session',
-  // middleware: ['auth-guard', 'admin-guard', 'permission-guard']
+  middleware: ['auth-guard', 'admin-guard']
 })
 
 const router = useRouter()

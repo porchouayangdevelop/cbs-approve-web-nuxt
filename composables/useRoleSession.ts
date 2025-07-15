@@ -53,7 +53,7 @@ export const useRoleSession = () => {
   const {getUserPermissions} = usePermissions();
   const route = useRoute();
 
-  // Get current role from user state or JWT token
+  // Get the current role from user state or JWT token
   const currentRole = computed(() => {
     if (user.value?.role) {
       return user.value.role.toLowerCase();
@@ -66,8 +66,6 @@ export const useRoleSession = () => {
 
     return user.value?.role;
   });
-
-  console.log(currentRole.value, 'currentRole');
 
   // Get enhanced user profile from JWT token
   const userProfile = computed(() => {

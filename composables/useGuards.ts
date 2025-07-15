@@ -27,27 +27,29 @@ export const useGuards = () => {
     if (!user.value) return false;
 
     const roles = Array.isArray(role) ? role : [role];
-    return roles.includes(user.value?.role.toLowerCase());
+    const userRole = user.value?.role?.toLowerCase();
+
+    const hasRequiredRole = roles.some(r => r.toLowerCase() === userRole);
+    if (!hasRequiredRole) {
+      console.warn(`User does not have required role(s): ${roles.join(', ')}`);
+    }
+    return hasRequiredRole;
   }
 
   const hasPermission = (permission: string | string []): boolean => {
     if (!user.value || !user.value.permissions) return false;
 
     const permissions = Array.isArray(permission) ? permission : [permission];
-    return permissions.some(perm => user.value?.permissions.includes(perm));
+    const userPermissions = user.value.permissions.map(p => p.toLowerCase());
+
+    const hasRequiredPermission = permissions.some(perm => userPermissions.includes(perm.toLowerCase()));
+    if (!hasRequiredPermission) {
+      console.warn(`User does not have required permission(s): ${permissions.join(', ')}`);
+    }
+
+    return hasRequiredPermission;
   }
 
-  // const hasAnyPermission = (permission: string[]): boolean => {
-  //   if (!user.value || !user.value.permissions) return false;
-  //
-  //   return permission.some(perm => user.value?.permissions.includes(perm));
-  // }
-  //
-  // const hasAllPermission = (permission: string[]): boolean => {
-  //   if (!user.value || !user.value.permissions) return false;
-  //
-  //   return permission.every(perm => user.value?.permissions.includes(perm));
-  // }
 
   const canAccess = (route: string) => {
 
@@ -107,7 +109,7 @@ export const useGuards = () => {
 
       // admin -> user routes [User Management]
       '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
-      '/admin/users/create': {roles: ['admin'], permissions: ['admin:access', 'users:manage','users:create']},
+      '/admin/users/create': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
       '/admin/users/[id]': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
       '/admin/users/import': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
       '/admin/users/active': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
@@ -258,11 +260,9 @@ export const useGuards = () => {
     }
 
     // Check permission-based access
-    if (access.permissions && !hasPermission(access.permissions)) {
-      return false
-    }
+    return !(access.permissions && !hasPermission(access.permissions));
 
-    return true; // user has required role or permission
+     // user has required role or permission
   }
 
   // const canPerform = (action: string, resource?: string): boolean => {
