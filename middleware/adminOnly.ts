@@ -5,7 +5,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (!user.value || !hasRole('admin')) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'เฉพาะผู้ดูแลระบบเท่านั้นที่สามารถเข้าถึงหน้านี้ได้'
+      statusMessage: ''
     })
   }
 

@@ -37,7 +37,7 @@
               variant="soft"
               size="sm"
           >
-            {{ userRole }} Portal
+            {{ displayRole }} Portal
           </UBadge>
         </div>
 
@@ -77,7 +77,6 @@
             <span class="hidden xl:inline">{{ action.label }}</span>
           </UButton>
         </div>
-<!--        <LanguageSwitcher/>-->
 
         <!-- Notifications -->
         <UDropdownMenu :items="notificationItems" :popper="{ placement: 'bottom-end' }">
@@ -158,7 +157,7 @@
 <script setup lang="ts">
 import {useRoleSession} from '~/composables/useRoleSession'
 import {useAuth} from '~/composables/useAuth'
-import LanguageSwitcher from "~/components/LanguageSwitcher.vue";
+import {useCheckAuth} from '~/composables/useCheckAuth'
 
 defineEmits<{
   'toggle-sidebar': []
@@ -169,14 +168,38 @@ defineEmits<{
 const colorMode = useColorMode()
 const route = useRoute()
 const {user} = useAuth()
+const {currentUserRole} = useCheckAuth()
 
 // Use role session composable
 const {
   currentConfig,
   userProfile,
-  currentRole: userRole,
   getNotifications
 } = useRoleSession()
+
+// Get the current user role - prioritize user.value.role, fallback to JWT token
+const displayRole = computed(() => {
+  // First try to get from authenticated user
+  if (user.value?.role) {
+    return user.value.role.charAt(0).toUpperCase() + user.value.role.slice(1)
+  }
+
+  // Fallback to JWT token role
+  const jwtRole = currentUserRole()
+  if (jwtRole) {
+    return jwtRole.charAt(0).toUpperCase() + jwtRole.slice(1)
+  }
+
+  // Default fallback
+  return 'User'
+})
+
+// Debug log to help troubleshoot
+watch(() => [user.value?.role, currentUserRole()], ([userRole, jwtRole]) => {
+  console.log('AppBar - User role from auth:', userRole)
+  console.log('AppBar - Role from JWT:', jwtRole)
+  console.log('AppBar - Display role:', displayRole.value)
+}, { immediate: true })
 
 // Reactive states
 const isDark = computed(() => colorMode.value === 'dark')
@@ -196,23 +219,25 @@ const notificationItems = computed(() => {
     }]),
     [{
       label: 'View all notifications',
-      to: `/${userRole.value}/notifications`
+      to: `/${displayRole.value.toLowerCase()}/notifications`
     }]
   ]
 })
 
 // Role-specific user menu with access control
 const userMenuItems = computed(() => {
+  const roleValue = displayRole.value.toLowerCase()
+
   const baseItems = [
     [{
       label: 'Profile',
       icon: 'i-heroicons-user',
-      to: `/${userRole.value}/profile`
+      to: `/${roleValue}/profile`
     }],
     [{
       label: 'Settings',
       icon: 'i-heroicons-cog-6-tooth',
-      to: `/${userRole.value}/settings`
+      to: `/${roleValue}/settings`
     }]
   ]
 
@@ -235,7 +260,7 @@ const userMenuItems = computed(() => {
     }]
   }
 
-  const specificItems = roleSpecificItems[userRole.value as keyof typeof roleSpecificItems]
+  const specificItems = roleSpecificItems[roleValue as keyof typeof roleSpecificItems]
   if (specificItems) {
     baseItems.splice(1, 0, specificItems)
   }
@@ -274,10 +299,10 @@ watch(() => route.path, () => {
   showMobileSearch.value = false
 })
 
-// Watch for user role changes
+// Watch for user role changes and log for debugging
 watch(() => user.value?.role, (newRole) => {
   if (newRole) {
-    console.log('User role changed to:', newRole)
+    console.log('AppBar - User role changed to:', newRole)
   }
 }, {immediate: true})
 </script>

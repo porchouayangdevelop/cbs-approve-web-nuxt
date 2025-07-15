@@ -107,7 +107,7 @@ export const useGuards = () => {
 
       // admin -> user routes [User Management]
       '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
-      '/admin/users/create': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
+      '/admin/users/create': {roles: ['admin'], permissions: ['admin:access', 'users:manage','users:create']},
       '/admin/users/[id]': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
       '/admin/users/import': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
       '/admin/users/active': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
@@ -271,51 +271,52 @@ export const useGuards = () => {
   //   return hasPermission(permissions);
   // }
   //
-  // const getAccessibleRoutes = (): string[] => {
-  //   if (!checkAuth()) return [];
-  //
-  //   const allRoutes: string[] = [
-  //     '/admin',
-  //     '/admin/users',
-  //     '/admin/settings',
-  //     '/users',
-  //     '/users/create',
-  //     '/users/edit',
-  //     '/checkers',
-  //     '/checkers/requests',
-  //     '/dashboard',
-  //     '/profile'
-  //   ]
-  //
-  //   return allRoutes.filter(route => canAccess(route));
-  // }
+  const getAccessibleRoutes = (): string[] => {
+    if (!checkAuth()) return [];
 
-  // const getMissingPermission = (routePath: string): MissingAccess => {
-  //   const routePermissions: Record<string, RouteAccess> = {
-  //     '/admin': {roles: ['admin'], permissions: ['admin:access']},
-  //     '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
-  //     '/admin/settings': {roles: ['admin'], permissions: ['admin:access', 'settings:manage']},
-  //     '/users': {roles: ['admin', 'Manager'], permissions: ['users:read']},
-  //     '/users/create': {roles: ['admin', 'Manager'], permissions: ['users:create']},
-  //     '/users/edit': {roles: ['admin', 'Manager'], permissions: ['users:edit']},
-  //     '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
-  //     '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
-  //     '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
-  //     '/profile': {roles: ['admin', 'checker', 'user'], permissions: ['profile:read']}
-  //   }
-  //
-  //   const access = routePermissions[routePath];
-  //   if (!access) return {roles: [], permissions: []}; // No specific access defined for this route
-  //
-  //   const missingRoles = access.roles ? access.roles.filter(role => !hasRole(role)) : [];
-  //
-  //   const missingPermissions = access.permissions ? access.permissions.filter(permission => !hasPermission(permission)) : [];
-  //   return {
-  //     roles: missingRoles,
-  //     permissions: missingPermissions
-  //   }
-  //
-  // }
+    const allRoutes: string[] = [
+      '/admin',
+      '/admin/users',
+      '/admin/users/create',
+      '/admin/settings',
+      '/users',
+      '/users/create',
+      '/users/edit',
+      '/checkers',
+      '/checkers/requests',
+      '/dashboard',
+      '/profile'
+    ]
+
+    return allRoutes.filter(route => canAccess(route));
+  }
+
+  const getMissingPermission = (routePath: string): MissingAccess => {
+    const routePermissions: Record<string, RouteAccess> = {
+      '/admin': {roles: ['admin'], permissions: ['admin:access']},
+      '/admin/users': {roles: ['admin'], permissions: ['admin:access', 'users:manage']},
+      '/admin/settings': {roles: ['admin'], permissions: ['admin:access', 'settings:manage']},
+      '/users': {roles: ['admin', 'Manager'], permissions: ['users:read']},
+      '/users/create': {roles: ['admin', 'Manager'], permissions: ['users:create']},
+      '/users/edit': {roles: ['admin', 'Manager'], permissions: ['users:edit']},
+      '/checkers': {roles: ['admin', 'checker'], permissions: ['checker:access']},
+      '/checkers/requests': {roles: ['admin', 'checker'], permissions: ['checker:access', 'requests:review']},
+      '/dashboard': {roles: ['admin', 'checker', 'user'], permissions: ['dashboard:read']},
+      '/profile': {roles: ['admin', 'checker', 'user'], permissions: ['profile:read']}
+    }
+
+    const access = routePermissions[routePath];
+    if (!access) return {roles: [], permissions: []}; // No specific access defined for this route
+
+    const missingRoles = access.roles ? access.roles.filter(role => !hasRole(role)) : [];
+
+    const missingPermissions = access.permissions ? access.permissions.filter(permission => !hasPermission(permission)) : [];
+    return {
+      roles: missingRoles,
+      permissions: missingPermissions
+    }
+
+  }
 
   const redirectToAllowPage = async () => {
     if (!checkAuth()) {
@@ -366,8 +367,8 @@ export const useGuards = () => {
     // hasAllPermission,
     canAccess,
     // canPerform,
-    // getAccessibleRoutes,
-    // getMissingPermission,
+    getAccessibleRoutes,
+    getMissingPermission,
     redirectToAllowPage,
     handledUnauthorized
   }

@@ -48,15 +48,26 @@ interface RoleSessionData {
 }
 
 export const useRoleSession = () => {
-  const { user } = useAuth();
-  const { currentUserRole, getUserProfile } = useCheckAuth();
-  const { getUserPermissions } = usePermissions();
+  const {user} = useAuth();
+  const {currentUserRole, getUserProfile} = useCheckAuth();
+  const {getUserPermissions} = usePermissions();
   const route = useRoute();
 
   // Get current role from user state or JWT token
   const currentRole = computed(() => {
-    return user.value?.role || currentUserRole() || 'user';
+    if (user.value?.role) {
+      return user.value.role.toLowerCase();
+    }
+
+    const jwtRole = currentUserRole();
+    if (jwtRole) {
+      return jwtRole.toLowerCase();
+    }
+
+    return user.value?.role;
   });
+
+  console.log(currentRole.value, 'currentRole');
 
   // Get enhanced user profile from JWT token
   const userProfile = computed(() => {
@@ -511,135 +522,11 @@ export const useRoleSession = () => {
         }]
       ]
     },
-
-    manager: {
-      title: 'Manager Portal',
-      shortTitle: 'Manager',
-      subtitle: 'Team Management',
-      icon: 'i-heroicons-user-group',
-      logoColor: 'bg-purple-600',
-      badgeColor: 'purple',
-      roleTextColor: 'text-purple-600 dark:text-purple-400',
-      searchPlaceholder: 'Search team requests, reports...',
-      notificationCount: 8,
-      quickActions: [
-        {
-          label: 'Team Overview',
-          icon: 'i-heroicons-user-group',
-          to: '/users/team',
-          class: 'text-purple-600'
-        },
-        {
-          label: 'Approve Requests',
-          icon: 'i-heroicons-check-circle',
-          to: '/users/requests/review',
-          class: 'text-green-600'
-        },
-        {
-          label: 'Analytics',
-          icon: 'i-heroicons-chart-bar',
-          to: '/users/analytics',
-          class: 'text-blue-600'
-        }
-      ],
-      navigationSections: [
-        {
-          items: [
-            {
-              label: 'Dashboard',
-              to: '/users',
-              icon: 'i-heroicons-squares-2x2'
-            }
-          ]
-        },
-        {
-          title: 'Team Management',
-          items: [
-            {
-              label: 'Team Overview',
-              to: '/users/team',
-              icon: 'i-heroicons-user-group'
-            },
-            {
-              label: 'Team Requests',
-              to: '/users/requests',
-              icon: 'i-heroicons-document-text',
-              badge: '12',
-              badgeColor: 'blue'
-            },
-            {
-              label: 'Approval Queue',
-              to: '/users/requests/review',
-              icon: 'i-heroicons-check-circle',
-              badge: '5',
-              badgeColor: 'orange'
-            }
-          ]
-        },
-        {
-          title: 'Request Management',
-          items: [
-            {
-              label: 'Create Request',
-              to: '/users/requests/create',
-              icon: 'i-heroicons-plus-circle'
-            },
-            {
-              label: 'My Requests',
-              to: '/users/requests',
-              icon: 'i-heroicons-document-text'
-            },
-            {
-              label: 'Templates',
-              to: '/users/templates',
-              icon: 'i-heroicons-document-duplicate'
-            }
-          ]
-        },
-        {
-          title: 'Analytics & Reports',
-          items: [
-            {
-              label: 'Team Analytics',
-              to: '/users/analytics',
-              icon: 'i-heroicons-chart-bar'
-            },
-            {
-              label: 'Performance Reports',
-              to: '/users/reports',
-              icon: 'i-heroicons-document-chart-bar'
-            }
-          ]
-        }
-      ],
-      userMenuItems: [
-        [{
-          label: 'Manager Profile',
-          icon: 'i-heroicons-user',
-          to: '/users/profile'
-        }],
-        [{
-          label: 'Team Management',
-          icon: 'i-heroicons-user-group',
-          to: '/users/team'
-        }],
-        [{
-          label: 'Settings',
-          icon: 'i-heroicons-cog-6-tooth',
-          to: '/users/settings'
-        }],
-        [{
-          label: 'Sign Out',
-          icon: 'i-heroicons-arrow-right-on-rectangle',
-          click: () => handleLogout()
-        }]
-      ]
-    }
   }
 
   // Get current role configuration
   const currentConfig = computed(() => {
-    return roleConfigs[currentRole.value] || roleConfigs.user
+    return roleConfigs[currentRole.value || ''] || roleConfigs.user
   })
 
   // Get page title based on current route
@@ -867,7 +754,7 @@ export const useRoleSession = () => {
   // Handle logout functionality
   const handleLogout = async () => {
     try {
-      const { logout } = useAuth()
+      const {logout} = useAuth()
       await logout()
     } catch (error) {
       console.error('Logout error:', error)
@@ -876,7 +763,7 @@ export const useRoleSession = () => {
 
   // Session management
   const sessionData = computed((): RoleSessionData => ({
-    role: currentRole.value,
+    role: currentRole.value ? currentRole.value : '',
     config: currentConfig.value,
     permissions: getUserPermissions.value,
     userProfile: userProfile.value
@@ -888,28 +775,28 @@ export const useRoleSession = () => {
 
     const metrics = {
       admin: [
-        { label: 'Total Users', value: '1,234', icon: 'i-heroicons-users', color: 'blue' },
-        { label: 'Active Sessions', value: '89', icon: 'i-heroicons-signal', color: 'green' },
-        { label: 'System Health', value: '98%', icon: 'i-heroicons-heart', color: 'green' },
-        { label: 'Pending Tasks', value: '12', icon: 'i-heroicons-exclamation-triangle', color: 'orange' }
+        {label: 'Total Users', value: '1,234', icon: 'i-heroicons-users', color: 'blue'},
+        {label: 'Active Sessions', value: '89', icon: 'i-heroicons-signal', color: 'green'},
+        {label: 'System Health', value: '98%', icon: 'i-heroicons-heart', color: 'green'},
+        {label: 'Pending Tasks', value: '12', icon: 'i-heroicons-exclamation-triangle', color: 'orange'}
       ],
       checker: [
-        { label: 'Pending Approvals', value: '23', icon: 'i-heroicons-clock', color: 'orange' },
-        { label: 'Approved Today', value: '45', icon: 'i-heroicons-check-circle', color: 'green' },
-        { label: 'Avg. Response Time', value: '2.3h', icon: 'i-heroicons-bolt', color: 'blue' },
-        { label: 'Success Rate', value: '94%', icon: 'i-heroicons-chart-bar', color: 'green' }
+        {label: 'Pending Approvals', value: '23', icon: 'i-heroicons-clock', color: 'orange'},
+        {label: 'Approved Today', value: '45', icon: 'i-heroicons-check-circle', color: 'green'},
+        {label: 'Avg. Response Time', value: '2.3h', icon: 'i-heroicons-bolt', color: 'blue'},
+        {label: 'Success Rate', value: '94%', icon: 'i-heroicons-chart-bar', color: 'green'}
       ],
       user: [
-        { label: 'My Requests', value: '8', icon: 'i-heroicons-document-text', color: 'blue' },
-        { label: 'Approved', value: '15', icon: 'i-heroicons-check-circle', color: 'green' },
-        { label: 'Pending', value: '3', icon: 'i-heroicons-clock', color: 'orange' },
-        { label: 'Draft', value: '2', icon: 'i-heroicons-document-plus', color: 'gray' }
+        {label: 'My Requests', value: '8', icon: 'i-heroicons-document-text', color: 'blue'},
+        {label: 'Approved', value: '15', icon: 'i-heroicons-check-circle', color: 'green'},
+        {label: 'Pending', value: '3', icon: 'i-heroicons-clock', color: 'orange'},
+        {label: 'Draft', value: '2', icon: 'i-heroicons-document-plus', color: 'gray'}
       ],
       manager: [
-        { label: 'Team Requests', value: '34', icon: 'i-heroicons-user-group', color: 'blue' },
-        { label: 'Team Performance', value: '92%', icon: 'i-heroicons-chart-bar', color: 'green' },
-        { label: 'Pending Approvals', value: '7', icon: 'i-heroicons-clock', color: 'orange' },
-        { label: 'Team Size', value: '12', icon: 'i-heroicons-users', color: 'purple' }
+        {label: 'Team Requests', value: '34', icon: 'i-heroicons-user-group', color: 'blue'},
+        {label: 'Team Performance', value: '92%', icon: 'i-heroicons-chart-bar', color: 'green'},
+        {label: 'Pending Approvals', value: '7', icon: 'i-heroicons-clock', color: 'orange'},
+        {label: 'Team Size', value: '12', icon: 'i-heroicons-users', color: 'purple'}
       ]
     }
 
@@ -922,19 +809,19 @@ export const useRoleSession = () => {
 
     const activities = {
       admin: [
-        { action: 'User created', subject: 'john.doe@company.com', time: '2 minutes ago', type: 'create' },
-        { action: 'System backup', subject: 'completed successfully', time: '1 hour ago', type: 'success' },
-        { action: 'Security alert', subject: 'resolved', time: '3 hours ago', type: 'warning' }
+        {action: 'User created', subject: 'john.doe@company.com', time: '2 minutes ago', type: 'create'},
+        {action: 'System backup', subject: 'completed successfully', time: '1 hour ago', type: 'success'},
+        {action: 'Security alert', subject: 'resolved', time: '3 hours ago', type: 'warning'}
       ],
       checker: [
-        { action: 'Request approved', subject: 'Leave Request #1234', time: '5 minutes ago', type: 'approve' },
-        { action: 'Request reviewed', subject: 'Expense Report #5678', time: '30 minutes ago', type: 'review' },
-        { action: 'Workflow updated', subject: 'Priority approval process', time: '2 hours ago', type: 'update' }
+        {action: 'Request approved', subject: 'Leave Request #1234', time: '5 minutes ago', type: 'approve'},
+        {action: 'Request reviewed', subject: 'Expense Report #5678', time: '30 minutes ago', type: 'review'},
+        {action: 'Workflow updated', subject: 'Priority approval process', time: '2 hours ago', type: 'update'}
       ],
       user: [
-        { action: 'Request submitted', subject: 'Annual Leave Request', time: '1 hour ago', type: 'create' },
-        { action: 'Document uploaded', subject: 'Supporting documents', time: '3 hours ago', type: 'upload' },
-        { action: 'Profile updated', subject: 'Contact information', time: '1 day ago', type: 'update' }
+        {action: 'Request submitted', subject: 'Annual Leave Request', time: '1 hour ago', type: 'create'},
+        {action: 'Document uploaded', subject: 'Supporting documents', time: '3 hours ago', type: 'upload'},
+        {action: 'Profile updated', subject: 'Contact information', time: '1 day ago', type: 'update'}
       ],
     }
 

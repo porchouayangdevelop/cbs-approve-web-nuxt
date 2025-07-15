@@ -56,8 +56,8 @@
                 }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600 dark:text-gray-400">User ID:</span>
-              <span class="text-sm font-mono text-gray-900 dark:text-white">{{ currentUser?.id || 'N/A' }}</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">User:</span>
+              <span class="text-sm font-mono text-gray-900 dark:text-white">{{ currentUser?.firstName || 'N/A' }}</span>
             </div>
           </div>
         </UCard>
@@ -115,22 +115,22 @@
               </div>
             </div>
 
-            <div v-if="currentUser?.permissions && currentUser.permissions.length > 0">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Your Permissions:</span>
-              </div>
-              <div class="flex flex-wrap gap-1">
-                <UBadge
-                    v-for="permission in currentUser.permissions"
-                    :key="permission"
-                    color="blue"
-                    variant="soft"
-                    size="xs"
-                >
-                  {{ permission }}
-                </UBadge>
-              </div>
-            </div>
+<!--            <div v-if="currentUser?.permissions && currentUser.permissions.length > 0">-->
+<!--              <div class="flex items-center justify-between mb-2">-->
+<!--                <span class="text-sm text-gray-600 dark:text-gray-400">Your Permissions:</span>-->
+<!--              </div>-->
+<!--              <div class="flex flex-wrap gap-1">-->
+<!--                <UBadge-->
+<!--                    v-for="permission in currentUser.permissions"-->
+<!--                    :key="permission"-->
+<!--                    color="neutral"-->
+<!--                    variant="soft"-->
+<!--                    size="xs"-->
+<!--                >-->
+<!--                  {{ permission }}-->
+<!--                </UBadge>-->
+<!--              </div>-->
+<!--            </div>-->
 
             <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
               <div class="flex items-center justify-between">
@@ -144,41 +144,6 @@
             </div>
           </div>
         </UCard>
-
-        <!-- Debug Information (Development Only) -->
-        <div v-if="isDevelopment" class="mt-8">
-          <UCard class="text-left max-w-lg mx-auto">
-            <template #header>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-code-bracket" class="w-5 h-5 text-orange-500"/>
-                <span class="font-semibold">Debug Information (Development)</span>
-              </div>
-            </template>
-
-            <div class="space-y-3">
-              <div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Route Information:</p>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded p-2 text-xs">
-                  <pre class="text-gray-800 dark:text-gray-200">{{ JSON.stringify(routeInfo, null, 2) }}</pre>
-                </div>
-              </div>
-
-              <div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">User Context:</p>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded p-2 text-xs">
-                  <pre class="text-gray-800 dark:text-gray-200">{{ JSON.stringify(currentUser, null, 2) }}</pre>
-                </div>
-              </div>
-
-              <div>
-                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Accessible Routes:</p>
-                <div class="bg-gray-100 dark:bg-gray-700 rounded p-2 text-xs">
-                  <pre class="text-gray-800 dark:text-gray-200">{{ JSON.stringify(accessibleRoutes, null, 2) }}</pre>
-                </div>
-              </div>
-            </div>
-          </UCard>
-        </div>
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
@@ -251,7 +216,6 @@ import {useGuards} from "~/composables/useGuards";
 
 definePageMeta({
   layout: false,
-  path: '/unauthorized'
 })
 
 const route = useRoute()
@@ -291,7 +255,6 @@ const accessibleRoutes = computed(() => {
 const getRoleColor = (role?: string) => {
   const colors: Record<string, string> = {
     'Admin': 'red',
-    'Manager': 'blue',
     'Checker': 'green',
     'User': 'gray'
   }

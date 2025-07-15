@@ -330,6 +330,7 @@ onMounted(() => {
 // Save role preference when changed
 watch(selectedRole, (newRole) => {
   localStorage.setItem('preferredRole', newRole)
+  useCookie('preferredRole').value = newRole
 })
 
 // SEO

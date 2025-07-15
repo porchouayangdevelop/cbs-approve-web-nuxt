@@ -21,7 +21,7 @@ export const useCheckAuth = () => {
       return null;
     }
 
-    const rolePriority = ['admin', 'manager', 'user'];
+    const rolePriority = ['admin', 'checker', 'user'];
     const userRoles = payload.realm_access.roles.map(role => role.toLowerCase());
 
     for (const role of rolePriority) {
@@ -29,7 +29,7 @@ export const useCheckAuth = () => {
         return role;
       }
     }
-
+    // If no priority role found, return the first role
     return userRoles[0] || null; // Return the first role if no priority match found
   }
 

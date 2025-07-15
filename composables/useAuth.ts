@@ -45,6 +45,14 @@ export const useAuth = () => {
 
   const {getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions} = useCheckAuth();
   const {decodeToken, isTokenExpired} = useJWTDecoder();
+  const {
+    setAccessToken,
+    getAccessToken,
+    validateAccessToken,
+    getRefreshToken,
+    setRefreshToken,
+    clearCookies
+  } = useCookieHelping();
 
 
   const getCurrentUser = async (): Promise<User | null> => {
@@ -52,8 +60,21 @@ export const useAuth = () => {
       isLoading.value = true;
 
       const token = useCookie('access_token').value;
-      if (!token || isTokenExpired(token)) {
+      if (!token) {
         throw new Error('Token is invalid or expired');
+      }
+
+      if(isTokenExpired(token)) {
+        console.warn('Access token is expired, trying to refresh...');
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          throw new Error('Failed to refresh access token');
+        }
+
+        const newToken = setAccessToken('access_token', 3600);
+        if(!newToken) {
+          throw new Error('Failed to set new access token');
+        }
       }
 
       if (!checkAuthStatus()) {
@@ -66,23 +87,23 @@ export const useAuth = () => {
       }
 
       const userProfile: User = {
-        id: profile.id || '',
-        username: profile.username || '',
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        email: profile.email || '',
+        id: profile.id,
+        username: profile.username,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        email: profile.email,
         emailVerified: profile.emailVerified,
-        role: profile.currentRole || '',
-        roles: profile.roles || [],
-        department: profile.department || '',
+        role: profile.currentRole,
+        roles: profile.roles,
+        department: profile.department,
         permissions: getUserPermissions(),
         avatar: profile.avatar,
         locale: profile.locale,
         sessionId: profile.sessionId,
       }
 
-      const validRole = ['admin', 'checker', 'user'].includes(userProfile.role.toLowerCase());
-      if (!validRole) {
+      const validRole = ['admin', 'checker', 'user'];
+      if (!validRole.includes(userProfile.role.toLowerCase())) {
         throw new Error(`Invalid user role: ${userProfile.role}`);
       }
 
@@ -91,10 +112,12 @@ export const useAuth = () => {
 
       console.log(`Current user loaded: ${user.value.username} with role ${user.value.role}`);
 
-      return userProfile ? userProfile : null;
+      return userProfile;
     } catch (e) {
       console.log(`Error fetching user data: ${e}`);
-      await logout();
+      user.value = null;
+      isAuthenticated.value = false;
+
       return null;
     } finally {
       isLoading.value = false;
@@ -141,24 +164,24 @@ export const useAuth = () => {
 
       const {data} = await $authApi.post<AuthResponse>(`realms/apb_teller/protocol/openid-connect/token`, params, config);
 
-      const response = data;
-
-      const token = useCookie('access_token');
-      const refreshToken = useCookie('refresh_token')
-      token.value = data.access_token;
-      refreshToken.value = data.refresh_token;
+      const accessToken = setAccessToken(data.access_token, data.expires_in);
+      const refreshToken = setRefreshToken(data.refresh_token, data.refresh_expires_in);
 
 
-      const decoder = decodeToken(token.value)
+      const decoder = decodeToken(data.access_token);
       if (decoder) {
         isAuthenticated.value = true;
         await getCurrentUser();
       }
 
-      return response;
+      return data;
 
     } catch (e) {
       console.error(`Login failed: ${e}`);
+
+      clearCookies();
+      user.value = null;
+      isAuthenticated.value = false;
       throw e;
     } finally {
       isLoading.value = false;

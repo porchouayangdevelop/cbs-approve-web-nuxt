@@ -3,7 +3,7 @@ import type {TokenPayload} from '~/composables/useJWTDecoder'
 
 definePageMeta({
   layout: 'checker-session',
-  // middleware: ['auth-guard', 'checker-guard']
+  middleware: ['auth-guard', 'checker-guard']
 })
 
 const {checkRole} = useCheckAuth();
