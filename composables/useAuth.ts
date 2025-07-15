@@ -9,10 +9,15 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  emailVerified: boolean;
   role: string;
+  roles: string[];
   department?: string;
   permissions: string[];
   avatar?: string;
+  locale?: string;
+  lastUpdated?: string;
+  sessionId?: string;
 }
 
 export interface Credentials {
@@ -33,48 +38,64 @@ export interface AuthResponse {
 
 export const useAuth = () => {
 
+
   const user = useState<User | null>('auth.user', () => null);
   const isAuthenticated = useState<boolean>('auth.isAuthenticated', () => false);
   const isLoading = useState<boolean>('auth.isLoading', () => false);
 
+  const {getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions} = useCheckAuth();
+  const {decodeToken, isTokenExpired} = useJWTDecoder();
 
-  const getCurrentUser = async () => {
+
+  const getCurrentUser = async (): Promise<User | null> => {
     try {
       isLoading.value = true;
 
-      const {checkRole} = useCheckAuth();
+      const token = useCookie('access_token').value;
+      if (!token || isTokenExpired(token)) {
+        throw new Error('Token is invalid or expired');
+      }
+
+      if (!checkAuthStatus()) {
+        throw new Error('User is not authenticated');
+      }
+
+      const profile = getUserProfile();
+      if (!profile) {
+        throw new Error('User profile not found');
+      }
 
       const userProfile: User = {
-        id: checkRole.value?.sub ? checkRole.value?.sub : '',
-        username: checkRole.value?.preferred_username ? checkRole.value?.preferred_username : '',
-        firstName: checkRole.value?.given_name ? checkRole.value?.given_name : '',
-        lastName: checkRole.value?.family_name ? checkRole.value?.family_name : '',
-        email: checkRole.value?.email ? checkRole.value?.email : '',
-        role: checkRole.value?.realm_access?.roles?.[0] || '',
-        department: '',
-        permissions: [],
-        avatar: ''
+        id: profile.id || '',
+        username: profile.username || '',
+        firstName: profile.firstName || '',
+        lastName: profile.lastName || '',
+        email: profile.email || '',
+        emailVerified: profile.emailVerified,
+        role: profile.currentRole || '',
+        roles: profile.roles || [],
+        department: profile.department || '',
+        permissions: getUserPermissions(),
+        avatar: profile.avatar,
+        locale: profile.locale,
+        sessionId: profile.sessionId,
+      }
+
+      const validRole = ['admin', 'checker', 'user'].includes(userProfile.role.toLowerCase());
+      if (!validRole) {
+        throw new Error(`Invalid user role: ${userProfile.role}`);
       }
 
       user.value = userProfile;
-      if (!user.value) {
-        throw new Error('User not found');
-      }
-
-      // Check if the user has a valid role
-      const validRoles = ['admin', 'checker', 'user']; // Define valid roles here
-      if (!validRoles.includes(user.value.role.toLowerCase())) {
-        throw new Error(`Invalid role: ${user.value.role}`);
-      }
-
       isAuthenticated.value = true;
 
-      console.log(user.value);
+      console.log(`Current user loaded: ${user.value.username} with role ${user.value.role}`);
 
       return userProfile ? userProfile : null;
     } catch (e) {
       console.log(`Error fetching user data: ${e}`);
       await logout();
+      return null;
     } finally {
       isLoading.value = false;
     }
@@ -91,13 +112,13 @@ export const useAuth = () => {
       if (selectRole && userRole !== selectRole) {
         throw new Error(`Error while login with role "${credential.role}"`);
       }
+      return response;
     } catch (e) {
       throw e;
     } finally {
       isLoading.value = false;
     }
   }
-
 
   const login = async (credentials: Credentials) => {
     try {
@@ -123,13 +144,16 @@ export const useAuth = () => {
       const response = data;
 
       const token = useCookie('access_token');
+      const refreshToken = useCookie('refresh_token')
       token.value = data.access_token;
+      refreshToken.value = data.refresh_token;
 
-      const {decodeToken} = useJWTDecoder()
-
-      isAuthenticated.value = true;
 
       const decoder = decodeToken(token.value)
+      if (decoder) {
+        isAuthenticated.value = true;
+        await getCurrentUser();
+      }
 
       return response;
 
@@ -146,23 +170,44 @@ export const useAuth = () => {
       isLoading.value = true;
       const {$authApi} = useNuxtApp();
       const config = useRuntimeConfig();
-      const {data} = await $authApi.post(`${config.logout}`, {
-        headers: {
-          'Authorization': `Bearer ${useCookie('access_token')?.value || ''}`
+
+      const refreshToken = useCookie('refresh_token').value;
+      if (refreshToken) {
+        try {
+          await $authApi.post(`${config.public.logout}`, new URLSearchParams({
+            client_id: 'apb_teller_security',
+            refresh_token: refreshToken
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+              // 'Authorization': `Bearer ${useCookie('access_token')?.value || ''}`
+            }
+          });
+        } catch (logoutError) {
+          console.warn('Server logout failed:', logoutError);
         }
-      });
-
-      const token = useCookie('access_token').value;
-
-      if (token) {
-        useCookie('access_token').value = null;
       }
+
+      const accessTokenCookie = useCookie('access_token');
+      const refreshTokenCookie = useCookie('refresh_token');
+
+      accessTokenCookie.value = null;
+      refreshTokenCookie.value = null;
+
       user.value = null;
       isAuthenticated.value = false;
       await navigateTo('/auth/login');
     } catch (e) {
       console.error(`Logout failed: ${e}`);
-      throw e;
+
+      const accessTokenCookie = useCookie('access_token');
+      const refreshTokenCookie = useCookie('refresh_token');
+      accessTokenCookie.value = null;
+      refreshTokenCookie.value = null;
+
+      user.value = null;
+      isAuthenticated.value = false;
+      await navigateTo('/auth/login');
     } finally {
       isLoading.value = false;
     }
@@ -173,26 +218,35 @@ export const useAuth = () => {
       isLoading.value = true;
       const {$authApi} = useNuxtApp();
       const config = useRuntimeConfig();
-      const refreshToken = useCookie('refresh_token');
+      const refreshToken = useCookie('refresh_token').value;
 
-      if (!refreshToken.value) {
+      if (!refreshToken) {
         await logout();
         return false;
       }
 
-      const {data} = await $authApi.post<AuthResponse>(`${config.refreshToken}`, {
-        refresh_token: refreshToken.value
+      const params = new URLSearchParams();
+      params.append('grant_type', 'refresh_token');
+      params.append('client_id', 'apb_teller_security');
+      params.append('refresh_token', refreshToken);
+      params.append('client_secret', '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC');
+
+      const {data} = await $authApi.post<AuthResponse>(`${config.refreshToken}`, params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
       });
 
-      const response = data as AuthResponse;
+      // Update cookies with new tokens
+      const accessToken = useCookie('access_token');
+      const newRefreshToken = useCookie('refresh_token');
 
-      const token = useCookie('access_token', {
-        maxAge: 1000 * 60 * 60 * 1000,
-        secure: true,
-        httpOnly: true,
-        sameSite: 'lax'
-      });
-      token.value = response.access_token;
+      accessToken.value = data.access_token;
+      if (data.refresh_token) {
+        newRefreshToken.value = data.refresh_token;
+      }
+
+      await getCurrentUser();
 
       return true;
 
@@ -203,13 +257,56 @@ export const useAuth = () => {
     }
   }
 
+  const updateProfile = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      if (currentUser) {
+        console.log(`Updating profile for user`);
+      }
+    } catch (e) {
+      console.error(`Error updating profile: ${e}`);
+      // await logout();
+    }
+  }
+
+  const hasRole = (roles: string | string[]): boolean => {
+    if (!user.value) return false;
+    const roleArray = Array.isArray(roles) ? roles : [roles];
+    return roleArray.some(role => user.value?.roles.includes(role.toLowerCase()) || user.value?.role.toLowerCase() === role.toLowerCase());
+  }
+
+  const hasPermission = (permission: string): boolean => {
+    if (!user.value?.permissions) return false;
+    return user.value.permissions.includes(permission.toLowerCase());
+  }
+
+  const hasAnyPermission = (permissions: string[]): boolean => {
+    if (!user.value?.permissions) return false;
+    return permissions.some(permission =>
+      user.value?.permissions.includes(permission.toLowerCase())
+    );
+  };
+
+  const hasAllPermissions = (permissions: string[]): boolean => {
+    if (!user.value?.permissions) return false;
+    return permissions.every(permission =>
+      user.value?.permissions.includes(permission.toLowerCase())
+    );
+  };
+
   return {
     user: readonly(user),
     isAuthenticated: readonly(isAuthenticated),
     isLoading: readonly(isLoading),
     getCurrentUser,
     login,
+    loginWithRole,
     logout,
-    refreshToken
+    refreshToken,
+    updateProfile,
+    hasRole,
+    hasPermission,
+    hasAnyPermission,
+    hasAllPermissions,
   }
 }
