@@ -148,7 +148,7 @@ export const useRoleSession = () => {
           items: [
             {
               label: 'Dashboard',
-              to: '/',
+              to: '/admin',
               icon: 'i-heroicons-home'
             }
           ]

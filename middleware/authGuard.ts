@@ -23,13 +23,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       await getCurrentUser();
     }catch(err) {
       console.error('Error fetching user data:', err);
-      return handledUnauthorized(to.path);
+      return navigateTo('/auth/login');
     }
   }
 
   if (!user.value) {
     console.log('User data still not available after fetching');
-    return handledUnauthorized(to.path);
+    return navigateTo('/auth/login');
   }
 
   if (!canAccess(to.path)) {

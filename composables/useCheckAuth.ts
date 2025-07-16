@@ -34,10 +34,91 @@ export const useCheckAuth = () => {
   }
 
   const getUserPermissions = (): string[] => {
+
     const payload = checkRole.value;
+
     if (!payload) {
       return [];
     }
+
+    const currentRole = currentUserRole();
+    if (!currentRole) {
+      return [];
+    }
+
+    const permissionMatrix: Record<string, string[]> = {
+      'admin': [
+        'admin:access',
+        'users:create',
+        'users:read',
+        'users:edit',
+        'users:delete',
+        'users:manage',
+        'settings:manage',
+        'settings:read',
+        'settings:edit',
+        'approval:access',
+        'approval:approve',
+        'approval:reject',
+        'approval:delegate',
+        'approval:manage',
+        'dashboard:read',
+        'profile:read',
+        'profile:edit',
+        'profile:manage',
+        'reports:read',
+        'reports:create',
+        'reports:manage',
+        'system:manage',
+        'audit:read',
+        'roles:manage',
+        'permissions:manage',
+        'workflows:manage',
+        'notifications:manage',
+        'content:manage',
+        'analytics:read',
+        'checkers:manage'
+      ],
+      'checker': [
+        'checker:access',
+        'approval:access',
+        'approval:approve',
+        'approval:reject',
+        'approval:delegate',
+        'requests:review',
+        'requests:read',
+        'requests:manage',
+        'dashboard:read',
+        'profile:read',
+        'profile:edit',
+        'workflows:review',
+        'workflows:manage',
+        'stats:review',
+        'reports:review',
+        'notifications:review',
+        'history:review',
+        'schedule:review',
+        'schedule:manage',
+        'settings:review',
+        'settings:manage'
+      ],
+      'user': [
+        'users:read',
+        'users:create',
+        'dashboard:read',
+        'profile:read',
+        'profile:edit',
+        'requests:create',
+        'requests:read',
+        'requests:edit',
+        'requests:delete',
+        'templates:read',
+        'notifications:read',
+        'history:read',
+        'stats:read',
+        'bulk:manage'
+      ],
+    };
 
     const permissions: string[] = [];
     if (payload.realm_access?.roles) {
@@ -46,21 +127,26 @@ export const useCheckAuth = () => {
       })
     }
 
-    if (payload.resource_access) {
-      Object.entries(payload.resource_access).forEach(([resource, access]) => {
-        access.roles.forEach((role: string) => {
-          permissions.push(`${resource}:${role.toLowerCase()}`);
-        });
-      });
-    }
+    const rolePermissions = permissionMatrix[currentRole.toLowerCase()] || [];
 
-    if (payload.scope) {
-      payload.scope.split(' ').forEach((scope: string) => {
-        permissions.push(scope.toLowerCase());
-      });
-    }
+    return [...new Set([...permissions, ...rolePermissions])];
 
-    return permissions;
+    // if (payload.resource_access) {
+    //   Object.entries(payload.resource_access).forEach(([resource, access]) => {
+    //     access.roles.forEach((role: string) => {
+    //       permissions.push(`${resource}:${role.toLowerCase()}`);
+    //     });
+    //   });
+    // }
+    //
+    // if (payload.scope) {
+    //   payload.scope.split(' ').forEach((scope: string) => {
+    //     permissions.push(scope.toLowerCase());
+    //   });
+    // }
+
+    // return permissions;
+
   }
 
   const getUserProfile = () => {
@@ -76,7 +162,7 @@ export const useCheckAuth = () => {
       emailVerified: payload.email_verified || false,
       department: '', // Assuming department is not available in the token
       phoneNumber: '',
-      locale:  'eng',
+      locale: 'eng',
       sessionId: payload.sid || '',
       roles: payload.realm_access?.roles || [],
       permissions: getUserPermissions(),
@@ -122,7 +208,6 @@ export const useCheckAuth = () => {
     if (!token || !payload) {
       return null;
     }
-
 
     return {
       token,
