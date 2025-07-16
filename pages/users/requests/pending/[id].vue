@@ -1,5 +1,8 @@
 <script setup lang="ts">
-
+definePageMeta({
+  layout: 'user-session',
+  middleware: ['auth-guard', 'user-guard']
+});
 const routes = useRoute();
 const router = useRouter();
 </script>

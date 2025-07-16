@@ -428,7 +428,8 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default'
+  layout: 'user-session',
+  middleware: ['auth-guard', 'user-guard'],
 })
 
 const route = useRoute()

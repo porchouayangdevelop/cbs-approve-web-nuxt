@@ -3,7 +3,7 @@ import RequestForm from "~/components/users/RequestForm.vue";
 
 definePageMeta({
   layout:'user-session',
-  // middleware: ['auth-guard', 'user-guard']
+  middleware: ['auth-guard', 'user-guard']
 })
 </script>
 

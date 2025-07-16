@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 definePageMeta({
-  layout:'user-session'
+  layout:'user-session',
+  middleware: ['auth-guard', 'user-guard']
 })
 
 </script>

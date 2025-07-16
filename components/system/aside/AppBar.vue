@@ -167,7 +167,9 @@ defineEmits<{
 
 const colorMode = useColorMode()
 const route = useRoute()
-const {user} = useAuth()
+const router = useRouter()
+const toast = useToast()
+const {user, logout: authLogout} = useAuth()
 const {currentUserRole} = useCheckAuth()
 
 // Use role session composable
@@ -191,7 +193,7 @@ const displayRole = computed(() => {
   }
 
   // Default fallback
-  return 'User'
+  return user.value?.role
 })
 
 // Debug log to help troubleshoot
@@ -205,6 +207,7 @@ watch(() => [user.value?.role, currentUserRole()], ([userRole, jwtRole]) => {
 const isDark = computed(() => colorMode.value === 'dark')
 const searchQuery = ref('')
 const showMobileSearch = ref(false)
+const loggingOut = ref(false)
 
 // Get role-specific notifications
 const notificationItems = computed(() => {
@@ -223,6 +226,50 @@ const notificationItems = computed(() => {
     }]
   ]
 })
+
+// FIXED: Proper logout handler
+const handleLogout = async () => {
+  if (loggingOut.value) return;
+
+  try {
+    loggingOut.value = true;
+
+    // Show logout confirmation
+    toast.add({
+      icon: 'i-heroicons-arrow-right-on-rectangle',
+      title: 'Logging out...',
+      description: 'Please wait while we sign you out.',
+      timeout: 2000
+    });
+
+    // Call the logout function from useAuth
+    await authLogout();
+
+    // Navigate to login page
+    await navigateTo('/auth/login');
+
+    // Show success message
+    toast.add({
+      icon: 'i-heroicons-check-circle',
+      title: 'Logged out successfully',
+      description: 'You have been signed out of your account.',
+      timeout: 3000
+    });
+
+  } catch (error) {
+    console.error('Logout error:', error);
+
+    // Show error message
+    toast.add({
+      icon: 'i-heroicons-exclamation-circle',
+      title: 'Logout failed',
+      description: 'There was an error signing you out. Please try again.',
+      timeout: 5000
+    });
+  } finally {
+    loggingOut.value = false;
+  }
+};
 
 // Role-specific user menu with access control
 const userMenuItems = computed(() => {
@@ -268,31 +315,19 @@ const userMenuItems = computed(() => {
   baseItems.push([{
     label: 'Help',
     icon: 'i-heroicons-question-mark-circle',
-    to: '/admin/help'
+    to: '/help'
   }])
 
+  // FIXED: Proper logout menu item
   baseItems.push([{
-    label: 'Logout',
-    icon: 'i-heroicons-arrow-right-on-rectangle',
-    click: () => {
-      console.log('Logout clicked')
-      handleLogout()
-    }
+    label: loggingOut.value ? 'Logging out...' : 'Logout',
+    icon: loggingOut.value ? 'i-heroicons-arrow-path' : 'i-heroicons-arrow-right-on-rectangle',
+    click: handleLogout,
+    disabled: loggingOut.value
   }])
 
   return baseItems
 })
-
-// Methods
-const handleLogout = async () => {
-  try {
-    const {logout} = useAuth()
-    await logout()
-    await navigateTo('/auth/login')
-  } catch (error) {
-    console.error('Logout error:', error)
-  }
-}
 
 // Watch for route changes to close mobile search
 watch(() => route.path, () => {

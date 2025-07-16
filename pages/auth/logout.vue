@@ -6,7 +6,7 @@ useSeoMeta({
 })
 definePageMeta({
   layout: false,
-  middleware: 'auth'
+  middleware: ['auth-guard']
 })
 </script>
 
