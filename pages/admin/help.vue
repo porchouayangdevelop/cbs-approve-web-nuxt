@@ -7,7 +7,7 @@ definePageMeta({
 
 <template>
   <div>
-    Page: admin/profile/[id]
+    Page: admin/help
   </div>
 </template>
 

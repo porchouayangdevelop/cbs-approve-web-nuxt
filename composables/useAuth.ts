@@ -25,6 +25,12 @@ export interface Credentials {
   password: string;
 }
 
+export interface CredentialLogout {
+  refreshToken: string;
+  client_id: string;
+  client_secret: string;
+}
+
 export interface AuthResponse {
   access_token: string;
   expires_in: number;
@@ -42,6 +48,7 @@ export const useAuth = () => {
   const user = useState<User | null>('auth.user', () => null);
   const isAuthenticated = useState<boolean>('auth.isAuthenticated', () => false);
   const isLoading = useState<boolean>('auth.isLoading', () => false);
+  const isInitialized = useState<boolean>('auth.isInitialized', () => false);
 
   const {getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions} = useCheckAuth();
   const {decodeToken, isTokenExpired} = useJWTDecoder();
@@ -54,6 +61,40 @@ export const useAuth = () => {
     clearCookies
   } = useCookieHelping();
 
+  const initializeAuth = async () => {
+    if (isInitialized.value) return;
+
+    try {
+      isLoading.value = true;
+
+      const token = getAccessToken('access_token');
+      if (!token) {
+        console.warn('No access token found, user is not authenticated');
+        isAuthenticated.value = false;
+        return;
+      }
+
+      if (isTokenExpired(token)) {
+        console.warn('Access token is expired, trying to refresh...');
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          console.warn('Failed to refresh access token, user is not authenticated');
+          clearCookies();
+          isAuthenticated.value = false;
+          return;
+        }
+      }
+      await getCurrentUser();
+    } catch (e) {
+      logger.error(`Error during auth initialization: ${e}`);
+      clearCookies();
+      user.value = null;
+      isAuthenticated.value = false;
+    } finally {
+      isLoading.value = false;
+      isInitialized.value = false;
+    }
+  }
 
   const getCurrentUser = async (): Promise<User | null> => {
     try {
@@ -64,7 +105,7 @@ export const useAuth = () => {
         throw new Error('Token is invalid or expired');
       }
 
-      if(isTokenExpired(token)) {
+      if (isTokenExpired(token)) {
         console.warn('Access token is expired, trying to refresh...');
         const refreshed = await refreshToken();
         if (!refreshed) {
@@ -72,7 +113,7 @@ export const useAuth = () => {
         }
 
         const newToken = setAccessToken('access_token', 3600);
-        if(!newToken) {
+        if (!newToken) {
           throw new Error('Failed to set new access token');
         }
       }
@@ -198,8 +239,9 @@ export const useAuth = () => {
       if (refreshToken) {
         try {
           await $authApi.post(`${config.public.logout}`, new URLSearchParams({
+            refresh_token: refreshToken,
             client_id: 'apb_teller_security',
-            refresh_token: refreshToken
+            client_secret: '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC'
           }), {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -277,6 +319,8 @@ export const useAuth = () => {
       console.error(`Refresh token failed: ${e}`);
       await logout();
       return false;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -316,6 +360,10 @@ export const useAuth = () => {
       user.value?.permissions.includes(permission.toLowerCase())
     );
   };
+
+  if (process.client && !isInitialized.value) {
+    initializeAuth();
+  }
 
   return {
     user: readonly(user),

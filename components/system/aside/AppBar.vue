@@ -268,7 +268,7 @@ const userMenuItems = computed(() => {
   baseItems.push([{
     label: 'Help',
     icon: 'i-heroicons-question-mark-circle',
-    to: '/help'
+    to: '/admin/help'
   }])
 
   baseItems.push([{

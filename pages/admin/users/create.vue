@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UserCreate from "~/components/users/UserCreate.vue";
+
 definePageMeta({
   layout: 'admin-session',
   middleware: ['auth-guard', 'admin-guard']
@@ -7,7 +9,9 @@ definePageMeta({
 
 <template>
   <div>
-    Page: admin/users/create
+    <UserCreate>
+
+    </UserCreate>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'admin-session',
-  middleware: ['auth-guard'] // Use both guards
+  middleware: ['auth-guard','admin-guard'] // Use both guards
 })
 
 const { user } = useAuth()

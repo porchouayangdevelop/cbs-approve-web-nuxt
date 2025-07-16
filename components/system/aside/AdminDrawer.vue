@@ -237,7 +237,7 @@ const navigationSections = ref<NavigationSection[]>([
     items: [
       {
         label: 'Dashboard',
-        to: '/',
+        to: '/admin',
         icon: 'i-heroicons-home'
       }
     ]
