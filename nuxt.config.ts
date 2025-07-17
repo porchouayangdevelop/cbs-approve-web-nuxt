@@ -43,6 +43,7 @@ export default defineNuxtConfig({
       refresh_token: '',
       check_token: '',
       role_list: '',
+      get_users:'',
       delete_user: '',
       edit_user: '',
       webTitle: '',

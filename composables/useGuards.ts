@@ -1,5 +1,3 @@
-import {useUserStore} from "~/store/userStore";
-
 interface RoutePermissions {
   [route: string]: string[];
 }

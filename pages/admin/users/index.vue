@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import {useSystemUserStore} from "~/store/systemUserStore";
+
 definePageMeta({
   layout: 'admin-session',
   middleware: ['auth-guard', 'admin-guard']
@@ -6,20 +8,9 @@ definePageMeta({
 
 const router = useRouter()
 
-// Types
-interface User {
-  id: string
-  name: string
-  email: string
-  role: string
-  status: 'active' | 'inactive' | 'pending'
-  department: string
-  avatar: string
-  lastLogin: string
-  createdAt: string
-  phone?: string
-  location?: string
-}
+import type {User} from '~/store/systemUserStore'
+
+const { getUsers, users} = useSystemUserStore();
 
 // State
 const loading = ref(false)
@@ -41,83 +32,33 @@ const showEditModal = ref(false)
 const showDeleteModal = ref(false)
 const selectedUser = ref<User | null>(null)
 
-// Sample data
-const users = ref<User[]>([
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@company.com',
-    role: 'Admin',
-    status: 'active',
-    department: 'Engineering',
-    avatar: 'https://avatars.githubusercontent.com/u/739984?v=4',
-    lastLogin: '2024-01-15T10:30:00Z',
-    createdAt: '2023-01-15T10:30:00Z',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA'
-  },
-  {
-    id: '2',
-    name: 'Sarah Wilson',
-    email: 'sarah.wilson@company.com',
-    role: 'Manager',
-    status: 'active',
-    department: 'Product',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-    lastLogin: '2024-01-14T15:45:00Z',
-    createdAt: '2023-02-10T10:30:00Z',
-    phone: '+1 (555) 234-5678',
-    location: 'New York, NY'
-  },
-  {
-    id: '3',
-    name: 'Mike Johnson',
-    email: 'mike.johnson@company.com',
-    role: 'User',
-    status: 'inactive',
-    department: 'Sales',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-    lastLogin: '2024-01-10T09:15:00Z',
-    createdAt: '2023-03-20T10:30:00Z',
-    phone: '+1 (555) 345-6789',
-    location: 'Austin, TX'
-  },
-  {
-    id: '4',
-    name: 'Emily Brown',
-    email: 'emily.brown@company.com',
-    role: 'User',
-    status: 'pending',
-    department: 'Marketing',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-    lastLogin: '2024-01-13T11:20:00Z',
-    createdAt: '2023-04-05T10:30:00Z',
-    phone: '+1 (555) 456-7890',
-    location: 'Seattle, WA'
-  },
-  {
-    id: '5',
-    name: 'David Chen',
-    email: 'david.chen@company.com',
-    role: 'Admin',
-    status: 'active',
-    department: 'Engineering',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    lastLogin: '2024-01-15T14:10:00Z',
-    createdAt: '2023-01-30T10:30:00Z',
-    phone: '+1 (555) 567-8901',
-    location: 'Los Angeles, CA'
-  }
-])
+
+const userData = computed(()=> {
+  return users.map(user => ({
+    // id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    enabled: user.enabled ? 'Active' : 'Inactive',
+    // emailVerified: user.emailVerified ? 'Yes' : 'No',
+    // role: user.role || 'User',
+    // lastLogin: user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'N/A',
+    createdAt: user.createTimestamp
+  }))
+})
+
 
 // Table columns
 const columns = [
-  { key: 'name', label: 'User' },
-  { key: 'role', label: 'Role' },
-  { key: 'department', label: 'Department' },
-  { key: 'status', label: 'Status' },
-  { key: 'lastLogin', label: 'Last Login' },
-  { key: 'actions', label: 'Actions' }
+  {key: 'name', label: 'User'},
+  {key: 'lastName', label: 'Lastname'},
+  {key: 'email', label: 'Email'},
+  // {key: 'emailVerified', label: 'emailVerified'},
+  {key: 'role', label: 'Role'},
+  // {key: 'department', label: 'Department'},
+  // {key: 'status', label: 'Status'},
+  // {key: 'lastLogin', label: 'Last Login'},
+  {key: 'actions', label: 'Actions'}
 ]
 
 // Filter options
@@ -125,41 +66,40 @@ const roleOptions = ['All Roles', 'Admin', 'Manager', 'User']
 const statusOptions = ['All Status', 'active', 'inactive', 'pending']
 const departmentOptions = ['All Departments', 'Engineering', 'Product', 'Sales', 'Marketing']
 const sortOptions = [
-  { label: 'Name', value: 'name' },
-  { label: 'Email', value: 'email' },
-  { label: 'Role', value: 'role' },
-  { label: 'Last Login', value: 'lastLogin' },
-  { label: 'Created Date', value: 'createdAt' }
+  {label: 'Name', value: 'name'},
+  {label: 'Email', value: 'email'},
+  {label: 'Role', value: 'role'},
+  {label: 'Last Login', value: 'lastLogin'},
+  {label: 'Created Date', value: 'createdAt'}
 ]
 
 // Computed
 const filteredUsers = computed(() => {
-  let filtered = users.value
+  let filtered = userData.value
 
   // Search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.department.toLowerCase().includes(query)
+        user.firstName.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
     )
   }
 
   // Role filter
   if (selectedRole.value && selectedRole.value !== 'All Roles') {
-    filtered = filtered.filter(user => user.role === selectedRole.value)
+    filtered = filtered.filter(user => user.firstName === selectedRole.value)
   }
 
-  // Status filter
-  if (selectedStatus.value && selectedStatus.value !== 'All Status') {
-    filtered = filtered.filter(user => user.status === selectedStatus.value)
-  }
-
-  // Department filter
-  if (selectedDepartment.value && selectedDepartment.value !== 'All Departments') {
-    filtered = filtered.filter(user => user.department === selectedDepartment.value)
-  }
+  // // Status filter
+  // if (selectedStatus.value && selectedStatus.value !== 'All Status') {
+  //   filtered = filtered.filter(user => user.status === selectedStatus.value)
+  // }
+  //
+  // // Department filter
+  // if (selectedDepartment.value && selectedDepartment.value !== 'All Departments') {
+  //   filtered = filtered.filter(user => user.department === selectedDepartment.value)
+  // }
 
   // Email filter
   if (emailFilter.value) {
@@ -242,36 +182,8 @@ const deleteUser = (user: User) => {
   showDeleteModal.value = true
 }
 
-const confirmDelete = async () => {
-  if (!selectedUser.value) return
-
-  deleting.value = true
-
-  try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Remove user from list
-    users.value = users.value.filter(u => u.id !== selectedUser.value?.id)
-
-    showDeleteModal.value = false
-    selectedUser.value = null
-
-    // Show success notification
-    console.log('User deleted successfully')
-
-  } catch (error) {
-    console.error('Delete error:', error)
-  } finally {
-    deleting.value = false
-  }
-}
-
 const createUser = () => {
-  // showCreateModal.value = true
-
-  router.push({path:'/users/create'});
-
+  router.push({path: '/admin/users/create'});
 }
 
 const exportUsers = () => {
@@ -306,22 +218,21 @@ const clearSelection = () => {
 }
 
 const handleUserCreated = (user: User) => {
-  users.value.unshift(user)
+  users.unshift(user)
   showCreateModal.value = false
 }
 
-const handleUserUpdated = (updatedUser: User) => {
-  const index = users.value.findIndex(u => u.id === updatedUser.id)
-  if (index > -1) {
-    users.value[index] = updatedUser
-  }
-  showEditModal.value = false
-}
+
+onMounted(() => {
+  // Fetch initial users
+  getUsers()
+})
 
 </script>
 
 <template>
   <div class="p-6 space-y-6">
+    {{ userData }}
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -432,57 +343,58 @@ const handleUserUpdated = (updatedUser: User) => {
           :rows="paginatedUsers"
           :head="columns"
           :loading="loading"
-          :data="users"
+          :data="userData"
           class="w-full"
       >
         <!-- User Avatar & Info -->
-        <template #name-data="{ row }">
-          <div class="flex items-center space-x-3">
-            <UAvatar
-                :src="row.avatar"
-                :alt="row.name"
-                size="sm"
-            />
-            <div>
-              <p class="font-medium text-gray-900 dark:text-white">{{ row.name }}</p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">{{ row.email }}</p>
-            </div>
-          </div>
-        </template>
+<!--        <template #name-data="{ row }">-->
+<!--          <div class="flex items-center space-x-3">-->
+<!--            <UAvatar-->
+<!--                :src="row.avatar"-->
+<!--                :alt="row.name"-->
+<!--                size="sm"-->
+<!--            />-->
+<!--            <div>-->
+<!--              <p class="font-medium text-gray-900 dark:text-white">{{ row.name }}</p>-->
+<!--              <p class="text-sm text-gray-500 dark:text-gray-400">{{ row.email }}</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </template>-->
 
         <!-- Role Badge -->
-        <template #role-data="{ row }">
-          <UBadge
-              :color="getRoleColor(row.role)"
-              variant="soft"
-          >
-            {{ row.role }}
-          </UBadge>
-        </template>
+<!--        <template #role-data="{ row }">-->
+<!--          <UBadge-->
+<!--              :color="getRoleColor(row.role)"-->
+<!--              variant="soft"-->
+<!--          >-->
+<!--            {{ row.role }}-->
+<!--          </UBadge>-->
+<!--        </template>-->
 
         <!-- Status Badge -->
-        <template #status-data="{ row }">
-          <UBadge
-              :color="row.status === 'active' ? 'green' : row.status === 'inactive' ? 'red' : 'yellow'"
-              variant="soft"
-          >
-            {{ row.status }}
-          </UBadge>
-        </template>
+<!--        <template #status-data="{ row }">-->
+<!--          <UBadge-->
+<!--              :color="row.status === 'active' ? 'green' : row.status === 'inactive' ? 'red' : 'yellow'"-->
+<!--              variant="soft"-->
+<!--          >-->
+<!--            {{ row.status }}-->
+<!--          </UBadge>-->
+<!--        </template>-->
 
         <!-- Last Login -->
         <template #lastLogin-data="{ row }">
           <div class="text-sm">
-            <p class="text-gray-900 dark:text-white">{{ formatDate(row.lastLogin) }}</p>
-            <p class="text-gray-500 dark:text-gray-400">{{ getTimeAgo(row.lastLogin) }}</p>
+            {{row}}
+<!--            <p class="text-gray-900 dark:text-white">{{ formatDate(row.lastLogin) }}</p>-->
+<!--            <p class="text-gray-500 dark:text-gray-400">{{ getTimeAgo(row.lastLogin) }}</p>-->
           </div>
         </template>
 
         <!-- Actions -->
         <template #actions-data="{ row }">
-          <UDropdown :items="getActionItems(row)">
-            <UButton variant="ghost" size="sm" icon="i-heroicons-ellipsis-horizontal" />
-          </UDropdown>
+<!--          <UDropdownMenu :items="getActionItems(row)">-->
+<!--            <UButton variant="ghost" size="sm" icon="i-heroicons-ellipsis-horizontal"/>-->
+<!--          </UDropdownMenu>-->
         </template>
       </UTable>
 
@@ -490,7 +402,8 @@ const handleUserUpdated = (updatedUser: User) => {
       <template #footer>
         <div class="flex items-center justify-between">
           <div class="text-sm text-gray-500 dark:text-gray-400">
-            Showing {{ ((currentPage - 1) * pageSize) + 1 }} to {{ Math.min(currentPage * pageSize, filteredUsers.length) }} of {{ filteredUsers.length }} users
+            Showing {{ ((currentPage - 1) * pageSize) + 1 }} to
+            {{ Math.min(currentPage * pageSize, filteredUsers.length) }} of {{ filteredUsers.length }} users
           </div>
           <UPagination
               v-model="currentPage"
