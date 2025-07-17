@@ -4,21 +4,21 @@
       <template #header>
         <div class="text-center">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ title || 'Login' }}
+            {{ title || 'Sign In' }}
           </h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ subtitle || 'Please login to proceed.' }}
+            {{ subtitle || 'Enter your credentials to continue' }}
           </p>
         </div>
       </template>
 
       <UForm :schema="loginSchema" :state="loginForm" @submit="handleLogin" class="space-y-6">
         <!-- Username/Email Field -->
-        <UFormField label="username" name="username" required>
+        <UFormField label="Username" name="username" required>
           <UInput
               v-model="loginForm.username"
               type="text"
-              :placeholder="usernamePlaceholder || 'Please enter the username.'"
+              :placeholder="usernamePlaceholder || 'Enter your username'"
               icon="i-heroicons-user"
               size="lg"
               :loading="loading"
@@ -27,11 +27,11 @@
         </UFormField>
 
         <!-- Password Field -->
-        <UFormField label="password" name="password" required>
+        <UFormField label="Password" name="password" required>
           <UInput
               v-model="loginForm.password"
               :type="showPassword ? 'text' : 'password'"
-              :placeholder="passwordPlaceholder || 'Please enter the password.'"
+              :placeholder="passwordPlaceholder || 'Enter your password'"
               icon="i-heroicons-lock-closed"
               size="lg"
               :loading="loading"
@@ -52,7 +52,7 @@
         <div class="flex items-center justify-between">
           <UCheckbox
               v-model="loginForm.remember"
-              label="Remember the login"
+              label="Remember me"
               class="cursor-pointer"
           />
           <UButton
@@ -61,7 +61,7 @@
               @click="$emit('forgot-password')"
               class="text-primary-600 hover:text-primary-500"
           >
-            Forget the password?
+            Forgot password?
           </UButton>
         </div>
 
@@ -80,44 +80,28 @@
             size="lg"
             :loading="loading"
             :disabled="loading || !isFormValid"
-            class="cursor-pointer bg-primary-600 hover:bg-primary-700 text-white"
+            class="cursor-pointer"
         >
           <template #leading>
             <UIcon v-if="!loading" name="i-heroicons-arrow-right-on-rectangle" />
           </template>
-          <span v-if="!loading">{{ submitText || 'Login' }}</span>
-          <span v-else>{{ loadingText || 'Log in...' }}</span>
+          <span v-if="!loading">{{ submitText || 'Sign In' }}</span>
+          <span v-else>{{ loadingText || 'Signing in...' }}</span>
         </UButton>
       </UForm>
 
-      <!-- Register Link (Only for Admin) -->
-<!--      <div v-if="showRegisterLink" class="mt-6 text-center">-->
-<!--        <div class="relative">-->
-<!--          <div class="absolute inset-0 flex items-center">-->
-<!--            <div class="w-full border-t border-gray-300 dark:border-gray-600" />-->
-<!--          </div>-->
-<!--          <div class="relative flex justify-center text-sm">-->
-<!--            <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">-->
-<!--              For system administrators-->
-<!--            </span>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="mt-4">-->
-<!--          <p class="text-sm text-gray-600 dark:text-gray-400">-->
-<!--            Want to create a new user account?-->
-<!--          </p>-->
-<!--          <UButton-->
-<!--              variant="link"-->
-<!--              size="sm"-->
-<!--              @click="$emit('register')"-->
-<!--              class="mt-1 text-primary-600 hover:text-primary-500"-->
-<!--          >-->
-<!--            Create Account (Admin only)-->
-<!--          </UButton>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!-- Role Auto-Detection Info -->
+      <div class="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div class="flex items-start space-x-2">
+          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-blue-500 mt-0.5" />
+          <div class="text-xs text-blue-700 dark:text-blue-300">
+            <p class="font-medium">Automatic Access Level Detection</p>
+            <p>Your role and permissions are automatically determined from your account credentials.</p>
+          </div>
+        </div>
+      </div>
 
-      <!-- Additional Links -->
+      <!-- Help Links -->
       <div v-if="showHelpLinks" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div class="flex justify-center space-x-6 text-sm">
           <UButton
@@ -126,7 +110,7 @@
               icon="i-heroicons-question-mark-circle"
               @click="$emit('help')"
           >
-            help
+            Help
           </UButton>
           <UButton
               variant="link"
@@ -134,14 +118,13 @@
               icon="i-heroicons-phone"
               @click="$emit('contact')"
           >
-            contact us
+            Contact Support
           </UButton>
         </div>
       </div>
     </UCard>
   </div>
 </template>
-
 <script setup lang="ts">
 import { z } from 'zod'
 
@@ -242,12 +225,12 @@ const resetForm = () => {
   showPassword.value = false
 }
 
-// Set loading state (for parent component)
+// Set loading state (for a parent component)
 const setLoading = (state: boolean) => {
   loading.value = state
 }
 
-// Set error message (for parent component)
+// Set error message (for a parent component)
 const setError = (message: string) => {
   errorMessage.value = message
 }

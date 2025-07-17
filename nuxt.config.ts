@@ -28,6 +28,11 @@ export default defineNuxtConfig({
     },
   },
 
+  // Add router configuration
+  router: {
+    middleware: ['auth-redirect']
+  },
+
   devServer: {
     port: 5000,
     host: '0.0.0.0'
@@ -58,7 +63,7 @@ export default defineNuxtConfig({
     '~/plugins/axios.ts',
     '~/plugins/error-handler.ts',
     '~/plugins/network-error.ts',
-    // '~/plugins/ckeditor.ts'
+    '~/plugins/auth-init.ts'
   ],
   modules: [// '@nuxt/content',
     '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', '@nuxtjs/color-mode',

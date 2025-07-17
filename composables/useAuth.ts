@@ -1,6 +1,5 @@
 import type {AxiosResponse} from "axios";
 import {useJWTDecoder} from "~/composables/useJWTDecoder";
-
 import type {TokenPayload} from "~/composables/useJWTDecoder";
 
 interface User {
@@ -52,6 +51,8 @@ export const useAuth = () => {
 
   const {getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions} = useCheckAuth();
   const {decodeToken, isTokenExpired} = useJWTDecoder();
+  const {defaultRoute} = useDefaultRouteForRole();
+
   const {
     setAccessToken,
     getAccessToken,
@@ -67,7 +68,7 @@ export const useAuth = () => {
     try {
       isLoading.value = true;
 
-      const token = getAccessToken('access_token');
+      const token = useCookie("access_token").value;
       if (!token) {
         console.warn('No access token found, user is not authenticated');
         isAuthenticated.value = false;
@@ -86,7 +87,7 @@ export const useAuth = () => {
       }
       await getCurrentUser();
     } catch (e) {
-      logger.error(`Error during auth initialization: ${e}`);
+      console.error(`Error during auth initialization: ${e}`);
       clearCookies();
       user.value = null;
       isAuthenticated.value = false;
@@ -127,6 +128,11 @@ export const useAuth = () => {
         throw new Error('User profile not found');
       }
 
+      const detectRole = currentUserRole();
+      if (!detectRole) {
+        throw new Error('User role not found');
+      }
+
       const userProfile: User = {
         id: profile.id,
         username: profile.username,
@@ -134,11 +140,11 @@ export const useAuth = () => {
         lastName: profile.lastName,
         email: profile.email,
         emailVerified: profile.emailVerified,
-        role: profile.currentRole,
+        role: profile.roles && profile.roles.length > 0 ? profile.roles[0] : detectRole,
         roles: profile.roles,
         department: profile.department,
         permissions: getUserPermissions(),
-        avatar: profile.avatar,
+        avatar: profile.avatar || generateAvatarUrl(profile.username, profile.lastName),
         locale: profile.locale,
         sessionId: profile.sessionId,
       }
@@ -150,8 +156,6 @@ export const useAuth = () => {
 
       user.value = userProfile;
       isAuthenticated.value = true;
-
-      console.log(`Current user loaded: ${user.value.username} with role ${user.value.role}`);
 
       return userProfile;
     } catch (e) {
@@ -184,6 +188,14 @@ export const useAuth = () => {
     }
   }
 
+  const generateAvatarUrl = (username: string, lastname: string): string => {
+    const baseUrl = 'https://ui-avatars.com/api/';
+    const size = 128; // Default size
+    const name = `${username} ${lastname}`.trim();
+    const encodedName = encodeURIComponent(name);
+    return `${baseUrl}?name=${encodedName}&size=${size}&background=random&color=fff`;
+  }
+
   const login = async (credentials: Credentials) => {
     try {
       isLoading.value = true;
@@ -208,18 +220,40 @@ export const useAuth = () => {
       const accessToken = setAccessToken(data.access_token, data.expires_in);
       const refreshToken = setRefreshToken(data.refresh_token, data.refresh_expires_in);
 
+      if (accessToken || refreshToken) {
+        const decoder = decodeToken(data.access_token);
+        if (decoder) {
+          isAuthenticated.value = true;
 
-      const decoder = decodeToken(data.access_token);
-      if (decoder) {
-        isAuthenticated.value = true;
-        await getCurrentUser();
+          await getCurrentUser();
+
+          // if (!user.value) {
+          //   throw new Error('User profile not found after login');
+          // }
+          //
+          // const toast = useToast();
+          // toast.add({
+          //   icon: 'i-heroicons-check-circle',
+          //   title: 'Login successful',
+          //   description: `Welcome back, ${user.value.firstName}! (${user.value.role})`,
+          // });
+
+          const intendedRoute = useCookie('intended_route');
+          const redirect = intendedRoute.value || defaultRoute(user.value?.role);
+
+          intendedRoute.value = null; // Clear the intended route after redirecting
+
+          await nextTick();
+          await navigateTo(redirect);
+        }
+      }
+      else {
+        throw new Error('Failed to set access or refresh token');
       }
 
       return data;
-
     } catch (e) {
       console.error(`Login failed: ${e}`);
-
       clearCookies();
       user.value = null;
       isAuthenticated.value = false;
@@ -231,47 +265,55 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
+
+      alert('Logging out...');
       isLoading.value = true;
       const {$authApi} = useNuxtApp();
       const config = useRuntimeConfig();
 
-      const refreshToken = useCookie('refresh_token').value;
-      if (refreshToken) {
+      // Get refresh token for server-side logout
+      const refreshTokenValue = useCookie('refresh_token').value;
+
+      // Clear local state first
+      await clearAuthState();
+
+      // Attempt server-side logout if refresh token exists
+      if (refreshTokenValue) {
         try {
-          await $authApi.post(`${config.public.logout}`, new URLSearchParams({
-            refresh_token: refreshToken,
+          await $authApi.post(`realms/apb_teller/protocol/openid-connect/logout`, new URLSearchParams({
+            refresh_token: refreshTokenValue,
             client_id: 'apb_teller_security',
             client_secret: '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC'
           }), {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
-              // 'Authorization': `Bearer ${useCookie('access_token')?.value || ''}`
             }
           });
+          console.log('Server logout successful');
         } catch (logoutError) {
-          console.warn('Server logout failed:', logoutError);
+          console.warn('Server logout failed, but local cleanup completed:', logoutError);
         }
       }
 
-      const accessTokenCookie = useCookie('access_token');
-      const refreshTokenCookie = useCookie('refresh_token');
-
-      accessTokenCookie.value = null;
-      refreshTokenCookie.value = null;
-
+      // Clear cookies
+      clearCookies();
       user.value = null;
       isAuthenticated.value = false;
+      isInitialized.value = false;
+
+      // Clear intended route cookie
+      const intendedRoute = useCookie('intended_route');
+      intendedRoute.value = null;
+
       await navigateTo('/auth/login');
     } catch (e) {
-      console.error(`Logout failed: ${e}`);
-
-      const accessTokenCookie = useCookie('access_token');
-      const refreshTokenCookie = useCookie('refresh_token');
-      accessTokenCookie.value = null;
-      refreshTokenCookie.value = null;
-
+      console.error(`Logout error: ${e}`);
+      // Ensure cleanup happens even if logout fails
+      clearCookies();
       user.value = null;
       isAuthenticated.value = false;
+      isInitialized.value = false;
+      await clearAuthState();
       await navigateTo('/auth/login');
     } finally {
       isLoading.value = false;
@@ -336,6 +378,32 @@ export const useAuth = () => {
     }
   }
 
+
+  const clearAuthState = async () => {
+    try {
+      const accessTokenCookie = useCookie('access_token');
+      const refreshTokenCookie = useCookie('refresh_token');
+      accessTokenCookie.value = null;
+      refreshTokenCookie.value = null;
+
+      user.value = null;
+      isAuthenticated.value = false;
+
+      if (process.client) {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('request_draft_') || key.startsWith('preferred-language') || key.startsWith('preferredRole')) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      isInitialized.value = false;
+      console.log('Auth state cleared successfully');
+
+    } catch (e) {
+      console.error(`Error clearing auth state: ${e}`);
+    }
+  }
+
   const hasRole = (roles: string | string[]): boolean => {
     if (!user.value) return false;
     const roleArray = Array.isArray(roles) ? roles : [roles];
@@ -379,5 +447,7 @@ export const useAuth = () => {
     hasPermission,
     hasAnyPermission,
     hasAllPermissions,
+    initializeAuth,
+    clearAuthState,
   }
 }

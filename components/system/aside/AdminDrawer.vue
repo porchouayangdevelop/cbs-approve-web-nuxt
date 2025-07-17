@@ -1,16 +1,17 @@
 <template>
   <aside
       :class="[
-      'fixed left-0 top-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
+      'fixed left-0 top-0 z-50 h-full w-75 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
       isOpen ? 'translate-x-0' : '-translate-x-full'
     ]"
   >
-    <div class="flex h-full flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg lg:shadow-none">
+    <div
+        class="flex h-full flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg lg:shadow-none">
       <!-- Logo -->
       <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-            <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5 text-white" />
+            <UIcon name="i-heroicons-squares-2x2" class="w-5 h-5 text-white"/>
           </div>
           <span class="text-xl font-bold text-gray-900 dark:text-white">
             Admin
@@ -181,7 +182,8 @@
             :popper="{ placement: 'top-start' }"
             class="w-full"
         >
-          <div class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
+          <div
+              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200">
             <UAvatar
                 src="https://avatars.githubusercontent.com/u/739984?v=4"
                 alt="User Avatar"
@@ -195,7 +197,7 @@
                 john@example.com
               </p>
             </div>
-            <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400" />
+            <UIcon name="i-heroicons-chevron-up" class="w-4 h-4 text-gray-400"/>
           </div>
         </UDropdownMenu>
       </div>
@@ -230,6 +232,8 @@ const emit = defineEmits<{
 
 const route = useRoute()
 
+const {logout} = useAuth();
+
 // Reactive navigation state for Admin
 const navigationSections = ref<NavigationSection[]>([
   // Main Dashboard
@@ -242,10 +246,9 @@ const navigationSections = ref<NavigationSection[]>([
       }
     ]
   },
-
   // User Management Section
   {
-    title: 'User Management',
+    title: 'Users Management',
     items: [
       {
         label: 'All Users',
@@ -319,25 +322,13 @@ const navigationSections = ref<NavigationSection[]>([
 
   // Checker Management Section
   {
-    title: 'Checker Management',
+    title: 'Workflow',
     items: [
-      {
-        label: 'All Checkers',
-        to: '/admin/checkers',
-        icon: 'i-heroicons-check-badge',
-        badge: '24',
-        badgeColor: 'blue'
-      },
       {
         label: 'Checker Operations',
         icon: 'i-heroicons-clipboard-document-check',
         expanded: false,
         children: [
-          {
-            label: 'Create Checker',
-            to: '/admin/checkers/create',
-            icon: 'i-heroicons-user-plus'
-          },
           {
             label: 'Checker Assignments',
             to: '/admin/checkers/assignments',
@@ -704,7 +695,7 @@ watch(() => route.path, () => {
       }
     })
   })
-}, { immediate: true })
+}, {immediate: true})
 
 // Close expanded menus when navigating to a direct route
 const handleDirectNavigation = () => {
@@ -757,8 +748,8 @@ const userMenuItems = [
     label: 'Sign Out',
     icon: 'i-heroicons-arrow-right-on-rectangle',
     click: () => {
-      console.log('Admin logout clicked')
-      emit('navigate')
+      alert('Sign Out')
+      logout();
     }
   }]
 ]

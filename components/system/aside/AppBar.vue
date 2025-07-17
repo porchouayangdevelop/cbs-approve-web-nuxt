@@ -1,3 +1,4 @@
+// components/system/aside/AppBar.vue
 <template>
   <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
     <div class="flex items-center justify-between px-4 py-3">
@@ -162,14 +163,13 @@ import {useCheckAuth} from '~/composables/useCheckAuth'
 defineEmits<{
   'toggle-sidebar': []
   'toggle-theme': []
-  logout: []
 }>()
 
 const colorMode = useColorMode()
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const {user, logout: authLogout} = useAuth()
+const {user, logout: authLogout, isLoading} = useAuth()
 const {currentUserRole} = useCheckAuth()
 
 // Use role session composable
@@ -193,15 +193,8 @@ const displayRole = computed(() => {
   }
 
   // Default fallback
-  return user.value?.role
+  return 'User'
 })
-
-// Debug log to help troubleshoot
-watch(() => [user.value?.role, currentUserRole()], ([userRole, jwtRole]) => {
-  console.log('AppBar - User role from auth:', userRole)
-  console.log('AppBar - Role from JWT:', jwtRole)
-  console.log('AppBar - Display role:', displayRole.value)
-}, { immediate: true })
 
 // Reactive states
 const isDark = computed(() => colorMode.value === 'dark')
@@ -227,9 +220,9 @@ const notificationItems = computed(() => {
   ]
 })
 
-// FIXED: Proper logout handler
+// FIXED: Proper logout handler with better error handling and cleanup
 const handleLogout = async () => {
-  if (loggingOut.value) return;
+  if (loggingOut.value || isLoading.value) return;
 
   try {
     loggingOut.value = true;
@@ -239,33 +232,64 @@ const handleLogout = async () => {
       icon: 'i-heroicons-arrow-right-on-rectangle',
       title: 'Logging out...',
       description: 'Please wait while we sign you out.',
-      timeout: 2000
     });
 
-    // Call the logout function from useAuth
-    await authLogout();
+    // Clear all cookies and tokens first
+    const accessTokenCookie = useCookie('access_token');
+    const refreshTokenCookie = useCookie('refresh_token');
 
-    // Navigate to login page
-    await navigateTo('/auth/login');
+    // Clear cookies immediately
+    accessTokenCookie.value = null;
+    refreshTokenCookie.value = null;
+
+    // Clear localStorage items
+    if (process.client) {
+      localStorage.removeItem('preferred-language');
+      localStorage.removeItem('preferredRole');
+      // Clear any request drafts
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('request_draft_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    }
+
+    // Call the logout function from useAuth (this will handle server-side logout)
+    try {
+      await authLogout();
+    } catch (logoutError) {
+      console.warn('Server logout failed, but continuing with local cleanup:', logoutError);
+    }
 
     // Show success message
     toast.add({
       icon: 'i-heroicons-check-circle',
       title: 'Logged out successfully',
       description: 'You have been signed out of your account.',
-      timeout: 3000
     });
+
+    // Force navigation to login page
+    await navigateTo('/auth/login', { replace: true });
 
   } catch (error) {
     console.error('Logout error:', error);
 
+    // Even if logout fails, clear local data and redirect
+    const accessTokenCookie = useCookie('access_token');
+    const refreshTokenCookie = useCookie('refresh_token');
+    accessTokenCookie.value = null;
+    refreshTokenCookie.value = null;
+
     // Show error message
     toast.add({
       icon: 'i-heroicons-exclamation-circle',
-      title: 'Logout failed',
-      description: 'There was an error signing you out. Please try again.',
-      timeout: 5000
+      title: 'Logout completed',
+      description: 'You have been signed out (with local cleanup).',
     });
+
+    // Force redirect regardless
+    await navigateTo('/auth/login', { replace: true });
+
   } finally {
     loggingOut.value = false;
   }
@@ -318,12 +342,12 @@ const userMenuItems = computed(() => {
     to: '/help'
   }])
 
-  // FIXED: Proper logout menu item
+  // FIXED: Proper logout menu item with loading state
   baseItems.push([{
     label: loggingOut.value ? 'Logging out...' : 'Logout',
     icon: loggingOut.value ? 'i-heroicons-arrow-path' : 'i-heroicons-arrow-right-on-rectangle',
     click: handleLogout,
-    disabled: loggingOut.value
+    disabled: loggingOut.value || isLoading.value
   }])
 
   return baseItems
@@ -334,7 +358,7 @@ watch(() => route.path, () => {
   showMobileSearch.value = false
 })
 
-// Watch for user role changes and log for debugging
+// Debug logging for role changes
 watch(() => user.value?.role, (newRole) => {
   if (newRole) {
     console.log('AppBar - User role changed to:', newRole)

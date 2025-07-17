@@ -10,7 +10,7 @@ const router = useRouter()
 
 import type {User} from '~/store/systemUserStore'
 
-const { getUsers, users} = useSystemUserStore();
+const {getUsers, users} = useSystemUserStore();
 
 // State
 const loading = ref(false)
@@ -33,7 +33,7 @@ const showDeleteModal = ref(false)
 const selectedUser = ref<User | null>(null)
 
 
-const userData = computed(()=> {
+const userData = computed(() => {
   return users.map(user => ({
     // id: user.id,
     firstName: user.firstName,
@@ -54,7 +54,8 @@ const columns = [
   {key: 'lastName', label: 'Lastname'},
   {key: 'email', label: 'Email'},
   // {key: 'emailVerified', label: 'emailVerified'},
-  {key: 'role', label: 'Role'},
+  // {key: 'role', label: 'Role'},
+  {key: 'enabled', label: 'Status'},
   // {key: 'department', label: 'Department'},
   // {key: 'status', label: 'Status'},
   // {key: 'lastLogin', label: 'Last Login'},
@@ -66,11 +67,11 @@ const roleOptions = ['All Roles', 'Admin', 'Manager', 'User']
 const statusOptions = ['All Status', 'active', 'inactive', 'pending']
 const departmentOptions = ['All Departments', 'Engineering', 'Product', 'Sales', 'Marketing']
 const sortOptions = [
-  {label: 'Name', value: 'name'},
+  {label: 'FirstName', value: 'firstName'},
   {label: 'Email', value: 'email'},
-  {label: 'Role', value: 'role'},
-  {label: 'Last Login', value: 'lastLogin'},
-  {label: 'Created Date', value: 'createdAt'}
+  // {label: 'Role', value: 'role'},
+  // {label: 'Last Login', value: 'lastLogin'},
+  // {label: 'Created Date', value: 'createdAt'}
 ]
 
 // Computed
@@ -130,6 +131,14 @@ const getRoleColor = (role: string) => {
     'User': 'green'
   }
   return colors[role] || 'gray'
+}
+
+const getActiveColor = (active: any) => {
+  const colors: Record<string, string> = {
+    true: 'green',
+    false: 'red'
+  }
+  return colors[active]
 }
 
 const formatDate = (dateString: string) => {
@@ -216,12 +225,6 @@ const bulkDelete = () => {
 const clearSelection = () => {
   selectedUsers.value = []
 }
-
-const handleUserCreated = (user: User) => {
-  users.unshift(user)
-  showCreateModal.value = false
-}
-
 
 onMounted(() => {
   // Fetch initial users
@@ -347,54 +350,53 @@ onMounted(() => {
           class="w-full"
       >
         <!-- User Avatar & Info -->
-<!--        <template #name-data="{ row }">-->
-<!--          <div class="flex items-center space-x-3">-->
-<!--            <UAvatar-->
-<!--                :src="row.avatar"-->
-<!--                :alt="row.name"-->
-<!--                size="sm"-->
-<!--            />-->
-<!--            <div>-->
-<!--              <p class="font-medium text-gray-900 dark:text-white">{{ row.name }}</p>-->
-<!--              <p class="text-sm text-gray-500 dark:text-gray-400">{{ row.email }}</p>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </template>-->
+        <!--        <template #name-data="{ row }">-->
+        <!--          <div class="flex items-center space-x-3">-->
+        <!--            <UAvatar-->
+        <!--                :src="row.avatar"-->
+        <!--                :alt="row.name"-->
+        <!--                size="sm"-->
+        <!--            />-->
+        <!--            <div>-->
+        <!--              <p class="font-medium text-gray-900 dark:text-white">{{ row.name }}</p>-->
+        <!--              <p class="text-sm text-gray-500 dark:text-gray-400">{{ row.email }}</p>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </template>-->
 
         <!-- Role Badge -->
-<!--        <template #role-data="{ row }">-->
-<!--          <UBadge-->
-<!--              :color="getRoleColor(row.role)"-->
-<!--              variant="soft"-->
-<!--          >-->
-<!--            {{ row.role }}-->
-<!--          </UBadge>-->
-<!--        </template>-->
+                <template #role-data="{ row }">
+                  <UBadge
+                      :color="getActiveColor(row.enabled)"
+                      variant="soft"
+                  >
+                  </UBadge>
+                </template>
 
         <!-- Status Badge -->
-<!--        <template #status-data="{ row }">-->
-<!--          <UBadge-->
-<!--              :color="row.status === 'active' ? 'green' : row.status === 'inactive' ? 'red' : 'yellow'"-->
-<!--              variant="soft"-->
-<!--          >-->
-<!--            {{ row.status }}-->
-<!--          </UBadge>-->
-<!--        </template>-->
+        <!--        <template #status-data="{ row }">-->
+        <!--          <UBadge-->
+        <!--              :color="row.status === 'active' ? 'green' : row.status === 'inactive' ? 'red' : 'yellow'"-->
+        <!--              variant="soft"-->
+        <!--          >-->
+        <!--            {{ row.status }}-->
+        <!--          </UBadge>-->
+        <!--        </template>-->
 
         <!-- Last Login -->
         <template #lastLogin-data="{ row }">
           <div class="text-sm">
-            {{row}}
-<!--            <p class="text-gray-900 dark:text-white">{{ formatDate(row.lastLogin) }}</p>-->
-<!--            <p class="text-gray-500 dark:text-gray-400">{{ getTimeAgo(row.lastLogin) }}</p>-->
+            {{ row }}
+            <!--            <p class="text-gray-900 dark:text-white">{{ formatDate(row.lastLogin) }}</p>-->
+            <!--            <p class="text-gray-500 dark:text-gray-400">{{ getTimeAgo(row.lastLogin) }}</p>-->
           </div>
         </template>
 
         <!-- Actions -->
         <template #actions-data="{ row }">
-<!--          <UDropdownMenu :items="getActionItems(row)">-->
-<!--            <UButton variant="ghost" size="sm" icon="i-heroicons-ellipsis-horizontal"/>-->
-<!--          </UDropdownMenu>-->
+          <!--          <UDropdownMenu :items="getActionItems(row)">-->
+          <!--            <UButton variant="ghost" size="sm" icon="i-heroicons-ellipsis-horizontal"/>-->
+          <!--          </UDropdownMenu>-->
         </template>
       </UTable>
 
@@ -422,7 +424,7 @@ onMounted(() => {
           <UButton size="sm" variant="outline" @click="bulkEdit">
             Edit
           </UButton>
-          <UButton size="sm" variant="outline" color="red" @click="bulkDelete">
+          <UButton size="sm" variant="outline" color="error" @click="bulkDelete">
             Delete
           </UButton>
           <UButton size="sm" variant="ghost" @click="clearSelection">

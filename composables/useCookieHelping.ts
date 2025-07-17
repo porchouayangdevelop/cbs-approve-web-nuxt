@@ -25,7 +25,7 @@ export const useCookieHelping = () => {
 
   const getAccessToken = () => {
     const accessToken = useCookie('access_token');
-    return accessToken.value || null;
+    return accessToken.value;
   }
 
   const getRefreshToken = () => {
@@ -45,8 +45,18 @@ export const useCookieHelping = () => {
     if (!accessToken) {
       return false;
     }
-    // Here you can add additional validation logic if needed
-    return true;
+
+    const { decodeToken, isTokenExpired } = useJWTDecoder();
+    return !isTokenExpired(accessToken);
+
+  }
+
+  const getCookiesInfo = () => {
+    return {
+      hasAccessToken: !!getAccessToken(),
+      hasRefreshToken: !!getRefreshToken(),
+      isAccessTokenValid: validateAccessToken(),
+    }
   }
 
   return {
@@ -55,7 +65,8 @@ export const useCookieHelping = () => {
     getAccessToken,
     getRefreshToken,
     clearCookies,
-    validateAccessToken
+    validateAccessToken,
+    getCookiesInfo
   };
 
 }

@@ -153,6 +153,30 @@ export const useRoleSession = () => {
             }
           ]
         },
+
+        {
+          title:'User & Role Management',
+          items:[
+            {
+              label: 'User Management',
+              to: '/admin/users',
+              icon: 'i-heroicons-users',
+              badge: '245',
+              badgeColor: 'blue'
+            },
+            {
+              label: 'Roles & Permissions',
+              to: '/admin/roles',
+              icon: 'i-heroicons-shield-check'
+            },
+            {
+              label: 'Audit Logs',
+              to: '/admin/audit-logs',
+              icon: 'i-heroicons-document-text'
+            }
+          ]
+        },
+
         {
           title: 'User Management',
           items: [

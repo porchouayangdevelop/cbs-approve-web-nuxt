@@ -1,11 +1,13 @@
 <template>
   <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
     <!-- Admin Sidebar Drawer -->
-    <AdminDrawer
+    <component
+        :is="sidebarComponent"
         :is-open="isSidebarOpen"
         @close="toggleSidebar"
         @navigate="handleNavigation"
     />
+
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -43,11 +45,27 @@
 import AdminDrawer from "~/components/system/aside/AdminDrawer.vue"
 import AppBar from "~/components/system/aside/AppBar.vue"
 import Breadcrumbs from "~/components/system/aside/Breadcrumbs.vue"
+import CheckerDrawer from "~/components/system/aside/CheckerDrawer.vue";
+import UserDrawer from "~/components/system/aside/UserDrawer.vue";
+import {useRoleSession} from "~/composables/useRoleSession";
 
 const colorMode = useColorMode()
+const { currentRole } = useRoleSession()
 
 // State
 const isSidebarOpen = ref(false)
+
+const sidebarComponent = computed(() => {
+  switch (currentRole.value) {
+    case 'admin':
+      return AdminDrawer
+    case 'checker':
+      return CheckerDrawer
+    case 'user':
+    default:
+      return UserDrawer
+  }
+})
 
 // Methods
 const toggleSidebar = () => {

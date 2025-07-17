@@ -6,6 +6,7 @@ definePageMeta({
 
 const { user } = useAuth()
 const { getDashboardMetrics, getRecentActivity } = useRoleSession()
+const {logout} = useAuth()
 
 // Admin dashboard data
 const metrics = getDashboardMetrics()
@@ -20,8 +21,19 @@ useSeoMeta({
 
 <template>
   <div class="space-y-6">
+
+
+    <UButton
+        class=""
+        color="primary"
+        @click="logout"
+        variant="solid"
+        size="sm"
+    >Sign out</UButton>
     <!-- Welcome Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+
+
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">

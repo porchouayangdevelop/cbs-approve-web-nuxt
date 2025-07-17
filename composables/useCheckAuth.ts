@@ -29,8 +29,21 @@ export const useCheckAuth = () => {
         return role;
       }
     }
+
+    const roleMapping: Record<string, string> = {
+      'admin': 'admin',
+      'checker': 'checker',
+      'user': 'user'
+    }
+
+    for (const role of userRoles) {
+      if (userRoles.includes(roleMapping[role])) {
+        return roleMapping[role];
+      }
+    }
+
     // If no priority role found, return the first role
-    return userRoles[0] || null; // Return the first role if no priority match found
+    return userRoles.length > 0 ? userRoles[0] : null;
   }
 
   const getUserPermissions = (): string[] => {
