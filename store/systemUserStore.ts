@@ -102,7 +102,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       const config = useRuntimeConfig();
       const {$authApi} = useNuxtApp();
 
-      const {data} = await $authApi.get(`${config.public.get_users}`);
+      const {data} = await $authApi.get(`admin/realms/apb_teller/users`);
 
       users.value = Array.isArray(data) ? data : data;
     } catch (e) {

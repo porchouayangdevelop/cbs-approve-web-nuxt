@@ -53,12 +53,7 @@ const columns = [
   {key: 'name', label: 'User'},
   {key: 'lastName', label: 'Lastname'},
   {key: 'email', label: 'Email'},
-  // {key: 'emailVerified', label: 'emailVerified'},
-  // {key: 'role', label: 'Role'},
   {key: 'enabled', label: 'Status'},
-  // {key: 'department', label: 'Department'},
-  // {key: 'status', label: 'Status'},
-  // {key: 'lastLogin', label: 'Last Login'},
   {key: 'actions', label: 'Actions'}
 ]
 
@@ -69,9 +64,7 @@ const departmentOptions = ['All Departments', 'Engineering', 'Product', 'Sales',
 const sortOptions = [
   {label: 'FirstName', value: 'firstName'},
   {label: 'Email', value: 'email'},
-  // {label: 'Role', value: 'role'},
-  // {label: 'Last Login', value: 'lastLogin'},
-  // {label: 'Created Date', value: 'createdAt'}
+  {label: 'Status', value: 'enabled'},
 ]
 
 // Computed
@@ -123,15 +116,6 @@ const paginatedUsers = computed(() => {
   return filteredUsers.value.slice(start, end)
 })
 
-// Methods
-const getRoleColor = (role: string) => {
-  const colors: Record<string, string> = {
-    'Admin': 'red',
-    'Manager': 'blue',
-    'User': 'green'
-  }
-  return colors[role] || 'gray'
-}
 
 const getActiveColor = (active: any) => {
   const colors: Record<string, string> = {
@@ -277,7 +261,7 @@ onMounted(() => {
         <!-- Role Filter -->
         <USelectMenu
             v-model="selectedRole"
-            :options="roleOptions"
+            :items="roleOptions"
             placeholder="Filter by role"
             size="lg"
         />
@@ -285,7 +269,7 @@ onMounted(() => {
         <!-- Status Filter -->
         <USelectMenu
             v-model="selectedStatus"
-            :options="statusOptions"
+            :items="statusOptions"
             placeholder="Filter by status"
             size="lg"
         />
@@ -326,7 +310,7 @@ onMounted(() => {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <USelectMenu
               v-model="selectedDepartment"
-              :options="departmentOptions"
+              :items="departmentOptions"
               placeholder="Department"
           />
           <UInput
@@ -336,7 +320,7 @@ onMounted(() => {
           />
           <USelectMenu
               v-model="sortBy"
-              :options="sortOptions"
+              :items="sortOptions"
               placeholder="Sort by"
           />
         </div>
@@ -365,13 +349,13 @@ onMounted(() => {
         <!--        </template>-->
 
         <!-- Role Badge -->
-                <template #role-data="{ row }">
-                  <UBadge
-                      :color="getActiveColor(row.enabled)"
-                      variant="soft"
-                  >
-                  </UBadge>
-                </template>
+<!--                <template #role-data="{ row }">-->
+<!--                  <UBadge-->
+<!--                      :color="getActiveColor(row.enabled)"-->
+<!--                      variant="soft"-->
+<!--                  >-->
+<!--                  </UBadge>-->
+<!--                </template>-->
 
         <!-- Status Badge -->
         <!--        <template #status-data="{ row }">-->

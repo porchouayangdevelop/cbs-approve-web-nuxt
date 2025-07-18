@@ -4,13 +4,25 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return;
   }
 
-  const {isAuthenticated, user, getCurrentUser, logout} = useAuth();
+  const {isAuthenticated, user} = useAuth();
   const {defaultRoute} = useDefaultRouteForRole();
-
   const {publicRoutes} = useRoutePublic();
 
   const isPublicRoute = publicRoutes.value.includes(to.path);
 
+  // Don't redirect if already on login page or if user is logging in
+  if(to.path === '/auth/login') {
+    if(isAuthenticated && user.value){
+
+      const intendedRoute   = useCookie('intended_route');
+      const targetRoute = intendedRoute .value || defaultRoute(user.value?.role);
+      intendedRoute .value = null; // Clear the intended route after redirecting
+      return navigateTo(targetRoute, { replace: true });
+    }
+    return; // Allow access to the login page
+  }
+
+  // Handle unauthenticated access to protected routes
   if (!isAuthenticated.value && !isPublicRoute) {
     console.log('User is not authenticated, redirecting to login');
 
@@ -20,22 +32,12 @@ export default defineNuxtRouteMiddleware((to, from) => {
       sameSite: 'lax',
     });
     intendedRoute.value = to.fullPath;
-    return navigateTo('/auth/login');
-  }
-
-  if (isAuthenticated.value && to.path === '/auth/login') {
-    console.log('User is authenticated, redirecting to intended route');
-    const intendedRoute = useCookie('intended_route');
-    const targetRoute = intendedRoute.value || defaultRoute(user.value?.role);
-
-    intendedRoute.value = null; // Clear the intended route after redirecting
-
-    return navigateTo(targetRoute);
+    return navigateTo('/auth/login',{replace: true});
   }
 
   if (to.path === '/' && isAuthenticated.value) {
     const route = defaultRoute(user.value?.role);
-    return navigateTo(route);
+    return navigateTo(route,{ replace: true });
   }
 })
 

@@ -6,36 +6,36 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   const {getCurrentUser, user, isAuthenticated, logout} = useAuth();
   const {checkAuth, handledUnauthorized, canAccess} = useGuards();
-  const {isTokenExpired, decodeToken} = useJWTDecoder();
+  const {isTokenExpired} = useJWTDecoder();
 
-  const clearAuthAndRedirect = async () => {
-    try {
-
-      const accessTokenCookie = useCookie('access_token');
-      const refreshTokenCookie = useCookie('refresh_token');
-      accessTokenCookie.value = null;
-      refreshTokenCookie.value = null;
-
-      if (process.client) {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('request_draft_') || key.startsWith('preferred-language') || key.startsWith('preferredRole')) {
-            localStorage.removeItem(key);
-          }
-        });
-      }
-
-      try {
-        await logout();
-      } catch (e) {
-        console.warn("AuthGuard: Logout cleanup fail", e)
-      }
-
-    } catch (e) {
-      console.error('AuthGuard: Error during auth cleanup:', e);
-    } finally {
-      navigateTo('/auth/login', {replace: true});
-    }
-  }
+  // const clearAuthAndRedirect = async () => {
+  //   try {
+  //
+  //     const accessTokenCookie = useCookie('access_token');
+  //     const refreshTokenCookie = useCookie('refresh_token');
+  //     accessTokenCookie.value = null;
+  //     refreshTokenCookie.value = null;
+  //
+  //     if (process.client) {
+  //       Object.keys(localStorage).forEach(key => {
+  //         if (key.startsWith('request_draft_') || key.startsWith('preferred-language') || key.startsWith('preferredRole')) {
+  //           localStorage.removeItem(key);
+  //         }
+  //       });
+  //     }
+  //
+  //     try {
+  //       await logout();
+  //     } catch (e) {
+  //       console.warn("AuthGuard: Logout cleanup fail", e)
+  //     }
+  //
+  //   } catch (e) {
+  //     console.error('AuthGuard: Error during auth cleanup:', e);
+  //   } finally {
+  //     navigateTo('/auth/login', {replace: true});
+  //   }
+  // }
 
 
   const publicRoutes: string[] = [
@@ -57,18 +57,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/auth/login');
   }
 
-  let decodedToken;
-  try {
-    decodedToken = decodeToken(token);
-    if (!decodedToken) {
-      await clearAuthAndRedirect();
-      return;
-    }
-  } catch (e) {
-    console.log('AuthGuard: error decoding token:', e);
-    await clearAuthAndRedirect();
-    return;
-  }
+  // let decodedToken;
+  // try {
+  //   decodedToken = decodeToken(token);
+  //   if (!decodedToken) {
+  //     await clearAuthAndRedirect();
+  //     return;
+  //   }
+  // } catch (e) {
+  //   console.log('AuthGuard: error decoding token:', e);
+  //   await clearAuthAndRedirect();
+  //   return;
+  // }
 
   if (isTokenExpired(token)) {
     console.log('AuthGuard: Access token is expired, attempting refresh...');
@@ -77,50 +77,47 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       const refreshed = await refreshToken();
       if (!refreshed) {
         console.log('Failed to refresh access token, redirecting to login');
-        await clearAuthAndRedirect();
-        return;
+        return navigateTo('/auth/login');
       }
     } catch (e) {
       console.error('Error refreshing token:', e);
-      await clearAuthAndRedirect();
-      return;
+      return navigateTo('/auth/login');
     }
 
   }
 
   if (!checkAuth()) {
     console.log('User is not authenticated, redirecting to login');
-    await clearAuthAndRedirect();
-    return;
+    // await clearAuthAndRedirect();
+    return navigateTo('/auth/login');
   }
 
-  let attempts = 0;
-  let maxAttempts = 10;
+  // let attempts = 0;
+  // let maxAttempts = 10;
+  //
+  // while (!user.value && attempts < maxAttempts) {
+  //   try {
+  //     await getCurrentUser();
+  //     attempts += 1;
+  //
+  //     if (!user.value && attempts < maxAttempts) {
+  //       console.log(`Attempt ${attempts}: User data not available yet, retrying...`);
+  //       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 1 second before retrying
+  //     }
+  //   } catch (e) {
+  //     console.log(`Error fetching user data on attempt ${attempts}:`, e);
+  //     if (attempts >= maxAttempts) {
+  //       console.error('Max attempts reached, redirecting to login');
+  //       await clearAuthAndRedirect();
+  //       return;
+  //     }
+  //   }
+  // }
 
-  while (!user.value && attempts < maxAttempts) {
+  if (!user.value) {
     try {
       await getCurrentUser();
-      attempts += 1;
-
-      if (!user.value && attempts < maxAttempts) {
-        console.log(`Attempt ${attempts}: User data not available yet, retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 1 second before retrying
-      }
-    } catch (e) {
-      console.log(`Error fetching user data on attempt ${attempts}:`, e);
-      if (attempts >= maxAttempts) {
-        console.error('Max attempts reached, redirecting to login');
-        await clearAuthAndRedirect();
-        return;
-      }
-    }
-
-  }
-
-  if(!user.value) {
-    try {
-      await getCurrentUser();
-    }catch(err) {
+    } catch (err) {
       console.error('Error fetching user data:', err);
       return navigateTo('/auth/login');
     }
@@ -128,13 +125,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   if (!user.value) {
     console.log('User data still not available after fetching');
-    await clearAuthAndRedirect();
-    return;
+    // await clearAuthAndRedirect();
+    return navigateTo('/auth/login');
   }
 
   if (!canAccess(to.path)) {
     return handledUnauthorized(to.path);
   }
-
-
 })

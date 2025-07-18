@@ -43,7 +43,6 @@ export interface AuthResponse {
 
 export const useAuth = () => {
 
-
   const user = useState<User | null>('auth.user', () => null);
   const isAuthenticated = useState<boolean>('auth.isAuthenticated', () => false);
   const isLoading = useState<boolean>('auth.isLoading', () => false);
@@ -220,36 +219,32 @@ export const useAuth = () => {
       const accessToken = setAccessToken(data.access_token, data.expires_in);
       const refreshToken = setRefreshToken(data.refresh_token, data.refresh_expires_in);
 
-      if (accessToken || refreshToken) {
-        const decoder = decodeToken(data.access_token);
-        if (decoder) {
-          isAuthenticated.value = true;
-
-          await getCurrentUser();
-
-          // if (!user.value) {
-          //   throw new Error('User profile not found after login');
-          // }
-          //
-          // const toast = useToast();
-          // toast.add({
-          //   icon: 'i-heroicons-check-circle',
-          //   title: 'Login successful',
-          //   description: `Welcome back, ${user.value.firstName}! (${user.value.role})`,
-          // });
-
-          const intendedRoute = useCookie('intended_route');
-          const redirect = intendedRoute.value || defaultRoute(user.value?.role);
-
-          intendedRoute.value = null; // Clear the intended route after redirecting
-
-          await nextTick();
-          await navigateTo(redirect);
-        }
-      }
-      else {
+      if (!accessToken || !refreshToken) {
         throw new Error('Failed to set access or refresh token');
       }
+
+      const decoder = decodeToken(data.access_token);
+
+      if (!decoder) {
+        throw new Error('Failed to decode access token');
+      }
+
+      isAuthenticated.value = true;
+
+      await getCurrentUser();
+
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error('Failed to fetch user data after login');
+      }
+
+      const intendedRoute = useCookie('intended_route');
+      const redirect = intendedRoute.value || defaultRoute(user.role);
+
+      intendedRoute.value = null; // Clear the intended route after redirecting
+
+      await nextTick();
+      await navigateTo(redirect, {replace: true});
 
       return data;
     } catch (e) {

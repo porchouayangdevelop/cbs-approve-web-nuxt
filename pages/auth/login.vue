@@ -157,14 +157,16 @@ const handleLogin = async (credentials: LoginCredentials) => {
     console.error('Login error:', error)
 
     // Show error message
-    let errorMessage = 'There was an error in logging.'
+    let errorMessage = 'There was an error logging in.'
 
     if (error?.response?.status === 401) {
       errorMessage = 'Username or password is incorrect'
     } else if (error?.response?.status === 403) {
-      errorMessage = `No right to access as}`
+      errorMessage = 'No permission to access'
     } else if (error?.response?.status === 429) {
-      errorMessage = 'Trying to log in too much please wait a moment่'
+      errorMessage = 'Too many login attempts, please wait'
+    } else if (error?.message) {
+      errorMessage = error.message
     }
 
     loginFormRef.value?.setError(errorMessage)
