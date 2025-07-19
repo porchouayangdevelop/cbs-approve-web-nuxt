@@ -21,6 +21,7 @@
               icon="i-heroicons-arrow-path"
               @click="handleRefresh"
               :loading="refreshing"
+              class="cursor-pointer"
           >
             Refresh
           </UButton>
@@ -30,6 +31,7 @@
               size="sm"
               icon="i-heroicons-arrow-down-tray"
               @click="handleExport"
+              class="cursor-pointer"
           >
             Export
           </UButton>
@@ -100,6 +102,21 @@
       </div>
     </UCard>
 
+    <!-- Debug Information (only in development) -->
+    <div v-if="$nuxt.$dev && showDebug" class="mb-4 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border">
+      <details>
+        <summary class="text-xs cursor-pointer">Debug Info</summary>
+        <div class="text-xs mt-2 space-y-1">
+          <p>Data length: {{ data?.length || 0 }}</p>
+          <p>Filtered length: {{ filteredData?.length || 0 }}</p>
+          <p>Paginated length: {{ paginatedData?.length || 0 }}</p>
+          <p>Current page: {{ currentPage }}</p>
+          <p>Page size: {{ pageSize }}</p>
+          <p>Loading: {{ loading }}</p>
+        </div>
+      </details>
+    </div>
+
     <!-- Table Card -->
     <UCard>
       <!-- Table Header with Bulk Actions -->
@@ -131,6 +148,7 @@
                 size="sm"
                 icon="i-heroicons-view-columns"
                 @click="showColumnModal = true"
+                class="cursor-pointer"
             >
               Columns
             </UButton>
@@ -144,8 +162,6 @@
         </div>
       </template>
 
-<!--      {{paginatedData}}-->
-
       <!-- Loading State -->
       <div v-if="loading" class="flex items-center justify-center py-12">
         <div class="text-center">
@@ -154,9 +170,8 @@
         </div>
       </div>
 
-
       <!-- Empty State -->
-      <div v-else-if="paginatedData.length === 0" class="text-center py-12">
+      <div v-else-if="!paginatedData || paginatedData.length === 0" class="text-center py-12">
         <slot name="empty">
           <UIcon name="i-heroicons-inbox" class="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -175,16 +190,14 @@
         </slot>
       </div>
 
-
       <!-- Table -->
       <UTable
           v-else
           :rows="paginatedData"
           :columns="visibleColumns"
           :loading="loading"
-          loadingColor="info"
           v-model="selectedItems"
-          @selected="handleSelect"
+          @select="handleSelect"
           class="w-full"
       >
         <!-- Dynamic Slots -->
@@ -237,6 +250,7 @@
                   variant="ghost"
                   size="sm"
                   icon="i-heroicons-ellipsis-horizontal"
+                  class="cursor-pointer"
               />
             </UDropdownMenu>
 
@@ -264,8 +278,6 @@
         </div>
       </template>
     </UCard>
-
-    <!-- Column Toggle Modal -->
   </div>
 </template>
 

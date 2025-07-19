@@ -1,4 +1,4 @@
-import {defineStore} from 'pinia';
+import { defineStore } from 'pinia';
 
 export interface User {
   id: string;
@@ -6,16 +6,15 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  emailVerified: boolean;
+  emailVerified?: boolean;
   createTimestamp: string;
   enabled: boolean;
-  disabledCredentialTypes: string[];
-  requiredActions: string[];
-  notBefore: number;
-  access: {
+  disabledCredentialTypes?: string[];
+  requiredActions?: string[];
+  notBefore?: number;
+  access?: {
     manage: boolean;
   };
-  role:string;
 }
 
 interface RoleCredential {
@@ -93,32 +92,52 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
   //actions
   const clearError = () => error.value = null;
-  const setLoading = (value: boolean) => loading.value = value;
+
 
   const getUsers = async () => {
     try {
-      setLoading(true);
+      loading.value = true;
       clearError();
-      const config = useRuntimeConfig();
-      const {$authApi} = useNuxtApp();
 
-      const {data} = await $authApi.get(`admin/realms/apb_teller/users`);
+      console.log('🔍 Starting to fetch users...');
+
+      const config = useRuntimeConfig();
+      const { $authApi } = useNuxtApp();
+
+      // console.log('🌐 API Base URL:', config.public.auth_url);
+      console.log('🔑 Auth token exists:', !!useCookie('access_token').value);
+
+      const { data } = await $authApi.get(`admin/realms/apb_teller/users`);
+
+      console.log('✅ Raw API Response:', data);
+      console.log('📊 Response type:', typeof data);
+      console.log('📋 Is Array:', Array.isArray(data));
 
       users.value = Array.isArray(data) ? data : data;
+
+      console.log('📦 Processed Users:', users.value);
+      if (users.value.length === 0) {
+        console.warn('⚠️ No users found in the response.');
+      } else {
+        console.log(`📈 Total users fetched: ${users.value.length}`);
+      }
+
     } catch (e) {
+      console.error('❌ Error fetching users:', e);
+
       error.value = e instanceof Error ? e.message : 'An error occurred while fetching users';
+      users.value = []; // Ensure users is always an array
     } finally {
-      setLoading(false);
+      loading.value = false;
     }
   }
 
-  const getRoles = async (id : number) => {
+  const getRoles = async (id: number) => {
     try {
       loading.value = true;
-      const config = useRuntimeConfig();
-      const {$authApi} = useNuxtApp();
+      const { $authApi } = useNuxtApp();
 
-      const {data} = await $authApi.get(`admin/realms/apb_teller/users/${id}/role-mappings/realm`);
+      const { data } = await $authApi.get(`admin/realms/apb_teller/users/${id}/role-mappings/realm`);
 
       roles.value = Array.isArray(data) ? data : data;
 
@@ -135,8 +154,8 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   }
 
   return {
-    users:readonly(users),
-    roles:readonly(roles),
+    users: readonly(users),
+    roles: readonly(roles),
     userCredential: readonly(userCredential),
     loading: readonly(loading),
     error: readonly(error),

@@ -4,19 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-block-quote": "^45.2.1",
-    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
-    "@ckeditor/ckeditor5-core": "^45.2.1",
-    "@ckeditor/ckeditor5-essentials": "^45.2.1",
-    "@ckeditor/ckeditor5-paragraph": "^45.2.1",
-    "@ckeditor/ckeditor5-vue": "^7.3.0",
-    "@nuxt/content": "3.6.1",
     "@nuxt/fonts": "0.11.4",
     "@nuxt/icon": "1.14.0",
     "@nuxt/image": "1.10.0",
@@ -42,5 +35,5 @@
     "vue-router": "^4.5.1",
     "zod": "^3.25.76"
   },
-  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
+  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
 }
