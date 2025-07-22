@@ -1,13 +1,12 @@
 <template>
   <div>
-    <NuxtRouteAnnouncer/>
-    <nuxt-loading-indicator/>
+    <NuxtRouteAnnouncer />
+    <nuxt-loading-indicator />
     <UApp>
       <nuxt-layout>
-        <nuxt-page/>
+        <nuxt-page />
       </nuxt-layout>
     </UApp>
   </div>
 </template>
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>

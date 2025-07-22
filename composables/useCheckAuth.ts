@@ -3,7 +3,7 @@ interface CheckAuth {
 }
 
 export const useCheckAuth = () => {
-  const {decodeToken, isTokenExpired} = useJWTDecoder();
+  const { decodeToken, isTokenExpired } = useJWTDecoder();
 
   const checkRole = computed(() => {
     const token = useCookie('access_token').value;
@@ -189,7 +189,7 @@ export const useCheckAuth = () => {
     return !!(token && !isTokenExpired(token) && checkRole.value)
   }
 
-  const hasRole = (role: string | string []): boolean => {
+  const hasRole = (role: string | string[]): boolean => {
     const payload = checkRole.value;
     if (!payload || !payload?.realm_access?.roles) {
       return false;

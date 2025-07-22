@@ -90,7 +90,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     containerId: ''
   })
 
-  const loading = ref(false);
+  let loading = ref(false);
   const error = ref<string | null>(null);
   const initilized = ref(false);
 
@@ -277,41 +277,31 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   const userCreateCredential = async (state: UserCreateCredential): Promise<void> => {
     try {
       loading.value = true;
-      clearError();
 
       const authReady = await waitForAuth();
       if (!authReady) throw new Error("Authentication not ready");
 
       userCredential.value = { ...state };
       const { $authApi } = useNuxtApp();
-      await $authApi.post(`admin/realms/apb_teller/users`, state);
-      await getUsers();
-      clearUserCredential();
+      return await $authApi.post(`admin/realms/apb_teller/users`, state);
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
-      clearUserCredential();
       throw e
     } finally {
       loading.value = false;
     }
   }
 
-  const assignRoleCredential = async (id: string, role: AssignRole): Promise<void> => {
+  const assignRoleCredential = async (id: string, role: AssignRole[]): Promise<void> => {
     try {
       loading.value = true;
-      clearError();
-
       const authReady = await waitForAuth();
       if (!authReady) throw new Error("Authentication not ready");
 
       const { $authApi } = useNuxtApp();
-      await $authApi.post(`admin/realms/apb_teller/users/${id}/role-mappings/realm`, role);
-
-      clearAssingRoleCredential();
-
+      return await $authApi.post(`admin/realms/apb_teller/users/${id}/role-mappings/realm`, role);
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
-      clearAssingRoleCredential();
       throw e
     } finally {
       loading.value = false;

@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <div class="flex-1 flex flex-col justify-center px-6 lg:px-1">
+    <div class="flex-1 flex flex-col justify-center px-6 lg:px-0">
       <div class="">
         <div class="">
           <!-- Registration Form (Show only after admin verification) -->
@@ -35,7 +35,6 @@
                 @submit="handleRegister"
                 class="space-y-4"
               >
-                {{ state.userType }}
                 <UFormField label="UserType" name="userType" required>
                   <USelectMenu
                     v-model="state.userType"
@@ -45,7 +44,9 @@
                     icon="i-heroicons-shield-check"
                     size="md"
                     class="w-full mb-[.2rem]"
-                  />
+                    @change.prevent="handleSelectedUserType(state.userType)"
+                  >
+                  </USelectMenu>
                 </UFormField>
 
                 <!-- Personal Information -->
@@ -89,29 +90,6 @@
                   />
                 </UFormField>
 
-                <!-- Department -->
-                <!-- <UFormField label="Department" name="department" required>
-                  <USelectMenu
-                    v-model="state.department"
-                    :options="departmentOptions"
-                    :items="departmentOptions"
-                    icon="i-heroicons-academic-cap"
-                    placeholder="Select department"
-                    class="w-full mb-[.2rem]"
-                  />
-                </UFormField> -->
-
-                <!-- Phone -->
-                <!-- <UFormField label="Phone" name="phone">
-                  <UInput
-                    v-model="state.phone"
-                    placeholder="020-XX-XXX-XXX"
-                    icon="i-heroicons-phone"
-                    :loading="loading"
-                    class="w-full mb-[.2rem]"
-                  />
-                </UFormField> -->
-
                 <!-- Password -->
                 <UFormField label="Password" name="password" required>
                   <UInput
@@ -135,35 +113,6 @@
                     </template>
                   </UInput>
                 </UFormField>
-
-                <!-- Confirm Password -->
-                <!-- <UFormField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  required
-                >
-                  <UInput
-                    v-model="state.confirmPassword"
-                    :type="showConfirmPassword ? 'text' : 'password'"
-                    placeholder="Confirm password"
-                    icon="i-heroicons-lock-closed"
-                    :loading="loading"
-                    class="w-full mb-[.2rem]"
-                  >
-                    <template #trailing>
-                      <UButton
-                        variant="ghost"
-                        size="xs"
-                        :icon="
-                          showConfirmPassword
-                            ? 'i-heroicons-eye-slash'
-                            : 'i-heroicons-eye'
-                        "
-                        @click="showConfirmPassword = !showConfirmPassword"
-                      />
-                    </template>
-                  </UInput>
-                </UFormField> -->
 
                 <!-- Password Strength Indicator -->
                 <div v-if="state.password" class="space-y-2">
@@ -266,23 +215,14 @@ const isAdminVerified = ref(false);
 const loading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const selectedUserType = ref<RoleMapping[]>([]);
 const role = ref<RoleMapping>({
   id: "",
   name: "",
   description: "",
-  composite: true,
-  clientRole: true,
+  composite: false,
+  clientRole: false,
   containerId: "",
-});
-
-// Form data - using simple reactive object
-const form = ref<RegisterForm>({
-  // userType: "",
-  firstName: "",
-  lastName: "",
-  username: "",
-  email: "",
-  password: "",
 });
 
 const {
@@ -312,14 +252,7 @@ const userTypeOptions = computed(() => {
 
 // Validation schema
 const registerSchema = z.object({
-  userType: z.object({
-    id: z.string(),
-    name: z.string(),
-    description: z.string().optional(),
-    composite: z.boolean(),
-    clientRole: z.boolean(),
-    containerId: z.string().optional(),
-  }),
+  userType: z.string().min(1, "User type is required."),
   firstName: z
     .string()
     .min(2, "First name must contain at least 2 characters."),
@@ -342,7 +275,7 @@ const registerSchema = z.object({
 type Schema = z.output<typeof registerSchema>;
 
 const state = reactive<Partial<Schema>>({
-  userType: undefined,
+  userType: "",
   firstName: undefined,
   lastName: undefined,
   username: undefined,
@@ -381,7 +314,15 @@ const passwordStrength = computed(() => {
   };
 });
 
-// Methods
+const handleSelectedUserType = (userType: string) => {
+  role.value = roles.find((role) => role.id === userType) || role.value;
+
+  selectedUserType.value = [];
+  selectedUserType.value.push(role.value);
+
+  console.log(selectedUserType.value);
+};
+
 const handleRegister = async () => {
   loading.value = true;
   const toast = useToast();
@@ -405,31 +346,19 @@ const handleRegister = async () => {
       ],
     };
 
-    await userCreateCredential(register).then(async (response) => {});
+    await userCreateCredential(register).then(async (response) => {
+      await assignRoleCredential(response.id, selectedUserType.value);
+      loading.value = false;
+      // Show success message
+      toast.add({
+        icon: "i-heroicons-check-circle",
+        title: "Account created successfully",
+        description: `Created user for ${validatedData.firstName} ${validatedData.lastName}`,
+        color: "success",
+      });
 
-    // Show success message
-    toast.add({
-      icon: "i-heroicons-check-circle",
-      title: "Account created successfully",
-      description: `Created user for ${validatedData.firstName} ${validatedData.lastName}`,
-      color: "success",
+      navigateTo("/admin/users");
     });
-
-    // Reset form
-    form.value = {
-      // userType: "",
-      firstName: "",
-      lastName: "",
-      username: "",
-      email: "",
-      // department: "",
-      // phone: "",
-      password: "",
-      // confirmPassword: '',
-      // acceptTerms: false,
-    };
-    navigateTo("/admin/users");
-    loading.value = false;
   } catch (error: any) {
     console.error("Registration error:", error);
 

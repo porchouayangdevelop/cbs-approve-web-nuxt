@@ -1,6 +1,6 @@
-import type {AxiosResponse} from "axios";
-import {useJWTDecoder} from "~/composables/useJWTDecoder";
-import type {TokenPayload} from "~/composables/useJWTDecoder";
+import type { AxiosResponse } from "axios";
+import { useJWTDecoder } from "~/composables/useJWTDecoder";
+import type { TokenPayload } from "~/composables/useJWTDecoder";
 
 interface User {
   id: string;
@@ -48,9 +48,12 @@ export const useAuth = () => {
   const isLoading = useState<boolean>('auth.isLoading', () => false);
   const isInitialized = useState<boolean>('auth.isInitialized', () => false);
 
-  const {getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions} = useCheckAuth();
-  const {decodeToken, isTokenExpired} = useJWTDecoder();
-  const {defaultRoute} = useDefaultRouteForRole();
+
+  const initializationPromise = useState<Promise<void> | null>('auth.initializationPromise', () => null);
+
+  const { getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions } = useCheckAuth();
+  const { decodeToken, isTokenExpired } = useJWTDecoder();
+  const { defaultRoute } = useDefaultRouteForRole();
 
   const {
     setAccessToken,
@@ -62,41 +65,85 @@ export const useAuth = () => {
   } = useCookieHelping();
 
   const initializeAuth = async () => {
-    if (isInitialized.value) return;
+    if (isInitialized.value || initializationPromise.value) { return initializationPromise.value };
+
+    initializationPromise.value = _performInitialization();
+    try {
+      // isLoading.value = true;
+
+      // const token = useCookie("access_token").value;
+      // if (!token) {
+      //   console.warn('No access token found, user is not authenticated');
+      //   isAuthenticated.value = false;
+      //   return;
+      // }
+
+      // if (isTokenExpired(token)) {
+      //   console.warn('Access token is expired, trying to refresh...');
+      //   const refreshed = await refreshToken();
+      //   if (!refreshed) {
+      //     console.warn('Failed to refresh access token, user is not authenticated');
+      //     clearCookies();
+      //     isAuthenticated.value = false;
+      //     return;
+      //   }
+      // }
+      // await getCurrentUser();
+      await initializationPromise.value;
+
+    }
+    // catch (e) {
+    //   console.error(`Error during auth initialization: ${e}`);
+    //   clearCookies();
+    //   user.value = null;
+    //   isAuthenticated.value = false;
+    // }
+    finally {
+      // isLoading.value = false;
+      // isInitialized.value = false;
+      initializationPromise.value = null;
+    }
+  }
+
+  const _performInitialization = async () => {
+    if (isInitialized.value || isLoading.value) return;
 
     try {
       isLoading.value = true;
 
       const token = useCookie("access_token").value;
       if (!token) {
-        console.warn('No access token found, user is not authenticated');
         isAuthenticated.value = false;
+        isInitialized.value = true;
         return;
       }
 
       if (isTokenExpired(token)) {
-        console.warn('Access token is expired, trying to refresh...');
+        console.log('Access token expired, attempting refresh...');
         const refreshed = await refreshToken();
         if (!refreshed) {
-          console.warn('Failed to refresh access token, user is not authenticated');
           clearCookies();
           isAuthenticated.value = false;
+          isInitialized.value = true;
           return;
         }
+
       }
       await getCurrentUser();
-    } catch (e) {
-      console.error(`Error during auth initialization: ${e}`);
+      isInitialized.value = true;
+    } catch (error) {
+      console.error('Auth initialization error:', error);
       clearCookies();
       user.value = null;
       isAuthenticated.value = false;
+      isInitialized.value = true;
     } finally {
       isLoading.value = false;
-      isInitialized.value = false;
     }
   }
 
   const getCurrentUser = async (): Promise<User | null> => {
+    // if (isLoading.value) return user.value;
     try {
       isLoading.value = true;
 
@@ -112,10 +159,10 @@ export const useAuth = () => {
           throw new Error('Failed to refresh access token');
         }
 
-        const newToken = setAccessToken('access_token', 3600);
-        if (!newToken) {
-          throw new Error('Failed to set new access token');
-        }
+        // const newToken = setAccessToken('access_token', 3600);
+        // if (!newToken) {
+        //   throw new Error('Failed to set new access token');
+        // }
       }
 
       if (!checkAuthStatus()) {
@@ -155,7 +202,6 @@ export const useAuth = () => {
 
       user.value = userProfile;
       isAuthenticated.value = true;
-
       return userProfile;
     } catch (e) {
       console.log(`Error fetching user data: ${e}`);
@@ -163,25 +209,6 @@ export const useAuth = () => {
       isAuthenticated.value = false;
 
       return null;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  const loginWithRole = async (credential: Credentials & { role?: string }) => {
-    try {
-      isLoading.value = true;
-      const response = await login(credential);
-
-      const userRole = user.value?.role?.toLowerCase();
-      const selectRole = credential.role?.toLowerCase();
-
-      if (selectRole && userRole !== selectRole) {
-        throw new Error(`Error while login with role "${credential.role}"`);
-      }
-      return response;
-    } catch (e) {
-      throw e;
     } finally {
       isLoading.value = false;
     }
@@ -196,10 +223,10 @@ export const useAuth = () => {
   }
 
   const login = async (credentials: Credentials) => {
+    if (isLoading.value) { throw new Error('Login already in progress') };
     try {
       isLoading.value = true;
-      const {$authApi} = useNuxtApp();
-      // const config = useRuntimeConfig();
+      const { $authApi } = useNuxtApp();
 
       const params = new URLSearchParams();
       params.append('grant_type', 'password');
@@ -214,7 +241,7 @@ export const useAuth = () => {
         }
       }
 
-      const {data} = await $authApi.post<AuthResponse>(`realms/apb_teller/protocol/openid-connect/token`, params, config);
+      const { data } = await $authApi.post<AuthResponse>(`realms/apb_teller/protocol/openid-connect/token`, params, config);
 
       const accessToken = setAccessToken(data.access_token, data.expires_in);
       const refreshToken = setRefreshToken(data.refresh_token, data.refresh_expires_in);
@@ -224,27 +251,26 @@ export const useAuth = () => {
       }
 
       const decoder = decodeToken(data.access_token);
-
       if (!decoder) {
         throw new Error('Failed to decode access token');
       }
 
       isAuthenticated.value = true;
-
       await getCurrentUser();
 
-      const user = await getCurrentUser();
-      if (!user) {
+      const userAccount = await getCurrentUser();
+
+      if (!userAccount) {
         throw new Error('Failed to fetch user data after login');
       }
 
       const intendedRoute = useCookie('intended_route');
-      const redirect = intendedRoute.value || defaultRoute(user.role);
+      const redirect = intendedRoute.value || defaultRoute(userAccount.role);
 
       intendedRoute.value = null; // Clear the intended route after redirecting
 
       await nextTick();
-      await navigateTo(redirect, {replace: true});
+      await navigateTo(redirect, { replace: true });
 
       return data;
     } catch (e) {
@@ -260,11 +286,8 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-
-      alert('Logging out...');
       isLoading.value = true;
-      const {$authApi} = useNuxtApp();
-      const config = useRuntimeConfig();
+      const { $authApi } = useNuxtApp();
 
       // Get refresh token for server-side logout
       const refreshTokenValue = useCookie('refresh_token').value;
@@ -316,9 +339,10 @@ export const useAuth = () => {
   }
 
   const refreshToken = async () => {
+    if (isLoading.value) return false;
     try {
       isLoading.value = true;
-      const {$authApi} = useNuxtApp();
+      const { $authApi } = useNuxtApp();
       const config = useRuntimeConfig();
       const refreshToken = useCookie('refresh_token').value;
 
@@ -333,7 +357,7 @@ export const useAuth = () => {
       params.append('refresh_token', refreshToken);
       params.append('client_secret', '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC');
 
-      const {data} = await $authApi.post<AuthResponse>(`${config.refreshToken}`, params, {
+      const { data } = await $authApi.post<AuthResponse>(`${config.refreshToken}`, params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -424,17 +448,17 @@ export const useAuth = () => {
     );
   };
 
-  if (process.client && !isInitialized.value) {
+  if (process.client && !isInitialized.value && !initializationPromise.value) {
     initializeAuth();
   }
 
   return {
     user: readonly(user),
     isAuthenticated: readonly(isAuthenticated),
+    isInitialized: readonly(isInitialized),
     isLoading: readonly(isLoading),
     getCurrentUser,
     login,
-    loginWithRole,
     logout,
     refreshToken,
     updateProfile,
@@ -446,3 +470,5 @@ export const useAuth = () => {
     clearAuthState,
   }
 }
+
+

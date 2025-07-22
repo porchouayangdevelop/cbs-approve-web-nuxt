@@ -1,12 +1,11 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  if (process.server) {
-    // Server-side logic can be added here if needed
-    return;
-  }
+  // Server-side logic can be added here if needed
+  if (process.server) return;
 
-  const {getCurrentUser, user, isAuthenticated, logout} = useAuth();
-  const {checkAuth, handledUnauthorized, canAccess} = useGuards();
-  const {isTokenExpired} = useJWTDecoder();
+
+  const { getCurrentUser, user, isAuthenticated, logout, isInitialized, isLoading } = useAuth();
+  const { checkAuth, handledUnauthorized, canAccess } = useGuards();
+  const { isTokenExpired } = useJWTDecoder();
 
   // const clearAuthAndRedirect = async () => {
   //   try {
@@ -51,6 +50,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return;
   }
 
+
+  if (!isInitialized.value && isLoading.value) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return;
+  }
+
   const token = useCookie('access_token').value;
   if (!token) {
     console.log('No access token found, redirecting to login');
@@ -73,7 +78,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (isTokenExpired(token)) {
     console.log('AuthGuard: Access token is expired, attempting refresh...');
     try {
-      const {refreshToken} = useAuth();
+      const { refreshToken } = useAuth();
       const refreshed = await refreshToken();
       if (!refreshed) {
         console.log('Failed to refresh access token, redirecting to login');
@@ -114,7 +119,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   //   }
   // }
 
-  if (!user.value) {
+  if (!user.value && isLoading.value) {
     try {
       await getCurrentUser();
     } catch (err) {
