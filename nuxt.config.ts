@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
-  devtools: {enabled: false},
+  devtools: { enabled: false },
   ssr: false,
 
   imports: {
@@ -10,7 +10,7 @@ export default defineNuxtConfig({
 
   $production: {
     routeRules: {
-      '/**': {isr: true}
+      '/**': { isr: true }
     }
   },
   // $development: {},
@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 
   // Add router configuration
   router: {
-    middleware: ['auth-redirect'] // Make sure this is the only global middleware
+    // middleware: ['auth-redirect'] // Make sure this is the only global middleware
   },
   experimental: {
     payloadExtraction: false
@@ -49,7 +49,7 @@ export default defineNuxtConfig({
       refresh_token: '',
       check_token: '',
       role_list: '',
-      get_users:'',
+      get_users: '',
       delete_user: '',
       edit_user: '',
       webTitle: '',

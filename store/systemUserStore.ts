@@ -31,13 +31,10 @@ export interface RoleMapping {
 }
 
 interface UserCreateCredential {
-  userType: string
   username: string
   firstName: string
   lastName: string
   email?: string
-  department: string
-  phone: string
   enabled: boolean
   emailVerified: boolean
   credentials: Array<{
@@ -64,13 +61,10 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   const users = ref<User[]>([]);
   const roles = ref<RoleMapping[]>([]);
   const userCredential = ref<UserCreateCredential>({
-    userType: '',
     username: '',
     firstName: '',
     lastName: '',
     email: '',
-    department: '',
-    phone: '',
     enabled: true,
     emailVerified: false,
     credentials: [{
@@ -92,6 +86,19 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
   //actions
   const clearError = () => error.value = null;
+  const clearUserCredential = () => userCredential.value = {
+    username: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    enabled: true,
+    emailVerified: false,
+    credentials: [{
+      type: 'password',
+      value: '',
+      temporary: false
+    }]
+  }
 
 
   const getUsers = async () => {
@@ -132,7 +139,22 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     }
   }
 
-  const getRoles = async (id: number) => {
+  const getRoles = async () => {
+    loading.value = true
+    try {
+      const { $authApi } = useNuxtApp();
+      const { data } = await $authApi.get(`admin/realms/apb_teller/roles`);
+      roles.value = Array.isArray(data) ? data : data;
+      return roles.value;
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
+      roles.value = [];
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getRole = async (id: number) => {
     try {
       loading.value = true;
       const { $authApi } = useNuxtApp();
@@ -150,15 +172,30 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     }
   }
 
-  const userCreateCredential = (state: UserCreateCredential) => {
+  const userCreateCredential = async (state: UserCreateCredential) => {
+    loading.value = true;
+
+    try {
+      userCredential.value = state;
+      const { $authApi } = useNuxtApp();
+      const { data } = await $authApi.post(`admin/realms/apb_teller/users`, state);
+      userCredential.value = data;
+      clearUserCredential();
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
+      clearUserCredential();
+    } finally {
+      loading.value = false;
+    }
+
   }
 
   return {
-    users: readonly(users),
-    roles: readonly(roles),
-    userCredential: readonly(userCredential),
-    loading: readonly(loading),
-    error: readonly(error),
+    users,
+    roles,
+    userCredential,
+    loading,
+    error,
 
     // Getters
     usersList,
@@ -169,6 +206,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     // Actions
     getUsers,
     getRoles,
+    getRole,
     userCreateCredential,
     clearError,
   };
