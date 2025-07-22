@@ -1,4 +1,4 @@
-import axios, {type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig} from 'axios';
+import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 
 export default defineNuxtPlugin(async (nuxtApp) => {
   const config = useRuntimeConfig();
@@ -6,7 +6,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     baseURL: config.public.auth_url,
     headers: {
       // 'Allow-Origin': '*',
-      'Content-Type': 'application/x-www-form-urlencoded',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
     }
   });
 

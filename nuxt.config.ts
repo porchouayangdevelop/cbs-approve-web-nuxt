@@ -30,7 +30,7 @@ export default defineNuxtConfig({
 
   // Add router configuration
   router: {
-    // middleware: ['auth-redirect'] // Make sure this is the only global middleware
+    middleware: ['auth.global'] // Make sure this is the only global middleware
   },
   experimental: {
     payloadExtraction: false

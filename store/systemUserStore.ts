@@ -30,7 +30,7 @@ export interface RoleMapping {
   containerId?: string;
 }
 
-interface UserCreateCredential {
+export interface UserCreateCredential {
   username: string
   firstName: string
   lastName: string
@@ -44,7 +44,6 @@ interface UserCreateCredential {
   }>
 }
 
-
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -54,6 +53,15 @@ interface ApiResponse<T> {
 interface StoreState {
   loading: boolean;
   error: string | null;
+}
+
+export interface AssignRole {
+  id: string;
+  name: string;
+  description?: string;
+  composite?: boolean;
+  clientRole?: boolean;
+  containerId?: string;
 }
 
 export const useSystemUserStore = defineStore('SystemUserStore', () => {
@@ -73,15 +81,26 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       temporary: false
     }]
   })
+  const assignCredential = ref<AssignRole>({
+    id: '',
+    name: '',
+    description: '',
+    composite: false,
+    clientRole: false,
+    containerId: ''
+  })
 
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const initilized = ref(false);
 
   //getters
   const usersList = computed(() => users.value);
   const rolesList = computed(() => roles.value);
   const isLoading = computed(() => loading.value);
   const isError = computed(() => error.value);
+  const isInitialized = computed(() => initilized.value);
+
 
 
   //actions
@@ -99,101 +118,221 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       temporary: false
     }]
   }
+  const clearAssingRoleCredential = () => assignCredential.value = {
+    id: '',
+    name: '',
+    description: '',
+    composite: false,
+    clientRole: false,
+    containerId: ''
+  }
 
 
-  const getUsers = async () => {
+  const waitForAuth = async (): Promise<boolean> => {
+    const { isAuthenticated, isLoading: authLoading } = useAuth();
+    const { isTokenExpired } = useJWTDecoder();
+
+    while (authLoading.value) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const token = useCookie('access_token').value;
+    if (!token) {
+      return false;
+    }
+    if (isTokenExpired(token)) {
+      return false;
+    }
+
+    if (!isAuthenticated.value) {
+      return false;
+    }
+
+    return true;
+  }
+
+
+  const getUsers = async (): Promise<User[]> => {
     try {
+      if (loading.value) {
+        while (loading.value) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return users.value;
+      }
+
       loading.value = true;
       clearError();
 
       console.log('🔍 Starting to fetch users...');
 
-      const config = useRuntimeConfig();
-      const { $authApi } = useNuxtApp();
+      const authReady = await waitForAuth();
+      if (!authReady) {
+        throw new Error("Authentication not ready")
+      }
 
-      // console.log('🌐 API Base URL:', config.public.auth_url);
-      console.log('🔑 Auth token exists:', !!useCookie('access_token').value);
+      const { $authApi } = useNuxtApp();
 
       const { data } = await $authApi.get(`admin/realms/apb_teller/users`);
 
-      console.log('✅ Raw API Response:', data);
-      console.log('📊 Response type:', typeof data);
-      console.log('📋 Is Array:', Array.isArray(data));
 
-      users.value = Array.isArray(data) ? data : data;
+      const userData = Array.isArray(data) ? data : data;
 
-      console.log('📦 Processed Users:', users.value);
-      if (users.value.length === 0) {
-        console.warn('⚠️ No users found in the response.');
-      } else {
-        console.log(`📈 Total users fetched: ${users.value.length}`);
-      }
+      users.value.length = 0;
+      users.value.push(...userData);
 
-    } catch (e) {
+      initilized.value = true;
+
+      // console.log('📦 Processed Users:', users.value);
+      // if (users.value.length === 0) {
+      //   console.warn('⚠️ No users found in the response.');
+      // } else {
+
+      // }
+
+      return users.value;
+    } catch (e: any) {
       console.error('❌ Error fetching users:', e);
 
-      error.value = e instanceof Error ? e.message : 'An error occurred while fetching users';
-      users.value = []; // Ensure users is always an array
+      // Set a user-friendly error message
+      if (e.response?.status === 401) {
+        error.value = 'Authentication required. Please log in again.';
+      } else if (e.response?.status === 403) {
+        error.value = 'You do not have permission to access this resource.';
+      } else if (e.response?.status >= 500) {
+        error.value = 'Server error. Please try again later.';
+      } else {
+        error.value = e.message || 'An error occurred while fetching users';
+      }
+
+      // Don't clear existing data on error unless it's an auth error
+      if (e.response?.status === 401 || e.response?.status === 403) {
+        users.value.length = 0;
+      }
+
+      throw e; // Re-throw for component error handling
     } finally {
       loading.value = false;
     }
   }
 
-  const getRoles = async () => {
-    loading.value = true
+  const getRoles = async (): Promise<RoleMapping[]> => {
     try {
+      if (loading.value) {
+        while (loading.value) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return roles.value;
+      }
+
+      loading.value = true;
+      clearError();
+      const authReady = await waitForAuth();
+      if (!authReady) throw new Error("Authentication not ready");
+
       const { $authApi } = useNuxtApp();
       const { data } = await $authApi.get(`admin/realms/apb_teller/roles`);
-      roles.value = Array.isArray(data) ? data : data;
+
+      const roleData = Array.isArray(data) ? data : data;
+      roles.value.length = 0;
+      roles.value.push(...roleData);
+
       return roles.value;
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
-      roles.value = [];
+    } catch (e: any) {
+      console.error('❌ Error fetching roles:', e);
+      error.value = e.message || 'An error occurred while fetching roles';
+
+      if (e.response?.status === 401 || e.response?.status === 403) {
+        roles.value.length = 0;
+      }
+
+      throw e;
     } finally {
       loading.value = false
     }
   }
 
-  const getRole = async (id: number) => {
+  const getRole = async (id: number): Promise<RoleMapping[]> => {
     try {
       loading.value = true;
+      clearError();
+      const authReady = await waitForAuth();
+      if (!authReady) throw new Error("Authentication not ready");
+
       const { $authApi } = useNuxtApp();
 
       const { data } = await $authApi.get(`admin/realms/apb_teller/users/${id}/role-mappings/realm`);
 
-      roles.value = Array.isArray(data) ? data : data;
-
-      return roles.value;
-
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
+      const roleData = Array.isArray(data) ? data : data;
+      return roleData;
+    } catch (e: any) {
+      console.error('❌ Error fetching role:', e);
+      error.value = e.message || 'An error occurred while fetching role';
+      throw e;
     } finally {
       loading.value = false;
     }
   }
 
-  const userCreateCredential = async (state: UserCreateCredential) => {
-    loading.value = true;
-
+  const userCreateCredential = async (state: UserCreateCredential): Promise<void> => {
     try {
-      userCredential.value = state;
+      loading.value = true;
+      clearError();
+
+      const authReady = await waitForAuth();
+      if (!authReady) throw new Error("Authentication not ready");
+
+      userCredential.value = { ...state };
       const { $authApi } = useNuxtApp();
-      const { data } = await $authApi.post(`admin/realms/apb_teller/users`, state);
-      userCredential.value = data;
+      await $authApi.post(`admin/realms/apb_teller/users`, state);
+      await getUsers();
       clearUserCredential();
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
       clearUserCredential();
+      throw e
     } finally {
       loading.value = false;
     }
-
   }
+
+  const assignRoleCredential = async (id: string, role: AssignRole): Promise<void> => {
+    try {
+      loading.value = true;
+      clearError();
+
+      const authReady = await waitForAuth();
+      if (!authReady) throw new Error("Authentication not ready");
+
+      const { $authApi } = useNuxtApp();
+      await $authApi.post(`admin/realms/apb_teller/users/${id}/role-mappings/realm`, role);
+
+      clearAssingRoleCredential();
+
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
+      clearAssingRoleCredential();
+      throw e
+    } finally {
+      loading.value = false;
+    }
+  }
+
+
+  const resetStore = () => {
+    users.value.length = 0;
+    roles.value.length = 0;
+    clearError();
+    clearUserCredential();
+    initilized.value = false;
+  }
+
 
   return {
     users,
     roles,
     userCredential,
+    assignCredential,
     loading,
     error,
 
@@ -202,12 +341,15 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     rolesList,
     isLoading,
     isError,
+    isInitialized,
 
     // Actions
     getUsers,
+    assignRoleCredential,
     getRoles,
     getRole,
     userCreateCredential,
     clearError,
+    resetStore
   };
 });

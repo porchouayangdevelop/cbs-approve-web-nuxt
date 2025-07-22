@@ -35,6 +35,7 @@
                 @submit="handleRegister"
                 class="space-y-4"
               >
+                {{ state.userType }}
                 <UFormField label="UserType" name="userType" required>
                   <USelectMenu
                     v-model="state.userType"
@@ -54,7 +55,6 @@
                       v-model="state.firstName"
                       placeholder="First name"
                       icon="i-heroicons-user"
-                      :loading="loading"
                       class="w-full mb-[.2rem]"
                     />
                   </UFormField>
@@ -63,7 +63,6 @@
                     <UInput
                       v-model="state.lastName"
                       placeholder="Last name"
-                      :loading="loading"
                       class="w-full mb-[.2rem]"
                     />
                   </UFormField>
@@ -75,7 +74,6 @@
                     v-model="state.username"
                     placeholder="Username for login"
                     icon="i-heroicons-at-symbol"
-                    :loading="loading"
                     class="w-full mb-[.2rem] normal-case"
                   />
                 </UFormField>
@@ -87,7 +85,6 @@
                     type="email"
                     placeholder="example@company.com"
                     icon="i-heroicons-envelope"
-                    :loading="loading"
                     class="w-full mb-[.2rem]"
                   />
                 </UFormField>
@@ -122,7 +119,6 @@
                     :type="showPassword ? 'text' : 'password'"
                     placeholder="Password"
                     icon="i-heroicons-lock-closed"
-                    :loading="loading"
                     class="w-full mb-[.2rem]"
                   >
                     <template #trailing>
@@ -207,16 +203,6 @@
                   </div>
                 </div>
 
-                <!-- Terms & Conditions -->
-                <!-- <UFormField name="acceptTerms">
-                  <UCheckbox
-                    v-model="state.acceptTerms"
-                    label="Accept the Terms of Use and Privacy Policy."
-                    required
-                    class="cursor-pointer my-1"
-                  />
-                </UFormField> -->
-
                 <!-- Submit Button -->
                 <UButton
                   type="submit"
@@ -249,6 +235,7 @@ import { z } from "zod";
 import { useDepartmentWithSignUp } from "~/composables/useDepartmentWithSignUp";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import { useSystemUserStore } from "~/store/systemUserStore";
+import type { AssignRole, UserCreateCredential } from "~/store/systemUserStore";
 
 definePageMeta({
   layout: "admin-session", // Use admin session layout
@@ -257,63 +244,57 @@ definePageMeta({
 
 // Interfaces
 interface RegisterForm {
-  userType: string;
+  // userType: string;
   firstName: string;
   lastName: string;
   username: string;
   email: string;
-  // department: string;
-  // phone: string;
   password: string;
-  // confirmPassword: string
-  // acceptTerms: boolean
-}
-
-interface UserCreateRequest {
-  userType: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  // department: string;
-  // phone: string;
-  enabled: boolean;
-  emailVerified: boolean;
-  credentials: Array<{
-    type: string;
-    value: string;
-    temporary: boolean;
-  }>;
 }
 
 interface RoleMapping {
   id: string;
   name: string;
+  description?: string;
+  composite?: boolean;
+  clientRole?: boolean;
+  containerId?: string;
 }
 
 // State
 const isAdminVerified = ref(false);
-const adminCode = ref("");
-const verifyingAdmin = ref(false);
 const loading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const role = ref<RoleMapping>({
+  id: "",
+  name: "",
+  description: "",
+  composite: true,
+  clientRole: true,
+  containerId: "",
+});
 
 // Form data - using simple reactive object
 const form = ref<RegisterForm>({
-  userType: "",
+  // userType: "",
   firstName: "",
   lastName: "",
   username: "",
   email: "",
-  // department: "",
-  // phone: "",
   password: "",
-  // confirmPassword: '',
-  // acceptTerms: false
 });
 
-const { roles, getRoles} = useSystemUserStore();
+const {
+  //state
+  roles,
+  assignCredential,
+
+  //action
+  getRoles,
+  userCreateCredential,
+  assignRoleCredential,
+} = useSystemUserStore();
 
 // Options
 const userTypeOptions = computed(() => {
@@ -329,19 +310,22 @@ const userTypeOptions = computed(() => {
 // { label: "Checker", value: "checker" },
 // { label: "User", value: "user" },
 
-// const departmentOptions = computed(() => useDepartmentWithSignUp());
-
 // Validation schema
 const registerSchema = z.object({
-  userType: z.string().min(1, "Please select user type."),
+  userType: z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().optional(),
+    composite: z.boolean(),
+    clientRole: z.boolean(),
+    containerId: z.string().optional(),
+  }),
   firstName: z
     .string()
     .min(2, "First name must contain at least 2 characters."),
   lastName: z.string().min(2, "Last name must be at least 2 characters long."),
   username: z.string().min(8, "Username must contain at least 8 characters."),
   email: z.string().email("Please enter a valid email address."),
-  // department: z.string().min(1, "Please select a department."),
-  // phone: z.string().optional(),
   password: z
     .string()
     .min(8, "Password must contain at least 8 characters.")
@@ -349,8 +333,6 @@ const registerSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,
       "Password must include uppercase, lowercase, number, and special character"
     ),
-  // confirmPassword: z.string(),
-  // acceptTerms: z.boolean().refine(val => val, 'Please accept the terms of use.')
 });
 //     .refine(data => data.password === data.confirmPassword, {
 //   message: "Passwords do not match",
@@ -360,16 +342,12 @@ const registerSchema = z.object({
 type Schema = z.output<typeof registerSchema>;
 
 const state = reactive<Partial<Schema>>({
-  // userType: undefined,
+  userType: undefined,
   firstName: undefined,
   lastName: undefined,
   username: undefined,
   email: undefined,
-  // department: undefined,
-  // phone: undefined,
   password: undefined,
-  // confirmPassword: undefined,
-  // acceptTerms: undefined,
 });
 
 // Computed
@@ -384,6 +362,11 @@ const isFormValid = computed(() => {
 
 const passwordStrength = computed(() => {
   const password = state.password;
+  if (!password)
+    return {
+      score: 0,
+      label: "Very soft",
+    };
   let score = 0;
 
   if (password.length >= 8) score++;
@@ -399,56 +382,30 @@ const passwordStrength = computed(() => {
 });
 
 // Methods
-
-const verifyAdminCode = async () => {
-  verifyingAdmin.value = true;
-
-  try {
-    // Simulate admin code verification
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Mock verification - in real app, verify against backend
-    if (adminCode.value === "ADMIN2024" || adminCode.value === "CBS_ADMIN") {
-      isAdminVerified.value = true;
-
-      const toast = useToast();
-      toast.add({
-        icon: "i-heroicons-check-circle",
-        title: "Successfully confirmed",
-        description: "You can now create an account.",
-        color: "success",
-      });
-    } else {
-      throw new Error("Administrator code is invalid.");
-    }
-  } catch (error: any) {
-    const toast = useToast();
-    toast.add({
-      icon: "i-heroicons-exclamation-circle",
-      title: "Unable to verify eligibility",
-      description: error.message || "Administrator code is invalid.",
-      color: "error",
-    });
-
-    adminCode.value = "";
-  } finally {
-    verifyingAdmin.value = false;
-  }
-};
-
 const handleRegister = async () => {
   loading.value = true;
   const toast = useToast();
   try {
     // Validate form data
     const validatedData = registerSchema.parse(state);
-    console.log(validatedData);
 
-    // Transform form data to API request format
-    // const requestData = transformFormToRequest(validatedData)
+    const register: UserCreateCredential = {
+      username: validatedData.username,
+      firstName: validatedData.firstName,
+      lastName: validatedData.lastName,
+      email: validatedData.email,
+      enabled: true,
+      emailVerified: true,
+      credentials: [
+        {
+          type: "password",
+          value: validatedData.password,
+          temporary: false,
+        },
+      ],
+    };
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await userCreateCredential(register).then(async (response) => {});
 
     // Show success message
     toast.add({
@@ -460,7 +417,7 @@ const handleRegister = async () => {
 
     // Reset form
     form.value = {
-      userType: "",
+      // userType: "",
       firstName: "",
       lastName: "",
       username: "",
@@ -471,11 +428,8 @@ const handleRegister = async () => {
       // confirmPassword: '',
       // acceptTerms: false,
     };
-
-    // Redirect to login after delay
-    setTimeout(() => {
-      navigateTo("/auth/login");
-    }, 2000);
+    navigateTo("/admin/users");
+    loading.value = false;
   } catch (error: any) {
     console.error("Registration error:", error);
 

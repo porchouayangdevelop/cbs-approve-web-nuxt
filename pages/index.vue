@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
   layout: false,
-  // middleware: ['auth-redirect.global']
+  middleware: ["auth.global"],
 });
 </script>
 
