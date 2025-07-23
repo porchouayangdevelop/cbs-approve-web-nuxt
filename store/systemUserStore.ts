@@ -7,7 +7,7 @@ export interface User {
   lastName: string;
   email: string;
   emailVerified?: boolean;
-  createTimestamp: string;
+  createdTimestamp: string;
   enabled: boolean;
   disabledCredentialTypes?: string[];
   requiredActions?: string[];

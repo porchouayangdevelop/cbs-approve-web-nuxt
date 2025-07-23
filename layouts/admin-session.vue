@@ -1,9 +1,6 @@
 <template>
-  <LoadingScreen />
-  <div
-    v-if="!isLoading || isInitialized"
-    class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden"
-  >
+  <!-- <LoadingScreen /> -->
+  <div class="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
     <!-- Admin Sidebar Drawer -->
     <component
       :is="sidebarComponent"

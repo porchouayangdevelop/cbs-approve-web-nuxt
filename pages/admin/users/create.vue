@@ -347,7 +347,7 @@ const handleRegister = async () => {
     };
 
     await userCreateCredential(register).then(async (response) => {
-      await assignRoleCredential(response.id, selectedUserType.value);
+      // await assignRoleCredential(response.id, selectedUserType.value);
       loading.value = false;
       // Show success message
       toast.add({
@@ -357,7 +357,7 @@ const handleRegister = async () => {
         color: "success",
       });
 
-      navigateTo("/admin/users");
+      navigateTo("/admin/users", { replace: true });
     });
   } catch (error: any) {
     console.error("Registration error:", error);
