@@ -88,7 +88,7 @@
             Add User
           </UButton>
 
-          <UButton @click="openModal"> Open Modal </UButton>
+          <!-- <UButton @click="openModal"> Open Modal </UButton> -->
         </div>
       </div>
 
@@ -127,6 +127,17 @@
             <div class="uppercase font-mono">
               {{ row.getValue("email") ? row.getValue("email") : "N/A" }}
             </div>
+          </template>
+          <template #assignRole-cell="{ row }">
+            <UButton
+              size="small"
+              class="px-[.3rem]"
+              variant="outline"
+              icon="i-heroicons-user-group"
+              @click="assignRole(row)"
+            >
+              Assign
+            </UButton>
           </template>
           <template #action-cell="{ row }">
             <UDropdownMenu :items="getDropdownActions(row.original)">
@@ -335,7 +346,7 @@ const userColumns: TableColumn<User>[] = [
   {
     accessorKey: "index",
     header: ({ column }) => getHeader(column, "#", "left"),
-    cell: ({ row }) => `#${row.getValue("index")}`,
+    cell: ({ row }) => `${row.getValue("index")}`,
   },
   // {
   //   accessorKey: "id",
@@ -408,10 +419,14 @@ const userColumns: TableColumn<User>[] = [
       );
     },
   },
+  // {
+  //   accessorKey: "createdTimestamp",
+  //   header: ({ column }) => getHeader(column, "Created", "left"),
+  //   cell: ({ row }) => formatDate(row.getValue("createdTimestamp")),
+  // },
   {
-    accessorKey: "createdTimestamp",
-    header: ({ column }) => getHeader(column, "Created", "left"),
-    cell: ({ row }) => formatDate(row.getValue("createdTimestamp")),
+    id: "assignRole",
+    accessorKey: "AssignRole",
   },
   {
     id: "action",
@@ -435,6 +450,30 @@ const getHeader = (
     class: "-mx-2.5",
     click() {
       column.pin(isPinned === position ? false : position);
+    },
+  });
+};
+
+const assignRoleAction = (user: User) => {
+  const instance = modal.open({
+    title: "Assign Role",
+    content: "",
+    okText: "OK",
+    cancelText: "Cancel",
+    data: {
+      user,
+    },
+    onOk: () => {
+      toast.add({
+        title: "Success",
+        description: "Operation successful",
+      });
+    },
+    onCancel: () => {
+      toast.add({
+        title: "Cancel",
+        description: "Operation cancelled",
+      });
     },
   });
 };
@@ -511,10 +550,11 @@ const pagination = ref({
 
 const openModal = () => {
   const instance = modal.open({
-    title: "Modal Title",
-    content: "Modal Content",
+    title: "Assign Role",
+    content: "",
     okText: "OK",
     cancelText: "Cancel",
+    data: {},
     onOk: () => {
       toast.add({
         title: "Success",
@@ -552,11 +592,12 @@ const editUser = (user: any) => {
 };
 
 const assignRole = (user: any) => {
-  console.log("Assign role to user:", user);
-  toast.add({
-    title: "Feature Coming Soon",
-    description: "Role assignment feature will be available soon",
-  });
+  assignRoleAction(user.original);
+
+  // toast.add({
+  //   title: "Feature Coming Soon",
+  //   description: "Role assignment feature will be available soon",
+  // });
 };
 
 const resetPassword = (user: any) => {

@@ -236,6 +236,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       const roleData = Array.isArray(data) ? data : data;
       roles.value.length = 0;
       roles.value.push(...roleData);
+      initilized.value = true;
 
       return roles.value;
     } catch (e: any) {
