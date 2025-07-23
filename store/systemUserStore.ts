@@ -253,7 +253,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     }
   }
 
-  const getRole = async (id: number): Promise<RoleMapping[]> => {
+  const getRole = async (id: string): Promise<RoleMapping[]> => {
     try {
       loading.value = true;
       clearError();
@@ -262,10 +262,19 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
       const { $authApi } = useNuxtApp();
 
-      const { data } = await $authApi.get(`admin/realms/apb_teller/users/${id}/role-mappings/realm`);
+      const queryParams = {
+        briefRepresentation: false,
+      }
+
+      const { data } = await $authApi.get(`/admin/realms/apb_teller/roles-by-id/${id}`, {
+        params: queryParams,
+      });
 
       const roleData = Array.isArray(data) ? data : data;
-      return roleData;
+      roles.value.push(...roleData);
+      initilized.value = true;
+
+      return roles.value;
     } catch (e: any) {
       console.error('❌ Error fetching role:', e);
       error.value = e.message || 'An error occurred while fetching role';

@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div>Page: admin/roles/edit/[id] - Edit</div>
+  <div>Page: admin/roles/assign</div>
 </template>
 
 <style scoped></style>

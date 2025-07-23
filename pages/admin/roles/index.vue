@@ -46,6 +46,9 @@ const loading = ref(false);
 const globalFilter = ref("");
 const selectRole = ref("");
 
+const itemsPerPage = ref(10);
+const currentPage = ref(1);
+
 // reactive data
 const loadingMessage = computed(() => {
   if (!isAuthenticated.value) return "Authenticating...";
@@ -117,9 +120,32 @@ const roleColumns: TableColumn<Role>[] = [
   {
     id: "action",
     accessorKey: "actions",
-    header: ({ column }) => getHeader(column, "Actions", "right"),
+    header: () =>
+      h(
+        "div",
+        {
+          // color: "neutral",
+          // variant: "ghost",
+          // icon: "i-lucide-menu",
+          class: "text-right",
+        },
+        "Actions"
+      ),
   },
 ];
+
+const totalItems = computed(() => filteredRoleData.value.length);
+const totalPages = computed(() =>
+  Math.ceil(totalItems.value / itemsPerPage.value)
+);
+const startItem = computed(() => {
+  if (totalItems.value === 0) return 0;
+  return (currentPage.value - 1) * itemsPerPage.value + 1;
+});
+const endItem = computed(() => {
+  const end = currentPage.value * itemsPerPage.value;
+  return Math.min(end, totalItems.value);
+});
 
 const getHeader = (
   column: Column<Role>,
@@ -133,7 +159,7 @@ const getHeader = (
     label,
     icon: isPinned ? "i-lucide-pin-off" : "i-lucide-pin",
     class: "-mx-2.5",
-    click() {
+    onClick() {
       column.pin(isPinned === position ? false : position);
     },
   });
@@ -159,8 +185,8 @@ const columnPinning = ref({
 });
 
 const pagination = ref({
-  pageSize: 10,
-  pageIndex: 1,
+  pageSize: itemsPerPage.value,
+  pageIndex: currentPage.value - 1,
   total: 0,
 });
 
@@ -181,9 +207,35 @@ const filteredRoleData = computed(() => {
   return filtered;
 });
 
+// Paginated data for display
+const paginatedRoleData = computed(() => {
+  console.log(
+    `Computing paginated data: page ${currentPage.value}, size ${itemsPerPage.value}`
+  );
+  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+  const endIndex = startIndex + itemsPerPage.value;
+  const result = filteredRoleData.value.slice(startIndex, endIndex);
+  console.log(
+    `Showing items ${startIndex + 1} to ${Math.min(endIndex, filteredRoleData.value.length)} of ${filteredRoleData.value.length}`
+  );
+  return result;
+});
+
 // methoads
 const newRole = () => {
   router.push("/admin/roles/create");
+};
+
+const viewRole = (row: any) => {
+  router.push(`/admin/roles/${row.original.id}`);
+};
+
+const editRole = (row: any) => {
+  router.push(`/admin/roles/edit/${row.original.id}`);
+};
+
+const deleteRole = (row: any) => {
+  deleteRole(row.original.id);
 };
 
 const refreshData = async () => {
@@ -249,6 +301,32 @@ const exportRoles = () => {
   });
 };
 
+const updatePaginationSize = (newSize: number) => {
+  itemsPerPage.value = newSize;
+  currentPage.value = 1; // Reset to first page when changing page size
+
+  // Update pagination object for any components that might need it
+  pagination.value.pageSize = newSize;
+  pagination.value.pageIndex = 0;
+
+  console.log(
+    `Page size updated to: ${newSize}, Total pages: ${totalPages.value}`
+  );
+};
+
+const handlePageChange = (page: number) => {
+  console.log(`Page change requested: ${page}, Current: ${currentPage.value}`);
+  currentPage.value = page;
+  pagination.value.pageIndex = page - 1;
+
+  // Force reactivity update
+  nextTick(() => {
+    console.log(
+      `Page changed to: ${currentPage.value}, showing items ${startItem.value} to ${endItem.value}`
+    );
+  });
+};
+
 const initializeFetchRole = async () => {
   try {
     if (!isAuthenticated.value) {
@@ -284,6 +362,26 @@ watch(
   },
   { immediate: true }
 );
+
+watch(globalFilter, () => {
+  currentPage.value = 1;
+  pagination.value.pageIndex = 0;
+});
+
+// watch([itemsPerPage, currentPage], () => {
+//   pagination.value.pageSize = itemsPerPage.value;
+//   pagination.value.pageIndex = currentPage.value - 1;
+// });
+
+// Watch for data changes to ensure pagination is within bounds
+watch([filteredRoleData, itemsPerPage], () => {
+  const maxPage =
+    Math.ceil(filteredRoleData.value.length / itemsPerPage.value) || 1;
+  if (currentPage.value > maxPage) {
+    currentPage.value = maxPage;
+    pagination.value.pageIndex = maxPage - 1;
+  }
+});
 
 if (process.dev) {
   watch(roles, (newRoles) => {}, { immediate: true });
@@ -390,18 +488,34 @@ if (process.dev) {
 
         <u-table
           :columns="roleColumns"
-          :data="roleData"
+          :data="paginatedRoleData"
           :loading="loading"
           v-model:column-pinning="columnPinning"
           v-model:pagination="pagination"
           v-model:global-filter="globalFilter"
           ref="table"
+          size="sm"
+          :ui="{
+            base: 'w-full',
+            td: 'py-1 px-3 border-b border-gray-200 dark:border-gray-700',
+            th: 'py-1 px-3',
+          }"
         >
           <template #description-cell="{ row }">
             {{
               row.getValue("description") ? row.getValue("description") : "N/A"
             }}
           </template>
+
+          <template #composite-cell="{ row }">
+            <u-badge
+              variant="info"
+              :color="row.getValue('composite') ? 'success' : 'danger'"
+            >
+              {{ row.getValue("composite") ? "Yes" : "No" }}
+            </u-badge>
+          </template>
+
           <template #action-cell="{ row }">
             <div class="flex justify-end items-center gap-1">
               <u-button
@@ -420,6 +534,7 @@ if (process.dev) {
                 icon="i-heroicons-pencil"
                 class="cursor-pointer"
                 color="warning"
+                @click="editRole(row)"
               >
                 Edit
               </u-button>
@@ -429,13 +544,52 @@ if (process.dev) {
                 color="error"
                 icon="i-heroicons-trash"
                 class="cursor-pointer"
+                @click="deleteRole(row)"
               >
                 Delete
               </u-button>
             </div>
           </template>
         </u-table>
-        <div class="flex justify-end border-t border-default pt-4">
+
+        <div
+          class="flex justify-between items-center px-4 py-3 border-t border-gray-200 dark:border-gray-700"
+        >
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >Show:</span
+              >
+              <USelectMenu
+                v-model="itemsPerPage"
+                :items="[5, 10, 20, 50, 100]"
+                size="sm"
+                class="w-20"
+                @change="updatePaginationSize(itemsPerPage)"
+              />
+              <span class="text-sm text-gray-600 dark:text-gray-400"
+                >per page</span
+              >
+            </div>
+
+            <!-- <p class="text-sm text-gray-600 dark:text-gray-400">
+              Showing {{ startItem }} to {{ endItem }} of {{ totalItems }} roles
+            </p> -->
+          </div>
+
+          <UPagination
+            v-model="currentPage"
+            :page-count="totalPages"
+            :total="totalItems"
+            size="sm"
+            :max="7"
+            :show-last="true"
+            :show-first="true"
+            @update:model-value="handlePageChange(currentPage)"
+          />
+        </div>
+
+        <!-- <div class="flex justify-end border-t border-default pt-4">
           <UPagination
             :default-page="
               (table?.tableApi?.getState().pagination.pageIndex || 0) + 1
@@ -444,7 +598,16 @@ if (process.dev) {
             :total="table?.tableApi?.getFilteredRowModel().rows.length"
             @update:page="(p) => table?.tableApi?.setPageIndex(p - 1)"
           />
-        </div>
+          <UPagination
+            v-model="currentPage"
+            :page-count="itemsPerPage"
+            :total="totalItems"
+            size="sm"
+            :max="7"
+            :show-last="true"
+            :show-first="true"
+          />
+        </div> -->
 
         <!-- Table Footer -->
         <div
@@ -453,8 +616,8 @@ if (process.dev) {
         >
           <div class="flex items-center justify-between">
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              Showing {{ filteredRoleData.length }} of
-              {{ roleData.length }} users
+              Showing {{ startItem }} to {{ endItem }} of {{ totalItems }} roles
+              (Page {{ currentPage }} of {{ totalPages }})
             </p>
             <div class="flex items-center space-x-2">
               <UButton

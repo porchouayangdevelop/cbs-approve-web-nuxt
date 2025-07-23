@@ -112,6 +112,12 @@
           v-model:pagination="pagination"
           v-model:global-filter="globalFilter"
           ref="table"
+          size="small"
+          :ui="{
+            base: 'w-full',
+            th: 'py-1',
+            td: 'py-[.1rem] border-b border-gray-200 dark:border-gray-700',
+          }"
         >
           <template #username-cell="{ row }">
             <div class="uppercase font-mono">
