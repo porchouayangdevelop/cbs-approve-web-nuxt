@@ -9,6 +9,7 @@ export interface User {
   emailVerified?: boolean;
   createdTimestamp: string;
   enabled: boolean;
+  totp?: boolean;
   disabledCredentialTypes?: string[];
   requiredActions?: string[];
   notBefore?: number;
@@ -67,6 +68,7 @@ export interface AssignRole {
 export const useSystemUserStore = defineStore('SystemUserStore', () => {
   //state
   const users = ref<User[]>([]);
+  const user = ref<User>({} as User);
   const roles = ref<RoleMapping[]>([]);
   const userCredential = ref<UserCreateCredential>({
     username: '',
@@ -223,6 +225,36 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     }
   }
 
+
+  const getUser = async (id: string): Promise<User> => {
+    try {
+      if (loading.value) {
+        while (loading.value) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return user.value;
+      }
+
+      loading.value = true;
+      clearError();
+
+      const authReady = await waitForAuth();
+      if (!authReady) throw new Error("Authentication not ready");
+      const { $authApi } = useNuxtApp();
+      const { data } = await $authApi.get(`admin/realms/apb_teller/users/${id}`);
+      user.value = data;
+      initilized.value = true;
+      return user.value;
+    } catch (error) {
+      console.error('❌ Error fetching user:', error);
+
+      throw error;
+    }
+    finally {
+      loading.value = false;
+    }
+  }
+
   const getRoles = async (): Promise<RoleMapping[]> => {
     try {
       if (loading.value) {
@@ -337,6 +369,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
   return {
     users,
+    user,
     roles,
     userCredential,
     assignCredential,
@@ -352,6 +385,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
     // Actions
     getUsers,
+    getUser,
     assignRoleCredential,
     getRoles,
     getRole,

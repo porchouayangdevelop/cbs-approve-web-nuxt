@@ -7,8 +7,8 @@
         class="h-48 md:h-64 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 relative overflow-hidden"
       >
         <img
-          v-if="profile.coverImage"
-          :src="profile.coverImage"
+          v-if="profileData.coverImage"
+          :src="profileData.coverImage"
           alt="Cover"
           class="w-full h-full object-cover"
         />
@@ -37,19 +37,19 @@
               <!-- Profile Picture -->
               <div class="relative">
                 <UAvatar
-                  :src="profile.avatar"
-                  :alt="profile.name"
-                  size="2xl"
+                  :src="profileData.avatar"
+                  :alt="profileData.name"
+                  size="3xl"
                   class="ring-4 ring-white dark:ring-gray-800 shadow-xl"
                 />
-                <UButton
+                <!-- <UButton
                   variant="solid"
                   color="primary"
                   size="xs"
                   icon="i-heroicons-camera"
                   class="absolute bottom-2 right-2 rounded-full"
                   @click="editAvatar"
-                />
+                /> -->
               </div>
 
               <!-- Profile Info -->
@@ -64,13 +64,13 @@
                       <h1
                         class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate"
                       >
-                        {{ profile.name }}
+                        {{ profileData.name }}
                       </h1>
                       <p class="text-lg text-gray-600 dark:text-gray-400 mt-1">
-                        {{ profile.title }}
+                        {{ profileData.title }}
                       </p>
                       <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                        {{ profile.bio }}
+                        {{ profileData.bio }}
                       </p>
 
                       <!-- Quick Stats -->
@@ -79,7 +79,7 @@
                           <div
                             class="text-xl font-semibold text-gray-900 dark:text-white"
                           >
-                            {{ profile.stats.projects }}
+                            {{ profileData.stats.projects }}
                           </div>
                           <div class="text-xs text-gray-500 dark:text-gray-400">
                             Projects
@@ -89,7 +89,7 @@
                           <div
                             class="text-xl font-semibold text-gray-900 dark:text-white"
                           >
-                            {{ profile.stats.team }}
+                            {{ profileData.stats.team }}
                           </div>
                           <div class="text-xs text-gray-500 dark:text-gray-400">
                             Team Size
@@ -99,7 +99,7 @@
                           <div
                             class="text-xl font-semibold text-gray-900 dark:text-white"
                           >
-                            {{ profile.stats.experience }}
+                            {{ profileData.stats.experience }}
                           </div>
                           <div class="text-xs text-gray-500 dark:text-gray-400">
                             Years Exp.
@@ -215,7 +215,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                        profile.email
+                        profileData.email
                       }}</span>
                     </div>
                     <div class="flex items-center">
@@ -224,7 +224,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                        profile.phone
+                        profileData.phone
                       }}</span>
                     </div>
                     <div class="flex items-center">
@@ -233,7 +233,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                        profile.location
+                        profileData.location
                       }}</span>
                     </div>
                     <div class="flex items-center">
@@ -242,7 +242,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400"
-                        >Joined {{ profile.joinDate }}</span
+                        >Joined {{ profileData.joinDate }}</span
                       >
                     </div>
                   </div>
@@ -260,7 +260,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                        profile.department
+                        profileData.department
                       }}</span>
                     </div>
                     <div class="flex items-center">
@@ -269,7 +269,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400"
-                        >ID: {{ profile.employeeId }}</span
+                        >ID: {{ profileData.employeeId }}</span
                       >
                     </div>
                     <div class="flex items-center">
@@ -278,7 +278,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400"
-                        >Reports to {{ profile.manager }}</span
+                        >Reports to {{ profileData.manager }}</span
                       >
                     </div>
                     <div class="flex items-center">
@@ -287,7 +287,7 @@
                         class="w-5 h-5 text-gray-400 mr-3"
                       />
                       <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                        profile.workSchedule
+                        profileData.workSchedule
                       }}</span>
                     </div>
                   </div>
@@ -303,7 +303,7 @@
                 </h3>
                 <div class="flex flex-wrap gap-2">
                   <UBadge
-                    v-for="skill in profile.skills"
+                    v-for="skill in profileData.skills"
                     :key="skill.name"
                     :color="
                       skill.level === 'expert'
@@ -347,7 +347,10 @@
                           Receive email updates about your account
                         </p>
                       </div>
-                      <UToggle v-model="settings.emailNotifications" />
+                      <UToggle
+                        v-model="localSettings.emailNotifications"
+                        @change="updateSettings"
+                      />
                     </div>
                     <div class="flex items-center justify-between">
                       <div>
@@ -359,7 +362,10 @@
                           Receive promotional content and updates
                         </p>
                       </div>
-                      <UToggle v-model="settings.marketingEmails" />
+                      <UToggle
+                        v-model="localSettings.marketingEmails"
+                        @change="updateSettings"
+                      />
                     </div>
                   </div>
                 </div>
@@ -382,7 +388,10 @@
                           Make your profile visible to team members
                         </p>
                       </div>
-                      <UToggle v-model="settings.profileVisibility" />
+                      <UToggle
+                        v-model="localSettings.profileVisibility"
+                        @change="updateSettings"
+                      />
                     </div>
                     <div class="flex items-center justify-between">
                       <div>
@@ -394,7 +403,10 @@
                           Show when you're online
                         </p>
                       </div>
-                      <UToggle v-model="settings.activityStatus" />
+                      <UToggle
+                        v-model="localSettings.activityStatus"
+                        @change="updateSettings"
+                      />
                     </div>
                   </div>
                 </div>
@@ -427,10 +439,17 @@
                         Password
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Last changed 3 months ago
+                        Last changed
+                        {{
+                          profileData.security?.passwordLastChanged ||
+                          "3 months ago"
+                        }}
                       </p>
                     </div>
-                    <UButton variant="outline" size="sm"
+                    <UButton
+                      variant="outline"
+                      size="sm"
+                      @click="$emit('changePassword')"
                       >Change Password</UButton
                     >
                   </div>
@@ -453,12 +472,29 @@
                         2FA Status
                       </p>
                       <p class="text-xs text-green-600 dark:text-green-400">
-                        Enabled via Authenticator App
+                        {{
+                          profileData.security?.twoFactorEnabled
+                            ? "Enabled via Authenticator App"
+                            : "Disabled"
+                        }}
                       </p>
                     </div>
-                    <UButton variant="outline" size="sm" color="error"
-                      >Disable 2FA</UButton
+                    <UButton
+                      variant="outline"
+                      size="sm"
+                      :color="
+                        profileData.security?.twoFactorEnabled
+                          ? 'error'
+                          : 'primary'
+                      "
+                      @click="$emit('toggle2FA')"
                     >
+                      {{
+                        profileData.security?.twoFactorEnabled
+                          ? "Disable 2FA"
+                          : "Enable 2FA"
+                      }}
+                    </UButton>
                   </div>
                 </div>
 
@@ -471,7 +507,7 @@
                   </h3>
                   <div class="space-y-3">
                     <div
-                      v-for="session in activeSessions"
+                      v-for="session in profileData.activeSessions"
                       :key="session.id"
                       class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
                     >
@@ -500,6 +536,7 @@
                         variant="outline"
                         size="xs"
                         color="error"
+                        @click="$emit('revokeSession', session.id)"
                         >Revoke</UButton
                       >
                       <UBadge v-else color="success" size="xs">Current</UBadge>
@@ -519,7 +556,7 @@
 
               <div class="space-y-4">
                 <div
-                  v-for="activity in recentActivity"
+                  v-for="activity in profileData.recentActivity"
                   :key="activity.id"
                   class="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                 >
@@ -565,6 +602,68 @@
                 </div>
               </div>
             </div>
+
+            <!-- Notifications Tab -->
+            <div v-else-if="activeTab === 'notifications'" class="p-6">
+              <h2
+                class="text-xl font-semibold text-gray-900 dark:text-white mb-6"
+              >
+                Notifications
+              </h2>
+
+              <div class="space-y-4">
+                <div
+                  v-for="notification in profileData.notifications"
+                  :key="notification.id"
+                  class="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                >
+                  <div
+                    :class="[
+                      'w-10 h-10 rounded-full flex items-center justify-center',
+                      notification.read
+                        ? 'bg-gray-100 dark:bg-gray-700'
+                        : 'bg-blue-100 dark:bg-blue-900',
+                    ]"
+                  >
+                    <UIcon
+                      :name="notification.icon"
+                      :class="[
+                        'w-5 h-5',
+                        notification.read
+                          ? 'text-gray-600 dark:text-gray-400'
+                          : 'text-blue-600 dark:text-blue-400',
+                      ]"
+                    />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p
+                      :class="[
+                        'text-sm font-medium',
+                        notification.read
+                          ? 'text-gray-600 dark:text-gray-400'
+                          : 'text-gray-900 dark:text-white',
+                      ]"
+                    >
+                      {{ notification.title }}
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ notification.description }}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {{ notification.timestamp }}
+                    </p>
+                  </div>
+                  <UButton
+                    v-if="!notification.read"
+                    variant="outline"
+                    size="xs"
+                    @click="$emit('markAsRead', notification.id)"
+                  >
+                    Mark as Read
+                  </UButton>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -573,39 +672,125 @@
 </template>
 
 <script setup lang="ts">
-// Profile data
-const profile = ref({
-  name: "John Doe",
-  title: "Senior Product Manager",
-  bio: "Passionate about creating exceptional user experiences and leading cross-functional teams to deliver innovative products.",
-  email: "john.doe@company.com",
-  phone: "+1 (555) 123-4567",
-  location: "San Francisco, CA",
-  department: "Product Management",
-  employeeId: "EMP001234",
-  manager: "Sarah Wilson",
-  workSchedule: "Full-time, Remote",
-  joinDate: "January 2020",
-  avatar: "https://avatars.githubusercontent.com/u/739984?v=4",
-  coverImage: "",
-  stats: {
-    projects: 24,
-    team: 12,
-    experience: 8,
-  },
-  skills: [
-    { name: "Product Strategy", level: "expert" },
-    { name: "User Research", level: "advanced" },
-    { name: "Agile/Scrum", level: "expert" },
-    { name: "Data Analysis", level: "advanced" },
-    { name: "Leadership", level: "expert" },
-    { name: "UI/UX Design", level: "intermediate" },
-  ],
+import { ref, computed, watch, onMounted } from "vue";
+// Define interfaces for type safety
+interface Skill {
+  name: string;
+  level: "expert" | "advanced" | "intermediate" | "beginner";
+}
+
+interface Stats {
+  projects: number;
+  team: number;
+  experience: number;
+}
+
+interface Session {
+  id: number;
+  device: "desktop" | "mobile";
+  browser: string;
+  os: string;
+  location: string;
+  lastActive: string;
+  current: boolean;
+}
+
+interface Activity {
+  id: number;
+  type: "login" | "update" | "security";
+  icon: string;
+  title: string;
+  description: string;
+  timestamp: string;
+}
+
+interface Notification {
+  id: number;
+  icon: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  read: boolean;
+}
+
+interface Security {
+  passwordLastChanged?: string;
+  twoFactorEnabled?: boolean;
+}
+
+interface Settings {
+  emailNotifications: boolean;
+  marketingEmails: boolean;
+  profileVisibility: boolean;
+  activityStatus: boolean;
+}
+
+interface ProfileData {
+  name: string;
+  title: string;
+  bio: string;
+  email: string;
+  phone: string;
+  location: string;
+  department: string;
+  employeeId: string;
+  manager: string;
+  workSchedule: string;
+  joinDate: string;
+  avatar: string;
+  coverImage?: string;
+  stats: Stats;
+  skills: Skill[];
+  activeSessions?: Session[];
+  recentActivity?: Activity[];
+  notifications?: Notification[];
+  security?: Security;
+  settings?: Settings;
+}
+
+// Define props
+const props = defineProps<{
+  profileData: ProfileData;
+  initialTab?: string;
+}>();
+
+// Define emits
+const emit = defineEmits<{
+  editProfile: [];
+  editAvatar: [];
+  editCover: [];
+  changePassword: [];
+  toggle2FA: [];
+  revokeSession: [sessionId: number];
+  markAsRead: [notificationId: number];
+  updateSettings: [settings: Settings];
+}>();
+
+// Reactive data
+const profileData = computed(() => props.profileData);
+const activeTab = ref(props.initialTab || "overview");
+
+// Local settings that can be modified
+const localSettings = ref<Settings>({
+  emailNotifications: true,
+  marketingEmails: false,
+  profileVisibility: true,
+  activityStatus: true,
+});
+
+// Initialize local settings from props
+onMounted(() => {
+  if (props.profileData.settings) {
+    localSettings.value = {
+      emailNotifications: props.profileData.settings.emailNotifications ?? true,
+      marketingEmails: props.profileData.settings.marketingEmails ?? false,
+      profileVisibility: props.profileData.settings.profileVisibility ?? true,
+      activityStatus: props.profileData.settings.activityStatus ?? true,
+    };
+  }
 });
 
 // Tab navigation
-const activeTab = ref("overview");
-
 const profileTabs = [
   {
     id: "overview",
@@ -621,7 +806,7 @@ const profileTabs = [
     id: "security",
     label: "Security",
     icon: "i-heroicons-shield-check",
-    badge: "2",
+    badge: profileData.value.security?.twoFactorEnabled ? undefined : "!",
     badgeColor: "yellow",
   },
   {
@@ -633,82 +818,39 @@ const profileTabs = [
     id: "notifications",
     label: "Notifications",
     icon: "i-heroicons-bell",
-    badge: "5",
+    badge:
+      profileData.value.notifications
+        ?.filter((n) => !n.read)
+        .length?.toString() || undefined,
     badgeColor: "red",
   },
 ];
 
-// Settings
-const settings = ref({
-  emailNotifications: true,
-  marketingEmails: false,
-  profileVisibility: true,
-  activityStatus: true,
-});
-
-// Active sessions
-const activeSessions = ref([
-  {
-    id: 1,
-    device: "desktop",
-    browser: "Chrome",
-    os: "macOS",
-    location: "San Francisco, CA",
-    lastActive: "2 minutes ago",
-    current: true,
-  },
-  {
-    id: 2,
-    device: "mobile",
-    browser: "Safari",
-    os: "iOS",
-    location: "San Francisco, CA",
-    lastActive: "1 hour ago",
-    current: false,
-  },
-]);
-
-// Recent activity
-const recentActivity = ref([
-  {
-    id: 1,
-    type: "login",
-    icon: "i-heroicons-arrow-right-on-rectangle",
-    title: "Logged in",
-    description: "Successful login from Chrome on macOS",
-    timestamp: "2 minutes ago",
-  },
-  {
-    id: 2,
-    type: "update",
-    icon: "i-heroicons-pencil-square",
-    title: "Profile updated",
-    description: "Updated bio and contact information",
-    timestamp: "2 hours ago",
-  },
-  {
-    id: 3,
-    type: "security",
-    icon: "i-heroicons-shield-check",
-    title: "Password changed",
-    description: "Successfully updated account password",
-    timestamp: "1 day ago",
-  },
-]);
-
 // Methods
 const editProfile = () => {
-  console.log("Edit profile");
-  // Navigate to edit mode or open modal
+  emit("editProfile");
 };
 
 const editAvatar = () => {
-  console.log("Edit avatar");
-  // Open file picker or avatar editor
+  emit("editAvatar");
 };
 
 const editCover = () => {
-  console.log("Edit cover");
-  // Open file picker for cover image
+  emit("editCover");
 };
+
+const updateSettings = () => {
+  emit("updateSettings", localSettings.value);
+};
+
+// Watch for settings changes from parent
+watch(
+  () => props.profileData.settings,
+  (newSettings) => {
+    if (newSettings) {
+      localSettings.value = { ...newSettings };
+    }
+  },
+  { deep: true }
+);
 </script>
