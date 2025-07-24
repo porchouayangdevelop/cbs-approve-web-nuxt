@@ -152,6 +152,13 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   }
 
 
+  const generateAvartar = (user: User) => {
+    const { firstName, lastName } = user;
+    const initials = `${firstName[0]}${lastName[0]}`;
+    const avartar = `https://ui-avatars.com/api/?name=${initials}`;
+    return avartar;
+  }
+
   const getUsers = async (): Promise<User[]> => {
     try {
       if (loading.value) {
@@ -350,6 +357,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     getRole,
     userCreateCredential,
     clearError,
-    resetStore
+    resetStore,
+    generateAvartar
   };
 });

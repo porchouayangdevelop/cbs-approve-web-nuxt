@@ -120,6 +120,10 @@
           v-model:pagination="paginationState"
           v-model:global-filter="globalFilter"
           ref="table"
+          :ui="{
+            th: 'py-1',
+            td: 'py-[.1rem] border-b border-gray-200 dark:border-gray-700',
+          }"
         >
           <!-- Dynamic cell templates -->
           <template

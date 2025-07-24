@@ -327,16 +327,34 @@ export const useAuth = () => {
     } catch (e) {
       console.error(`Logout error: ${e}`);
       // Ensure cleanup happens even if logout fails
+      forceLogoutCleanup();
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  const forceLogoutCleanup = async () => {
+    try {
       clearCookies();
       user.value = null;
       isAuthenticated.value = false;
       isInitialized.value = false;
       await clearAuthState();
-      await navigateTo('/auth/login');
-    } finally {
-      isLoading.value = false;
+
+      // Force navigation
+      if (process.client) {
+        window.location.href = '/auth/login';
+      } else {
+        await navigateTo('/auth/login', { replace: true });
+      }
+    } catch (error) {
+      console.error('Force cleanup error:', error);
+      // Last resort - reload page
+      if (process.client) {
+        window.location.reload();
+      }
     }
-  }
+  };
 
   const refreshToken = async () => {
     if (isLoading.value) return false;
@@ -357,7 +375,7 @@ export const useAuth = () => {
       params.append('refresh_token', refreshToken);
       params.append('client_secret', '8jIgedW9VfqjCAyAMuC5hrgPoYgZt2mC');
 
-      const { data } = await $authApi.post<AuthResponse>(`${config.refreshToken}`, params, {
+      const { data } = await $authApi.post<AuthResponse>(`${config.public.refresh_token}`, params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -382,6 +400,16 @@ export const useAuth = () => {
       return false;
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  const handleTokenExpired = async () => {
+    await clearAuthState();
+
+    const route = useRoute();
+    if (route.path !== '/auth/login' && !route.path.startsWith('/auth/')) {
+      const intendedRoute = useCookie('intended_route');
+      intendedRoute.value = route.fullPath;
     }
   }
 
@@ -457,6 +485,8 @@ export const useAuth = () => {
     isAuthenticated: readonly(isAuthenticated),
     isInitialized: readonly(isInitialized),
     isLoading: readonly(isLoading),
+
+    //methods
     getCurrentUser,
     login,
     logout,
@@ -468,6 +498,8 @@ export const useAuth = () => {
     hasAllPermissions,
     initializeAuth,
     clearAuthState,
+    forceLogoutCleanup,
+    handleTokenExpired
   }
 }
 

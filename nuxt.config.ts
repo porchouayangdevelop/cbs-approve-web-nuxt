@@ -65,7 +65,8 @@ export default defineNuxtConfig({
     '~/plugins/axios.ts',
     '~/plugins/error-handler.ts',
     '~/plugins/network-error.ts',
-    '~/plugins/auth-init.ts'
+    '~/plugins/auth-init.ts',
+    '~/plugins/token-monitoring.client.ts'
   ],
   modules: [// '@nuxt/content',
     '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', '@nuxtjs/color-mode',
@@ -79,6 +80,20 @@ export default defineNuxtConfig({
   ],
   colorMode: {
     classSuffix: ''
+  },
+
+  ui: {
+    theme: {
+      colors: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'info',
+        'success',
+        'warning',
+        'error',
+      ]
+    }
   },
 
   // i18n: {

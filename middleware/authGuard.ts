@@ -6,6 +6,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const { getCurrentUser, user, isAuthenticated, logout, isInitialized, isLoading } = useAuth();
   const { checkAuth, handledUnauthorized, canAccess } = useGuards();
   const { isTokenExpired } = useJWTDecoder();
+  const { showTokenExpirationModal } = useTokenExpiration();
 
   // const clearAuthAndRedirect = async () => {
   //   try {
@@ -76,18 +77,23 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   // }
 
   if (isTokenExpired(token)) {
-    console.log('AuthGuard: Access token is expired, attempting refresh...');
-    try {
-      const { refreshToken } = useAuth();
-      const refreshed = await refreshToken();
-      if (!refreshed) {
-        console.log('Failed to refresh access token, redirecting to login');
-        return navigateTo('/auth/login');
-      }
-    } catch (e) {
-      console.error('Error refreshing token:', e);
-      return navigateTo('/auth/login');
-    }
+    showTokenExpirationModal();
+
+
+    return abortNavigation('Token expired - please refresh your session')
+
+    // console.log('AuthGuard: Access token is expired, attempting refresh...');
+    // try {
+    //   const { refreshToken } = useAuth();
+    //   const refreshed = await refreshToken();
+    //   if (!refreshed) {
+    //     console.log('Failed to refresh access token, redirecting to login');
+    //     return navigateTo('/auth/login');
+    //   }
+    // } catch (e) {
+    //   console.error('Error refreshing token:', e);
+    //   return navigateTo('/auth/login');
+    // }
 
   }
 

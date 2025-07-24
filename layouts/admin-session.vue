@@ -18,6 +18,15 @@
         @logout="handleLogout"
       />
 
+      <!-- <ExpireSessionModal
+        v-model="showModal"
+        :user="sessionInfo.user"
+        :token-info="sessionInfo.tokenInfo"
+        :session-duration="sessionInfo.sessionDuration"
+        :last-activity="sessionInfo.lastActivity"
+        @refresh-token="handleRefresh"
+        @logout="handleLogoutForce"
+      /> -->
       <!-- Main Content -->
       <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
         <div class="max-w-9xl mx-auto">
@@ -44,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import ExpireSessionModal from "~/components/modals/ExpireSessionModal.vue";
 import AdminDrawer from "~/components/system/aside/AdminDrawer.vue";
 import AppBar from "~/components/system/aside/AppBar.vue";
 import Breadcrumbs from "~/components/system/aside/Breadcrumbs.vue";
@@ -54,6 +64,12 @@ import { useRoleSession } from "~/composables/useRoleSession";
 const colorMode = useColorMode();
 const { currentRole } = useRoleSession();
 const { isLoading, isInitialized } = useAuth();
+const {
+  showExpirationModal: showModal,
+  sessionInfo,
+  handleTokenRefresh: handleRefresh,
+  handleForceLogout: handleLogoutForce,
+} = useTokenExpiration();
 
 // State
 const isSidebarOpen = ref(false);

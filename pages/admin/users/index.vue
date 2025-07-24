@@ -119,6 +119,20 @@
             td: 'py-[.1rem] border-b border-gray-200 dark:border-gray-700',
           }"
         >
+          <template #avatar-cell="{ row }">
+            <div class="flex items-center space-x-2">
+              <UAvatar :src="row.getValue('avatar')" size="md" />
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">
+                  {{ row.getValue("firstName") }}
+                </p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 uppercase">
+                  {{ row.getValue("lastName") }}
+                </p>
+              </div>
+            </div>
+          </template>
+
           <template #username-cell="{ row }">
             <div class="uppercase font-mono">
               {{ row.getValue("username") }}
@@ -249,6 +263,7 @@ type User = {
 
 const UBadge = resolveComponent("UBadge");
 const UButton = resolveComponent("UButton");
+const USwitch = resolveComponent("USwitch");
 const table = useTemplateRef("table");
 
 const overlay = useOverlay();
@@ -279,6 +294,7 @@ const selectedStatus = ref("");
 const selectedRole = ref("");
 const selectedUsers = ref<any[]>([]);
 const globalFilter = ref("");
+const switchValue = ref(false);
 
 const loadingMessage = computed(() => {
   if (!isAuthenticated.value) return "Authenticating...";
@@ -314,6 +330,7 @@ const userData = computed(() => {
     emailVerified: u.emailVerified,
     enabled: u.enabled ? "Active" : "Inactive",
     createdTimestamp: u.createdTimestamp,
+    avatar: store.generateAvartar(u),
   }));
 });
 
@@ -332,18 +349,6 @@ const filteredUserData = computed(() => {
         user.username.toLowerCase().includes(query)
     );
   }
-
-  // Status filter
-  if (selectedStatus.value) {
-    filtered = filtered.filter((user) => user.enabled === selectedStatus.value);
-  }
-
-  // Role filter (you might need to add role data to the user object)
-  if (selectedRole.value) {
-    // This would require role information in your user data
-    // filtered = filtered.filter((user) => user.role === selectedRole.value);
-  }
-
   return filtered;
 });
 
@@ -355,10 +360,20 @@ const userColumns: TableColumn<User>[] = [
     cell: ({ row }) => `${row.getValue("index")}`,
   },
   // {
-  //   accessorKey: "id",
-  //   header: ({ column }) => getHeader(column, "#", "left"),
-  //   cell: ({ row }) => `#${row.getValue("id")}`,
+  //   accessorKey: "avatar",
+  //   header: ({ column }) => getHeader(column, "Full Name", "left"),
+  //   cell: ({ row }) => `${row.getValue("avatar")}`,
   // },
+  {
+    accessorKey: "firstName",
+    header: ({ column }) => getHeader(column, "First Name", "left"),
+    // cell: ({ row }) => row.getValue("firstName"),
+  },
+  {
+    accessorKey: "lastName",
+    header: ({ column }) => getHeader(column, "Last Name", "left"),
+    cell: ({ row }) => row.getValue("lastName"),
+  },
   {
     accessorKey: "username",
     header: ({ column }) => {
@@ -380,16 +395,6 @@ const userColumns: TableColumn<User>[] = [
       // return getHeader(column, "Username", "left");
     },
     cell: ({ row }) => row.getValue("username"),
-  },
-  {
-    accessorKey: "firstName",
-    header: ({ column }) => getHeader(column, "First Name", "left"),
-    cell: ({ row }) => row.getValue("firstName"),
-  },
-  {
-    accessorKey: "lastName",
-    header: ({ column }) => getHeader(column, "Last Name", "left"),
-    cell: ({ row }) => row.getValue("lastName"),
   },
 
   {
