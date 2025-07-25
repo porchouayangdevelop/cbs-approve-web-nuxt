@@ -35,7 +35,7 @@
                 @submit="handleRegister"
                 class="space-y-4"
               >
-                <UFormField label="UserType" name="userType" required>
+                <!-- <UFormField label="UserType" name="userType" required>
                   <USelectMenu
                     v-model="state.userType"
                     value-key="value"
@@ -47,7 +47,7 @@
                     @change.prevent="handleSelectedUserType(state.userType)"
                   >
                   </USelectMenu>
-                </UFormField>
+                </UFormField> -->
 
                 <!-- Personal Information -->
                 <div class="grid grid-cols-2 gap-4">
@@ -153,23 +153,32 @@
                 </div>
 
                 <!-- Submit Button -->
-                <UButton
-                  type="submit"
-                  block
-                  size="lg"
-                  :loading="loading"
-                  :disabled="loading"
-                  color="primary"
-                  class="cursor-pointer"
-                  variant="outline"
-                  @click="handleRegister"
-                >
-                  <template #leading>
-                    <UIcon v-if="!loading" name="i-heroicons-user-plus" />
-                  </template>
-                  <span v-if="!loading">Create User Account</span>
-                  <span v-else>Creating account...</span>
-                </UButton>
+                <div class="flex flex-row gap-1">
+                  <UButton
+                    type="submit"
+                    :loading="loading"
+                    :disabled="loading || !isFormValid"
+                    color="primary"
+                    class="cursor-pointer"
+                    variant="outline"
+                    @click="openModal"
+                  >
+                    <template #leading>
+                      <UIcon v-if="!loading" name="i-heroicons-user-plus" />
+                    </template>
+                    <span v-if="!loading">Create User Account</span>
+                    <span v-else>Creating account...</span>
+                  </UButton>
+                  <UButton
+                    class="cursor-pointer"
+                    icon="i-lucide-list-restart"
+                    variant="outline"
+                    color="error"
+                    @click="resetForm"
+                  >
+                    Reset
+                  </UButton>
+                </div>
               </UForm>
             </UCard>
           </div>
@@ -190,6 +199,8 @@ definePageMeta({
   layout: "admin-session", // Use admin session layout
   middleware: ["auth-guard", "admin-guard"], // Require authentication to access
 });
+
+import { LazyModalsConfrimModal } from "#components";
 
 // Interfaces
 interface RegisterForm {
@@ -225,6 +236,11 @@ const role = ref<RoleMapping>({
   containerId: "",
 });
 
+const overlay = useOverlay();
+const modal = overlay.create(LazyModalsConfrimModal);
+const toast = useToast();
+const router = useRouter();
+
 const {
   //state
   roles,
@@ -252,7 +268,7 @@ const userTypeOptions = computed(() => {
 
 // Validation schema
 const registerSchema = z.object({
-  userType: z.string().min(1, "User type is required."),
+  // userType: z.string().min(1, "User type is required."),
   firstName: z
     .string()
     .min(2, "First name must contain at least 2 characters."),
@@ -275,7 +291,7 @@ const registerSchema = z.object({
 type Schema = z.output<typeof registerSchema>;
 
 const state = reactive<Partial<Schema>>({
-  userType: "",
+  // userType: "",
   firstName: undefined,
   lastName: undefined,
   username: undefined,
@@ -323,9 +339,47 @@ const handleSelectedUserType = (userType: string) => {
   console.log(selectedUserType.value);
 };
 
+const resetForm = () => {
+  state.firstName = "";
+  state.lastName = "";
+  state.email = "";
+  state.username = "";
+  state.password = "";
+};
+
+const openModal = async () => {
+  const instance = modal.open({
+    title: "Confirm create a user",
+    okText: "OK",
+    cancelText: "Cancel",
+  });
+
+  const shouldCreate = await instance.result;
+  if (shouldCreate) {
+    toast.add({
+      title: "Success",
+      description: "",
+      icon: "i-lucide-check-check",
+      color: "success",
+    });
+    handleRegister();
+    router.back();
+    return;
+  }
+  toast.add({
+    title: "You've cancel",
+    description: "",
+    icon: "i-lucide-x",
+    color: "error",
+  });
+};
+
+const generateEmail = () => {
+  return state.username + "@gmail.com";
+};
+
 const handleRegister = async () => {
   loading.value = true;
-  const toast = useToast();
   try {
     // Validate form data
     const validatedData = registerSchema.parse(state);
@@ -357,7 +411,8 @@ const handleRegister = async () => {
         color: "success",
       });
 
-      navigateTo("/admin/users", { replace: true });
+      // navigateTo("/admin/users", { replace: true });
+      // router.back();
     });
   } catch (error: any) {
     console.error("Registration error:", error);

@@ -520,33 +520,30 @@ if (process.dev) {
             <div class="flex justify-end items-center gap-1">
               <u-button
                 icon="i-heroicons-eye"
-                variant="outline"
+                variant="ghost"
                 size="xs"
                 color="info"
                 @click="viewRole(row)"
                 class="cursor-pointer"
               >
-                View
               </u-button>
               <u-button
-                variant="outline"
+                variant="ghost"
                 size="xs"
-                icon="i-heroicons-pencil"
+                icon="i-heroicons-pencil-square"
                 class="cursor-pointer"
                 color="warning"
                 @click="editRole(row)"
               >
-                Edit
               </u-button>
               <u-button
-                variant="outline"
+                variant="ghost"
                 size="xs"
                 color="error"
                 icon="i-heroicons-trash"
                 class="cursor-pointer"
                 @click="deleteRole(row)"
               >
-                Delete
               </u-button>
             </div>
           </template>

@@ -333,6 +333,7 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       userCredential.value = { ...state };
       const { $authApi } = useNuxtApp();
       return await $authApi.post(`admin/realms/apb_teller/users`, state);
+
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An error occurred while fetching roles';
       throw e

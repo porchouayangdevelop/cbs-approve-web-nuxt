@@ -151,12 +151,11 @@
           <template #assignRole-cell="{ row }">
             <UButton
               size="small"
-              class="px-[.3rem]"
-              variant="outline"
-              icon="i-heroicons-user-group"
+              class="px-[.3rem] cursor-pointer"
+              variant="ghost"
+              icon="i-heroicons-shield-check"
               @click="assignRole(row)"
             >
-              Assign
             </UButton>
           </template>
           <template #action-cell="{ row }">
@@ -367,7 +366,7 @@ const userColumns: TableColumn<User>[] = [
   {
     accessorKey: "firstName",
     header: ({ column }) => getHeader(column, "First Name", "left"),
-    // cell: ({ row }) => row.getValue("firstName"),
+    cell: ({ row }) => row.getValue("firstName"),
   },
   {
     accessorKey: "lastName",
@@ -508,7 +507,7 @@ const getDropdownActions = (user: User): DropdownMenuItem[][] => {
     // ],
     [
       {
-        label: "AssignRole",
+        label: user.enabled ? "Enable" : "Disable",
         icon: "i-heroicons-user-group",
         onSelect: () => {
           assignRole(user);
