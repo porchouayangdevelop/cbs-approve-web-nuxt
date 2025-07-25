@@ -284,7 +284,7 @@ const {
   error,
   isInitialized,
 } = storeToRefs(useSystemUserStore());
-const { getUsers, getRoles, getRole } = store;
+const { getUsers, getRoles, getRole, deleteUser } = store;
 
 // Local state
 const loading = ref(false);
@@ -507,15 +507,6 @@ const getDropdownActions = (user: User): DropdownMenuItem[][] => {
     // ],
     [
       {
-        label: user.enabled ? "Enable" : "Disable",
-        icon: "i-heroicons-user-group",
-        onSelect: () => {
-          assignRole(user);
-        },
-      },
-    ],
-    [
-      {
         label: "view",
         icon: "i-heroicons-eye",
         onSelect: () => {
@@ -527,7 +518,7 @@ const getDropdownActions = (user: User): DropdownMenuItem[][] => {
       {
         label: "Edit user",
         icon: "i-heroicons-pencil-square",
-        onSelect: () => {
+        onSelect: async () => {
           editUser(user);
         },
       },
@@ -537,7 +528,7 @@ const getDropdownActions = (user: User): DropdownMenuItem[][] => {
         label: "Delete user",
         icon: "i-heroicons-trash",
         onSelect: () => {
-          deleteUser(user);
+          hanelDeleteUser(user);
         },
       },
     ],
@@ -597,8 +588,8 @@ const viewUser = (user: any) => {
   router.push(`/admin/users/${user.id}`);
 };
 
-const editUser = (user: any) => {
-  router.push(`/admin/users/${user.id}/edit`);
+const editUser = async (user: any) => {
+  router.push(`/admin/users/edit/${user.id}`);
 };
 
 const assignRole = (user: any) => {
@@ -618,8 +609,10 @@ const resetPassword = (user: any) => {
   });
 };
 
-const deleteUser = (user: any) => {
-  console.log("Delete user:", user);
+const hanelDeleteUser = async (id: User) => {
+  await deleteUser(id.id);
+  await refreshUsers();
+
   // Implement delete confirmation modal
   toast.add({
     title: "Delete User",

@@ -199,7 +199,7 @@
       </nav>
 
       <!-- User Profile -->
-      <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+      <!-- <div class="p-4 border-t border-gray-200 dark:border-gray-700">
         <UDropdownMenu
           :items="userMenuItems"
           :popper="{ placement: 'top-start' }"
@@ -229,12 +229,14 @@
             />
           </div>
         </UDropdownMenu>
-      </div>
+      </div> -->
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
+import { useSystemUserStore } from "~/store/systemUserStore";
+
 interface NavigationItem {
   label: string;
   to?: string;
@@ -263,6 +265,30 @@ const route = useRoute();
 
 const { logout } = useAuth();
 
+const store = useSystemUserStore();
+const { users, loading, roles } = storeToRefs(useSystemUserStore());
+const { getUsers, getRoles } = store;
+
+const { isAuthenticated, isInitialized, isLoading, user } = useAuth();
+
+const allUsers = computed(() => {
+  if (!user.value && users.value.length === 0) return 0;
+  return users.value.length;
+});
+
+const activeUserCount = computed(() => {
+  if (!user.value && users.value.length === 0) return 0;
+  const count = users.value.find((user) => user.enabled === true);
+  const counts = [];
+  counts.push(count);
+  return counts.length;
+});
+
+const rolesCount = computed(() => {
+  if (!user.value && roles.value.length === 0) return 0;
+  return roles.value.length;
+});
+
 // Reactive navigation state for Admin
 const navigationSections = ref<NavigationSection[]>([
   // Main Dashboard
@@ -283,8 +309,6 @@ const navigationSections = ref<NavigationSection[]>([
         label: "All Users",
         to: "/admin/users",
         icon: "i-heroicons-users",
-        badge: "245",
-        badgeColor: "blue",
       },
       {
         label: "User Management",
@@ -305,22 +329,16 @@ const navigationSections = ref<NavigationSection[]>([
             label: "Active Users",
             to: "/admin/users/active",
             icon: "i-heroicons-check-circle",
-            badge: "198",
-            badgeColor: "green",
           },
           {
             label: "Inactive Users",
             to: "/admin/users/inactive",
             icon: "i-heroicons-x-circle",
-            badge: "47",
-            badgeColor: "red",
           },
           {
             label: "Pending Approval",
             to: "/admin/users/pending",
             icon: "i-heroicons-clock",
-            badge: "12",
-            badgeColor: "yellow",
           },
         ],
       },
@@ -378,8 +396,6 @@ const navigationSections = ref<NavigationSection[]>([
             label: "Active Checkers",
             to: "/admin/checkers/active",
             icon: "i-heroicons-check-circle",
-            badge: "18",
-            badgeColor: "green",
           },
           {
             label: "Checker Performance",
@@ -426,101 +442,6 @@ const navigationSections = ref<NavigationSection[]>([
   },
 
   // System Maintenance Section
-  {
-    title: "System Maintenance",
-    items: [
-      {
-        label: "System Health",
-        to: "/admin/system/health",
-        icon: "i-heroicons-heart",
-        badge: "OK",
-        badgeColor: "green",
-      },
-      {
-        label: "Database Management",
-        icon: "i-heroicons-circle-stack",
-        expanded: false,
-        children: [
-          {
-            label: "Database Status",
-            to: "/admin/database/status",
-            icon: "i-heroicons-cpu-chip",
-          },
-          {
-            label: "Backup & Restore",
-            to: "/admin/database/backup",
-            icon: "i-heroicons-archive-box",
-          },
-          {
-            label: "Data Migration",
-            to: "/admin/database/migration",
-            icon: "i-heroicons-arrow-right",
-          },
-          {
-            label: "Performance Tuning",
-            to: "/admin/database/performance",
-            icon: "i-heroicons-bolt",
-          },
-        ],
-      },
-      {
-        label: "Security & Monitoring",
-        icon: "i-heroicons-shield-check",
-        expanded: false,
-        children: [
-          {
-            label: "Security Logs",
-            to: "/admin/security/logs",
-            icon: "i-heroicons-document-text",
-          },
-          {
-            label: "Access Monitoring",
-            to: "/admin/security/monitoring",
-            icon: "i-heroicons-eye",
-          },
-          {
-            label: "Firewall Settings",
-            to: "/admin/security/firewall",
-            icon: "i-heroicons-shield-exclamation",
-          },
-          {
-            label: "Vulnerability Scan",
-            to: "/admin/security/scan",
-            icon: "i-heroicons-bug-ant",
-            badge: "2",
-            badgeColor: "orange",
-          },
-        ],
-      },
-      {
-        label: "System Configuration",
-        icon: "i-heroicons-cog-8-tooth",
-        expanded: false,
-        children: [
-          {
-            label: "General Settings",
-            to: "/admin/config/general",
-            icon: "i-heroicons-adjustments-horizontal",
-          },
-          {
-            label: "Email Settings",
-            to: "/admin/config/email",
-            icon: "i-heroicons-envelope",
-          },
-          {
-            label: "Notification Settings",
-            to: "/admin/config/notifications",
-            icon: "i-heroicons-bell",
-          },
-          {
-            label: "API Configuration",
-            to: "/admin/config/api",
-            icon: "i-heroicons-code-bracket",
-          },
-        ],
-      },
-    ],
-  },
 
   // Content & Operations
   {
@@ -535,8 +456,6 @@ const navigationSections = ref<NavigationSection[]>([
             label: "All Requests",
             to: "/admin/requests",
             icon: "i-heroicons-list-bullet",
-            badge: "1,234",
-            badgeColor: "blue",
           },
           {
             label: "Request Categories",
@@ -813,4 +732,9 @@ const userMenuItems = [
     },
   ],
 ];
+
+onMounted(() => {
+  getRoles();
+  getUsers();
+});
 </script>

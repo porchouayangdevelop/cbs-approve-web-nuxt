@@ -45,6 +45,14 @@ export interface UserCreateCredential {
   }>
 }
 
+export interface UserEditCredential {
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  enabled?: boolean;
+  emailVerified: boolean
+}
+
 interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -102,8 +110,6 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   const isLoading = computed(() => loading.value);
   const isError = computed(() => error.value);
   const isInitialized = computed(() => initilized.value);
-
-
 
   //actions
   const clearError = () => error.value = null;
@@ -358,6 +364,40 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     }
   }
 
+  const updateUser = async (id: string, credential: UserEditCredential): Promise<void> => {
+
+    const { isAuthenticated, isLoading: authLoading, user: authUser } = useAuth();
+    const { $authApi } = useNuxtApp();
+    loading.value = true
+    try {
+      if (!authUser.value && !isAuthenticated.value) {
+        throw new Error('Not authenticated...')
+      }
+      return await $authApi.put(`admin/realms/apb_teller/users/${id}`, credential);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      loading.value = false;
+    }
+
+  }
+  const deleteUser = async (id: string): Promise<void> => {
+    const { isAuthenticated, isLoading: authLoading, user: authUser } = useAuth();
+    const { $authApi } = useNuxtApp();
+    loading.value = true
+    try {
+      if (!authUser.value && !isAuthenticated.value) {
+        throw new Error('Not authenticated...')
+      }
+
+      return await $authApi.delete(`admin/realms/apb_teller/users/${id}`);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      loading.value = false;
+    }
+  }
+
 
   const resetStore = () => {
     users.value.length = 0;
@@ -393,6 +433,8 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     userCreateCredential,
     clearError,
     resetStore,
-    generateAvartar
+    generateAvartar,
+    updateUser,
+    deleteUser
   };
 });

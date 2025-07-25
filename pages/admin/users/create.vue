@@ -3,8 +3,6 @@
     <div class="flex-1 flex flex-col justify-center px-6 lg:px-0">
       <div class="">
         <div class="">
-          <!-- Registration Form (Show only after admin verification) -->
-          <!--        v-if="isAdminVerified"-->
           <div>
             <UCard class="shadow-xl">
               <template #header>
@@ -18,11 +16,6 @@
                       >Create a user
                     </span>
                   </div>
-                  <!-- <h3
-                    class="text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    Create a user
-                  </h3> -->
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     Fill in new user information
                   </p>
@@ -51,7 +44,7 @@
 
                 <!-- Personal Information -->
                 <div class="grid grid-cols-2 gap-4">
-                  <UFormField label="FirstName" name="firstName">
+                  <UFormField label="FirstName" name="firstName" required>
                     <UInput
                       v-model="state.firstName"
                       placeholder="First name"
@@ -161,7 +154,6 @@
                     color="primary"
                     class="cursor-pointer"
                     variant="outline"
-                    @click="openModal"
                   >
                     <template #leading>
                       <UIcon v-if="!loading" name="i-heroicons-user-plus" />
@@ -178,6 +170,15 @@
                   >
                     Reset
                   </UButton>
+                  <UButton
+                    class="cursor-pointer"
+                    icon="i-lucide-arrow-left"
+                    variant="subtle"
+                    color="secondary"
+                    @click="router.back()"
+                  >
+                    Back
+                  </UButton>
                 </div>
               </UForm>
             </UCard>
@@ -185,6 +186,36 @@
         </div>
       </div>
     </div>
+
+    <!-- Open modal -->
+    <!-- <ConfrimModal
+      v-model="showConfirmModal"
+      title="Confirm User Creation"
+      :message="confirmMessage"
+      ok-text="Create User"
+      cancel-text="Cancel"
+      loading-text="Creating user..."
+      @confirm="handleRegister"
+      @cancel="handleModalCancel"
+    >
+      <template #content>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+          <h4 class="font-medium text-gray-900 dark:text-white">
+            User Details:
+          </h4>
+          <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+            <p>
+              <span class="font-medium">Name:</span> {{ state.firstName }}
+              {{ state.lastName }}
+            </p>
+            <p>
+              <span class="font-medium">Username:</span> {{ state.username }}
+            </p>
+            <p><span class="font-medium">Email:</span> {{ state.email }}</p>
+          </div>
+        </div>
+      </template>
+    </ConfrimModal> -->
   </div>
 </template>
 
@@ -201,16 +232,7 @@ definePageMeta({
 });
 
 import { LazyModalsConfrimModal } from "#components";
-
-// Interfaces
-interface RegisterForm {
-  // userType: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  password: string;
-}
+import ConfrimModal from "~/components/modals/ConfrimModal.vue";
 
 interface RoleMapping {
   id: string;
@@ -226,6 +248,7 @@ const isAdminVerified = ref(false);
 const loading = ref(false);
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
+const showConfirmModal = ref(false);
 const selectedUserType = ref<RoleMapping[]>([]);
 const role = ref<RoleMapping>({
   id: "",
@@ -261,10 +284,6 @@ const userTypeOptions = computed(() => {
     };
   });
 });
-
-// { label: "Admin", value: "admin" },
-// { label: "Checker", value: "checker" },
-// { label: "User", value: "user" },
 
 // Validation schema
 const registerSchema = z.object({
@@ -330,6 +349,10 @@ const passwordStrength = computed(() => {
   };
 });
 
+const confirmMessage = computed(() => {
+  return `Are you sure you want to create a new user account for ${state.firstName} ${state.lastName}?`;
+});
+
 const handleSelectedUserType = (userType: string) => {
   role.value = roles.find((role) => role.id === userType) || role.value;
 
@@ -348,28 +371,43 @@ const resetForm = () => {
 };
 
 const openModal = async () => {
-  const instance = modal.open({
-    title: "Confirm create a user",
-    okText: "OK",
-    cancelText: "Cancel",
-  });
-
-  const shouldCreate = await instance.result;
-  if (shouldCreate) {
-    toast.add({
-      title: "Success",
-      description: "",
-      icon: "i-lucide-check-check",
-      color: "success",
+  try {
+    registerSchema.parse(state);
+    const instance = modal.open({
+      modelValue: showConfirmModal.value,
+      title: "Confirm User Creation",
+      cancelText: "Cancel",
+      message: confirmMessage.value,
+      loadingText: "Create User...",
+      okText: "Confirm",
+      dismissible: true,
     });
-    handleRegister();
-    router.back();
-    return;
+
+    const shouldConfirm = await instance.result;
+
+    if (shouldConfirm) {
+      handleRegister();
+    }
+
+    handleModalCancel();
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const firstError = error.errors[0];
+      toast.add({
+        icon: "i-heroicons-exclamation-circle",
+        title: "Validation Error",
+        description: firstError.message,
+        color: "error",
+      });
+    }
   }
+};
+
+const handleModalCancel = () => {
   toast.add({
-    title: "You've cancel",
-    description: "",
-    icon: "i-lucide-x",
+    title: "User creation cancelled",
+    description: "No user account was created",
+    icon: "i-heroicons-x-circle",
     color: "error",
   });
 };

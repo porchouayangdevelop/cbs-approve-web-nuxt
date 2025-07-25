@@ -195,7 +195,7 @@ export const useAuth = () => {
         sessionId: profile.sessionId,
       }
 
-      const validRole = ['admin', 'checker', 'user'];
+      const validRole = ['default-roles-apb_teller', 'admin', 'checker', 'user'];
       if (!validRole.includes(userProfile.role.toLowerCase())) {
         throw new Error(`Invalid user role: ${userProfile.role}`);
       }
