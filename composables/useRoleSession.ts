@@ -48,9 +48,9 @@ interface RoleSessionData {
 }
 
 export const useRoleSession = () => {
-  const {user} = useAuth();
-  const {currentUserRole, getUserProfile} = useCheckAuth();
-  const {getUserPermissions} = usePermissions();
+  const { user } = useAuth();
+  const { currentUserRole, getUserProfile } = useCheckAuth();
+  const { getUserPermissions } = usePermissions();
   const route = useRoute();
 
   // Get the current role from user state or JWT token
@@ -90,7 +90,7 @@ export const useRoleSession = () => {
         name: profile.firstName,
         avatar: profile.avatar,
         email: profile.email,
-        roleTitle: getRoleTitle(profile.currentRole),
+        roleTitle: getRoleTitle(profile.currentRole || ''),
         username: profile.username,
         id: profile.id,
         department: profile.department,
@@ -155,8 +155,8 @@ export const useRoleSession = () => {
         },
 
         {
-          title:'User & Role Management',
-          items:[
+          title: 'User & Role Management',
+          items: [
             {
               label: 'User Management',
               to: '/admin/users',
@@ -776,7 +776,7 @@ export const useRoleSession = () => {
   // Handle logout functionality
   const handleLogout = async () => {
     try {
-      const {logout} = useAuth()
+      const { logout } = useAuth()
       await logout()
     } catch (error) {
       console.error('Logout error:', error)
@@ -797,28 +797,28 @@ export const useRoleSession = () => {
 
     const metrics = {
       admin: [
-        {label: 'Total Users', value: '1,234', icon: 'i-heroicons-users', color: 'blue'},
-        {label: 'Active Sessions', value: '89', icon: 'i-heroicons-signal', color: 'green'},
-        {label: 'System Health', value: '98%', icon: 'i-heroicons-heart', color: 'green'},
-        {label: 'Pending Tasks', value: '12', icon: 'i-heroicons-exclamation-triangle', color: 'orange'}
+        { label: 'Total Users', value: '1,234', icon: 'i-heroicons-users', color: 'blue' },
+        { label: 'Active Sessions', value: '89', icon: 'i-heroicons-signal', color: 'green' },
+        { label: 'System Health', value: '98%', icon: 'i-heroicons-heart', color: 'green' },
+        { label: 'Pending Tasks', value: '12', icon: 'i-heroicons-exclamation-triangle', color: 'orange' }
       ],
       checker: [
-        {label: 'Pending Approvals', value: '23', icon: 'i-heroicons-clock', color: 'orange'},
-        {label: 'Approved Today', value: '45', icon: 'i-heroicons-check-circle', color: 'green'},
-        {label: 'Avg. Response Time', value: '2.3h', icon: 'i-heroicons-bolt', color: 'blue'},
-        {label: 'Success Rate', value: '94%', icon: 'i-heroicons-chart-bar', color: 'green'}
+        { label: 'Pending Approvals', value: '23', icon: 'i-heroicons-clock', color: 'orange' },
+        { label: 'Approved Today', value: '45', icon: 'i-heroicons-check-circle', color: 'green' },
+        { label: 'Avg. Response Time', value: '2.3h', icon: 'i-heroicons-bolt', color: 'blue' },
+        { label: 'Success Rate', value: '94%', icon: 'i-heroicons-chart-bar', color: 'green' }
       ],
       user: [
-        {label: 'My Requests', value: '8', icon: 'i-heroicons-document-text', color: 'blue'},
-        {label: 'Approved', value: '15', icon: 'i-heroicons-check-circle', color: 'green'},
-        {label: 'Pending', value: '3', icon: 'i-heroicons-clock', color: 'orange'},
-        {label: 'Draft', value: '2', icon: 'i-heroicons-document-plus', color: 'gray'}
+        { label: 'My Requests', value: '8', icon: 'i-heroicons-document-text', color: 'blue' },
+        { label: 'Approved', value: '15', icon: 'i-heroicons-check-circle', color: 'green' },
+        { label: 'Pending', value: '3', icon: 'i-heroicons-clock', color: 'orange' },
+        { label: 'Draft', value: '2', icon: 'i-heroicons-document-plus', color: 'gray' }
       ],
       manager: [
-        {label: 'Team Requests', value: '34', icon: 'i-heroicons-user-group', color: 'blue'},
-        {label: 'Team Performance', value: '92%', icon: 'i-heroicons-chart-bar', color: 'green'},
-        {label: 'Pending Approvals', value: '7', icon: 'i-heroicons-clock', color: 'orange'},
-        {label: 'Team Size', value: '12', icon: 'i-heroicons-users', color: 'purple'}
+        { label: 'Team Requests', value: '34', icon: 'i-heroicons-user-group', color: 'blue' },
+        { label: 'Team Performance', value: '92%', icon: 'i-heroicons-chart-bar', color: 'green' },
+        { label: 'Pending Approvals', value: '7', icon: 'i-heroicons-clock', color: 'orange' },
+        { label: 'Team Size', value: '12', icon: 'i-heroicons-users', color: 'purple' }
       ]
     }
 
@@ -831,19 +831,19 @@ export const useRoleSession = () => {
 
     const activities = {
       admin: [
-        {action: 'User created', subject: 'john.doe@company.com', time: '2 minutes ago', type: 'create'},
-        {action: 'System backup', subject: 'completed successfully', time: '1 hour ago', type: 'success'},
-        {action: 'Security alert', subject: 'resolved', time: '3 hours ago', type: 'warning'}
+        { action: 'User created', subject: 'john.doe@company.com', time: '2 minutes ago', type: 'create' },
+        { action: 'System backup', subject: 'completed successfully', time: '1 hour ago', type: 'success' },
+        { action: 'Security alert', subject: 'resolved', time: '3 hours ago', type: 'warning' }
       ],
       checker: [
-        {action: 'Request approved', subject: 'Leave Request #1234', time: '5 minutes ago', type: 'approve'},
-        {action: 'Request reviewed', subject: 'Expense Report #5678', time: '30 minutes ago', type: 'review'},
-        {action: 'Workflow updated', subject: 'Priority approval process', time: '2 hours ago', type: 'update'}
+        { action: 'Request approved', subject: 'Leave Request #1234', time: '5 minutes ago', type: 'approve' },
+        { action: 'Request reviewed', subject: 'Expense Report #5678', time: '30 minutes ago', type: 'review' },
+        { action: 'Workflow updated', subject: 'Priority approval process', time: '2 hours ago', type: 'update' }
       ],
       user: [
-        {action: 'Request submitted', subject: 'Annual Leave Request', time: '1 hour ago', type: 'create'},
-        {action: 'Document uploaded', subject: 'Supporting documents', time: '3 hours ago', type: 'upload'},
-        {action: 'Profile updated', subject: 'Contact information', time: '1 day ago', type: 'update'}
+        { action: 'Request submitted', subject: 'Annual Leave Request', time: '1 hour ago', type: 'create' },
+        { action: 'Document uploaded', subject: 'Supporting documents', time: '3 hours ago', type: 'upload' },
+        { action: 'Profile updated', subject: 'Contact information', time: '1 day ago', type: 'update' }
       ],
     }
 

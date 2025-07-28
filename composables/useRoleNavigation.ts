@@ -85,6 +85,14 @@ export const useRoleNavigation = () => {
           permission: 'reports:read'
         }
       ],
+      'hq_it_checker': [
+        {
+          label: 'Dashboard',
+          path: '/admin',
+          icon: 'i-heroicons-home',
+          permission: 'admin:access'
+        },
+      ],
       checker: [
         {
           label: 'Dashboard',

@@ -1,82 +1,7 @@
 export const usePermissions = () => {
   const { user } = useAuth();
   const { getUserPermissions, currentUserRole } = useCheckAuth();
-
-  // Enhanced permission matrix based on roles
-  const permissionMatrix: Record<string, string[]> = {
-    'admin': [
-      'admin:access',
-      'users:create',
-      'users:read',
-      'users:edit',
-      'users:delete',
-      'users:manage',
-      'settings:manage',
-      'settings:read',
-      'settings:edit',
-      'approval:access',
-      'approval:approve',
-      'approval:reject',
-      'approval:delegate',
-      'approval:manage',
-      'dashboard:read',
-      'profile:read',
-      'profile:edit',
-      'profile:manage',
-      'reports:read',
-      'reports:create',
-      'reports:manage',
-      'system:manage',
-      'audit:read',
-      'roles:manage',
-      'permissions:manage',
-      'workflows:manage',
-      'notifications:manage',
-      'content:manage',
-      'analytics:read',
-      'checkers:manage'
-    ],
-    'checker': [
-      'checker:access',
-      'approval:access',
-      'approval:approve',
-      'approval:reject',
-      'approval:delegate',
-      'requests:review',
-      'requests:read',
-      'requests:manage',
-      'dashboard:read',
-      'profile:read',
-      'profile:edit',
-      'workflows:review',
-      'workflows:manage',
-      'stats:review',
-      'reports:review',
-      'notifications:review',
-      'history:review',
-      'schedule:review',
-      'schedule:manage',
-      'settings:review',
-      'settings:manage'
-    ],
-    'user': [
-      'users:read',
-      'users:create',
-      'dashboard:read',
-      'profile:read',
-      'profile:edit',
-      'requests:create',
-      'requests:read',
-      'requests:edit',
-      'requests:delete',
-      'templates:read',
-      'notifications:read',
-      'history:read',
-      'stats:read',
-      'bulk:manage'
-    ],
-  };
-
+  const { permissionMatrix: permissions } = usePermissionMatrix();
   // Get user permissions from both JWT token and role-based matrix
   const getUserPermissionsEnhanced = computed(() => {
     // Get permissions from JWT token
@@ -84,7 +9,7 @@ export const usePermissions = () => {
 
     // Get role-based permissions
     const currentRole = currentUserRole();
-    const rolePermissions = currentRole ? permissionMatrix[currentRole.toLowerCase()] || [] : [];
+    const rolePermissions = currentRole ? permissions.value[currentRole.toLowerCase()] || [] : [];
 
     // Combine and deduplicate permissions
     return [...new Set([...tokenPermissions, ...rolePermissions])];
@@ -93,7 +18,7 @@ export const usePermissions = () => {
   // Get user permissions (legacy compatibility)
   const getUserPermissionsLegacy = computed(() => {
     if (!user.value?.role) return [];
-    return permissionMatrix[user.value.role.toLowerCase()] || [];
+    return permissions.value[user.value.role.toLowerCase()] || [];
   });
 
   const hasPermission = (permission: string): boolean => {
@@ -204,7 +129,7 @@ export const usePermissions = () => {
   const getPermissionSummary = () => {
     const currentRole = currentUserRole();
     const tokenPermissions = getUserPermissions();
-    const rolePermissions = currentRole ? permissionMatrix[currentRole.toLowerCase()] || [] : [];
+    const rolePermissions = currentRole ? permissions.value[currentRole.toLowerCase()] || [] : [];
     const allPermissions = getUserPermissionsEnhanced.value;
 
     return {
@@ -230,6 +155,6 @@ export const usePermissions = () => {
     getAvailableActions,
     getPermissionLevel,
     getPermissionSummary,
-    permissionMatrix
+    permissions
   };
 };

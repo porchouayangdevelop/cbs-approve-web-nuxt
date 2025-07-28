@@ -418,6 +418,7 @@ const generateEmail = () => {
 
 const handleRegister = async () => {
   loading.value = true;
+
   try {
     // Validate form data
     const validatedData = registerSchema.parse(state);
@@ -439,6 +440,8 @@ const handleRegister = async () => {
     };
 
     await userCreateCredential(register).then(async (response) => {
+      const { invalidateCache } = useSystemUserStore();
+      invalidateCache();
       // await assignRoleCredential(response.id, selectedUserType.value);
       loading.value = false;
       // Show success message
@@ -449,7 +452,15 @@ const handleRegister = async () => {
         color: "success",
       });
 
-      // navigateTo("/admin/users", { replace: true });
+      if (process.client) {
+        window.history.replaceState(
+          { ...window.history.state, refreshUsers: true },
+          "",
+          window.location.href
+        );
+      }
+
+      navigateTo("/admin/users", { replace: true });
       // router.back();
     });
   } catch (error: any) {

@@ -239,7 +239,6 @@ watch(
               v-model="selectedRoleIds"
               :items="userTypeOptions"
               variant="card"
-              D
               size="xs"
               icon="i-heroicons-shield-check"
               @change="handleSelectedUserTypeMulti(selectedRoleIds)"

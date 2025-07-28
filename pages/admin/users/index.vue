@@ -284,7 +284,14 @@ const {
   error,
   isInitialized,
 } = storeToRefs(useSystemUserStore());
-const { getUsers, getRoles, getRole, deleteUser } = store;
+const {
+  getUsers,
+  getRoles,
+  getRole,
+  deleteUser,
+  forceRefreshUsers,
+  invalidateCache,
+} = store;
 
 // Local state
 const loading = ref(false);
@@ -294,6 +301,11 @@ const selectedRole = ref("");
 const selectedUsers = ref<any[]>([]);
 const globalFilter = ref("");
 const switchValue = ref(false);
+const pageRefreshCount = ref(0);
+
+const isReturingFromNavigation = ref(false);
+
+const route = useRoute();
 
 const loadingMessage = computed(() => {
   if (!isAuthenticated.value) return "Authenticating...";
@@ -490,21 +502,6 @@ const assignRoleAction = (user: User) => {
 
 const getDropdownActions = (user: User): DropdownMenuItem[][] => {
   return [
-    // [
-    //   {
-    //     label: "Copy email",
-    //     icon: "i-heroicons-document-duplicate",
-    //     onSelect: () => {
-    //       copy(user.email);
-
-    //       toast.add({
-    //         title: "Email copied",
-    //         color: "success",
-    //         icon: "i-heroicons-clipboard-check",
-    //       });
-    //     },
-    //   },
-    // ],
     [
       {
         label: "view",
@@ -667,16 +664,23 @@ const exportUsers = () => {
   });
 };
 
-const refreshUsers = async () => {
+const refreshUsers = async (force: boolean = false) => {
   loading.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    await getUsers();
-    toast.add({
-      title: "Users refreshed",
-      description: "User list has been updated",
-      color: "success",
-    });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (force) {
+      await forceRefreshUsers();
+    } else {
+      await getUsers(true);
+    }
+
+    pageRefreshCount.value++;
+    // toast.add({
+    //   title: "Users refreshed",
+    //   description: "User list has been updated",
+    //   color: "success",
+    // });
   } catch (error) {
     toast.add({
       title: "Error refreshing users",
@@ -688,15 +692,15 @@ const refreshUsers = async () => {
   }
 };
 
-const initializeData = async () => {
+const initializeData = async (force: boolean = false) => {
   try {
     if (!isAuthenticated.value) {
       await navigateTo("/auth/login");
       return;
     }
 
-    if (!isInitialized.value) {
-      await getUsers();
+    if (force && !isInitialized.value) {
+      await getUsers(force);
     }
   } catch (error) {
     console.error("Error initializing data:", error);
@@ -708,10 +712,37 @@ const initializeData = async () => {
   }
 };
 
+const checForDataRefresh = () => {
+  const shouldRefresh =
+    document.referrer.includes("/admin/users/create") ||
+    document.referrer.includes("/admin/users/edit") ||
+    window.history.state?.refreshUsers === true;
+
+  if (shouldRefresh) {
+    (invalidateCache(), initializeData(true));
+  }
+};
+
 // Lifecycle
 onMounted(() => {
+  checForDataRefresh();
+
   initializeData();
 });
+
+watch(
+  () => route.path,
+  (newPath, oldPath) => {
+    if (
+      newPath === "/admin/users" &&
+      oldPath &&
+      (oldPath.includes("/admin/users/create") ||
+        oldPath.includes("/admin/users/edit"))
+    ) {
+      refreshUsers(true);
+    }
+  }
+);
 
 watch(
   [isAuthenticated, isAuthLoading],
@@ -722,6 +753,14 @@ watch(
   },
   { immediate: true }
 );
+
+if (process.client) {
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && isAuthenticated.value) {
+      refreshUsers(true);
+    }
+  });
+}
 
 // Debug watchers (development only)
 if (process.dev) {

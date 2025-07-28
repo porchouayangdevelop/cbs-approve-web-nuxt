@@ -7,12 +7,14 @@ definePageMeta({
 import {
   useSystemUserStore,
   type UserEditCredential,
+  type RoleMapping,
 } from "~/store/systemUserStore";
 import { z } from "zod";
+import type { RadioGroupItem, RadioGroupValue } from "@nuxt/ui";
 
 const store = useSystemUserStore();
-const { user, loading } = storeToRefs(useSystemUserStore());
-const { updateUser, getUser } = store;
+const { user, loading, roles } = storeToRefs(useSystemUserStore());
+const { updateUser, getUser, getRoles } = store;
 const { isAuthenticated, isLoading, user: autUser } = useAuth();
 
 const toast = useToast();
@@ -21,6 +23,23 @@ const route = useRoute();
 //state
 const checkBoxValue = ref(false);
 const switchValue = ref(false);
+const userRoleType = ref("");
+
+const role = ref<RoleMapping>({
+  id: "",
+  name: "",
+  description: "",
+  composite: false,
+  clientRole: false,
+  containerId: "",
+});
+
+const selectedRoleIds = ref<string[]>([]);
+const selectedUserRoleType = ref<RoleMapping[]>([]);
+const selectedUserRoleTypes = ref<RoleMapping[]>([]);
+
+const radioItem = ref<RadioGroupItem[]>(["One", "Multi"]);
+const radioValue = ref("");
 
 // getters
 const userData = computed(() => {
@@ -65,6 +84,15 @@ const isFormValid = computed(() => {
   }
 });
 
+const userRoleTypeOptions = computed(() => {
+  return roles.value.map((role) => {
+    return {
+      label: role.name,
+      value: role.id,
+    };
+  });
+});
+
 //method
 
 const initialData = async (id: string) => {
@@ -89,6 +117,18 @@ const handleChangeEmailVerify = (): boolean => {
   }
 };
 
+const handleSelectedUserRoleType = (userType: string) => {
+  role.value = roles.value.find((role) => role.id === userType) || role.value;
+  selectedUserRoleType.value = [];
+  selectedUserRoleType.value.push(role.value);
+};
+
+const handleSelectedUserRoleTypes = (selectedIds: string[]) => {
+  selectedUserRoleTypes.value = selectedIds
+    .map((id) => roles.value.find((role) => role.id === id))
+    .filter(Boolean) as RoleMapping[];
+};
+
 const handleSubmit = () => {
   try {
     loading.value = true;
@@ -102,6 +142,8 @@ const handleSubmit = () => {
 
     updateUser(route.params.id as string, credential)
       .then((res) => {
+        const { invalidateCache } = useSystemUserStore();
+        invalidateCache();
         toast.add({
           title: "Success",
           description: "Update user success",
@@ -109,8 +151,15 @@ const handleSubmit = () => {
           color: "success",
           duration: 100,
         });
+        if (process.client) {
+          window.history.replaceState(
+            { ...window.history.state, refreshUsers: true },
+            "",
+            window.location.href
+          );
+        }
+
         useGoBack().goBack();
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -133,6 +182,7 @@ const handleSubmit = () => {
 onMounted(() => {
   const id = route.params.id as string;
   initialData(id);
+  getRoles();
 });
 
 //watcher
@@ -145,10 +195,20 @@ watch(user, (newUser) => {
 <template>
   <div class="space-y-1">
     <div class="">
-      <UCard>
+      <UCard shadow="xl">
         <template #header>
-          <h3>Update User</h3>
-          <!-- <u-separator orientation="horizontal" color="secondary" /> -->
+          <div class="text-center">
+            <div class="flex items-center justify-center mb-2">
+              <UIcon
+                name="i-heroicons-check-circle"
+                class="w-6 h-6 text-green-500 mr-2"
+              />
+              <span class="text-green-600 font-medium">Update a user </span>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Fill in user information
+            </p>
+          </div>
         </template>
         <template #default>
           <u-form
@@ -157,29 +217,81 @@ watch(user, (newUser) => {
             @submit="handleSubmit"
           >
             <u-form-field label="Username" name="Username" required>
-              <u-input disabled v-model="userData.username" variant="outline" />
+              <u-input
+                class=""
+                disabled
+                v-model="userData.username"
+                variant="outline"
+                icon="i-heroicons-user"
+              />
             </u-form-field>
 
-            <u-form-field label="FirstName" name="firstName" required>
-              <u-input v-model="userData.firstName" variant="outline" />
-            </u-form-field>
-
-            <u-form-field label="LastName" name="lastName" required>
-              <u-input v-model="userData.lastName" variant="outline" />
-            </u-form-field>
-
-            <div class="flex flex-row gap-2">
-              <u-form-field label="Enable" name="enable" required>
-                <u-switch v-model="userData.enabled" label="Verify email" />
+            <div class="grid grid-cols-2 gap-4 my-2">
+              <u-form-field label="FirstName" name="firstName" required>
+                <u-input
+                  class="w-full"
+                  v-model="userData.firstName"
+                  variant="outline"
+                  icon="i-heroicons-user"
+                />
               </u-form-field>
 
-              <u-form-field label="Username" name="Username" required>
-                <u-checkbox
-                  v-model="userData.emailVerified"
-                  label="Verify email"
+              <u-form-field label="LastName" name="lastName" required>
+                <u-input
+                  class="w-full"
+                  v-model="userData.lastName"
+                  variant="outline"
                 />
               </u-form-field>
             </div>
+
+            <div class="flex flex-row gap-2">
+              <u-form-field name="emailVerified" required>
+                <u-checkbox
+                  v-model="userData.emailVerified"
+                  label="Verify email?"
+                />
+              </u-form-field>
+
+              <u-form-field name="enable" required>
+                <u-switch v-model="userData.enabled" label="Enable?" />
+              </u-form-field>
+            </div>
+
+            <!-- <div class="mt-2">
+              <UFormField label="Roles">
+                <URadioGroup
+                  orientation="horizontal"
+                  v-model="radioValue"
+                  :items="radioItem"
+                >
+                </URadioGroup>
+              </UFormField>
+
+              <div v-if="radioValue === 'One'">
+                <USelectMenu
+                  v-model="userRoleType"
+                  :items="userRoleTypeOptions"
+                  value-key="value"
+                  placeholder="select a role"
+                  icon="i-heroicons-shield-check"
+                  size="md"
+                  class="w-full mb-[.2rem]"
+                  @change="handleSelectedUserRoleType(userRoleType)"
+                />
+              </div>
+              <div v-else-if="radioValue === 'Multi'">
+                <UCheckboxGroup
+                  class="grid-cols-4"
+                  v-model="selectedRoleIds"
+                  :items="userRoleTypeOptions"
+                  variant="card"
+                  size="sm"
+                  icon="i-heroicons-shield-check"
+                  @change="handleSelectedUserRoleTypes(selectedRoleIds)"
+                />
+              </div>
+            </div> -->
 
             <div class="flex gap-1 mt-3">
               <u-button

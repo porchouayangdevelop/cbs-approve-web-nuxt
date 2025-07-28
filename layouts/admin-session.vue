@@ -59,7 +59,6 @@ import AppBar from "~/components/system/aside/AppBar.vue";
 import Breadcrumbs from "~/components/system/aside/Breadcrumbs.vue";
 import CheckerDrawer from "~/components/system/aside/CheckerDrawer.vue";
 import UserDrawer from "~/components/system/aside/UserDrawer.vue";
-import { useRoleSession } from "~/composables/useRoleSession";
 
 const colorMode = useColorMode();
 const { currentRole } = useRoleSession();

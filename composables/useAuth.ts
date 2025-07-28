@@ -1,4 +1,5 @@
 import type { AxiosResponse } from "axios";
+import { string } from "zod";
 import { useJWTDecoder } from "~/composables/useJWTDecoder";
 import type { TokenPayload } from "~/composables/useJWTDecoder";
 
@@ -17,6 +18,15 @@ interface User {
   locale?: string;
   lastUpdated?: string;
   sessionId?: string;
+}
+
+interface Roles {
+  id: string;
+  name: string;
+  description?: string;
+  composite?: boolean;
+  clientRole?: boolean;
+  containerId?: string;
 }
 
 export interface Credentials {
@@ -47,6 +57,7 @@ export const useAuth = () => {
   const isAuthenticated = useState<boolean>('auth.isAuthenticated', () => false);
   const isLoading = useState<boolean>('auth.isLoading', () => false);
   const isInitialized = useState<boolean>('auth.isInitialized', () => false);
+  const isRoles = useState<string[]>('auth.isRole', () => [])
 
 
   const initializationPromise = useState<Promise<void> | null>('auth.initializationPromise', () => null);
@@ -54,6 +65,7 @@ export const useAuth = () => {
   const { getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions } = useCheckAuth();
   const { decodeToken, isTokenExpired } = useJWTDecoder();
   const { defaultRoute } = useDefaultRouteForRole();
+
 
   const {
     setAccessToken,
@@ -195,10 +207,30 @@ export const useAuth = () => {
         sessionId: profile.sessionId,
       }
 
+      const { $authApi } = useNuxtApp();
+
+      const { data } = await $authApi.get<Roles[]>(`admin/realms/apb_teller/roles`, {
+        headers: {
+          // 'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const roleData = Array.isArray(data) ? data : data;
+
+      const roles = [];
+      roles.length = 0;
+      roles.push(...roleData);
+
+      const mapRole: string[] = roles.map((role: Roles) => role.name);
+
       const validRole = ['default-roles-apb_teller', 'admin', 'checker', 'user'];
+      // const validRole = mapRole;
+
       if (!validRole.includes(userProfile.role.toLowerCase())) {
         throw new Error(`Invalid user role: ${userProfile.role}`);
       }
+
 
       user.value = userProfile;
       isAuthenticated.value = true;
@@ -479,6 +511,9 @@ export const useAuth = () => {
   if (process.client && !isInitialized.value && !initializationPromise.value) {
     initializeAuth();
   }
+
+
+
 
   return {
     user: readonly(user),

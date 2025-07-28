@@ -1,0 +1,1 @@
+export type Permissions = 'create' | 'read' | 'edit' | 'delete' | 'approve' | 'reject' | 'access' | 'review' | 'manage'

@@ -5,7 +5,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const authApiInstance: AxiosInstance = axios.create({
     baseURL: config.public.auth_url,
     headers: {
-      // 'Allow-Origin': '*',
+      // 'Access-Control-Allow-Origin': '*',
       // 'Content-Type': 'application/x-www-form-urlencoded',
     }
   });
@@ -13,7 +13,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const apiInstance = axios.create({
     baseURL: config.public.api_url,
     headers: {
-      'Allow-Origin': '*',
+      'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
       // 'Authorization': `Bearer ${useCookie('access_token')?.value || ''}`
     }

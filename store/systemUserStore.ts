@@ -162,24 +162,16 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
 
   const generateAvartar = (user: User) => {
     const { firstName, lastName } = user;
-    const initials = `${firstName[0]}${lastName[0]}`;
+    const initials = `${firstName[0]}${lastName[0] ? lastName[0] : ''}`;
     const avartar = `https://ui-avatars.com/api/?name=${initials}`;
     return avartar;
   }
 
-  const getUsers = async (): Promise<User[]> => {
-    try {
-      if (loading.value) {
-        while (loading.value) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        return users.value;
-      }
 
+  const forceRefreshUsers = async (): Promise<User[]> => {
+    try {
       loading.value = true;
       clearError();
-
-      console.log('🔍 Starting to fetch users...');
 
       const authReady = await waitForAuth();
       if (!authReady) {
@@ -187,24 +179,61 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
       }
 
       const { $authApi } = useNuxtApp();
-
       const { data } = await $authApi.get(`admin/realms/apb_teller/users`);
-
 
       const userData = Array.isArray(data) ? data : data;
 
+
       users.value.length = 0;
       users.value.push(...userData);
-
       initilized.value = true;
 
-      // console.log('📦 Processed Users:', users.value);
-      // if (users.value.length === 0) {
-      //   console.warn('⚠️ No users found in the response.');
-      // } else {
+      return users.value;
+    } catch (e: any) {
+      console.error('❌ Error force refreshing users:', e);
+      error.value = e.message || 'An error occurred while refreshing users';
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  }
+  const resetInitialization = () => {
+    initilized.value = false;
+  }
+  const getUsers = async (force: boolean = false): Promise<User[]> => {
 
-      // }
+    try {
+      if (loading.value && !force) {
+        while (loading.value) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return users.value;
+      }
 
+      if (force || !initilized.value) {
+        loading.value = true;
+        clearError();
+        console.log('🔍 Starting to fetch users...', force ? '(Forced)' : '(Normal)');
+
+        const authReady = await waitForAuth();
+        if (!authReady) {
+          throw new Error("Authentication not ready")
+        }
+
+        const { $authApi } = useNuxtApp();
+
+        const { data } = await $authApi.get(`admin/realms/apb_teller/users`);
+
+
+        const userData = Array.isArray(data) ? data : data;
+
+        users.value.length = 0;
+        users.value.push(...userData);
+
+        initilized.value = true;
+
+        return users.value;
+      }
       return users.value;
     } catch (e: any) {
       console.error('❌ Error fetching users:', e);
@@ -408,6 +437,11 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
   }
 
 
+  const invalidateCache = () => {
+    initilized.value = false;
+    users.value.length = 0;
+  }
+
   return {
     users,
     user,
@@ -425,6 +459,11 @@ export const useSystemUserStore = defineStore('SystemUserStore', () => {
     isInitialized,
 
     // Actions
+
+    forceRefreshUsers,
+    resetInitialization,
+    invalidateCache,
+
     getUsers,
     getUser,
     assignRoleCredential,
