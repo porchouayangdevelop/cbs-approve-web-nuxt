@@ -259,7 +259,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGuards } from "~/composables/useGuards";
+import { useGuards } from "~/composables/useRouteGuards";
 
 definePageMeta({
   layout: false,

@@ -64,7 +64,6 @@ export const useAuth = () => {
 
   const { getUserProfile, isAuthenticated: checkAuthStatus, currentUserRole, getUserPermissions } = useCheckAuth();
   const { decodeToken, isTokenExpired } = useJWTDecoder();
-  const { defaultRoute } = useDefaultRouteForRole();
 
 
   const {
@@ -296,8 +295,9 @@ export const useAuth = () => {
         throw new Error('Failed to fetch user data after login');
       }
 
+      const { getDefaultRoute } = usePermissionSystem();
       const intendedRoute = useCookie('intended_route');
-      const redirect = intendedRoute.value || defaultRoute(userAccount.role);
+      const redirect = intendedRoute.value || getDefaultRoute();
 
       intendedRoute.value = null; // Clear the intended route after redirecting
 
@@ -483,38 +483,6 @@ export const useAuth = () => {
     }
   }
 
-  const hasRole = (roles: string | string[]): boolean => {
-    if (!user.value) return false;
-    const roleArray = Array.isArray(roles) ? roles : [roles];
-    return roleArray.some(role => user.value?.roles.includes(role.toLowerCase()) || user.value?.role.toLowerCase() === role.toLowerCase());
-  }
-
-  const hasPermission = (permission: string): boolean => {
-    if (!user.value?.permissions) return false;
-    return user.value.permissions.includes(permission.toLowerCase());
-  }
-
-  const hasAnyPermission = (permissions: string[]): boolean => {
-    if (!user.value?.permissions) return false;
-    return permissions.some(permission =>
-      user.value?.permissions.includes(permission.toLowerCase())
-    );
-  };
-
-  const hasAllPermissions = (permissions: string[]): boolean => {
-    if (!user.value?.permissions) return false;
-    return permissions.every(permission =>
-      user.value?.permissions.includes(permission.toLowerCase())
-    );
-  };
-
-  if (process.client && !isInitialized.value && !initializationPromise.value) {
-    initializeAuth();
-  }
-
-
-
-
   return {
     user: readonly(user),
     isAuthenticated: readonly(isAuthenticated),
@@ -527,10 +495,6 @@ export const useAuth = () => {
     logout,
     refreshToken,
     updateProfile,
-    hasRole,
-    hasPermission,
-    hasAnyPermission,
-    hasAllPermissions,
     initializeAuth,
     clearAuthState,
     forceLogoutCleanup,

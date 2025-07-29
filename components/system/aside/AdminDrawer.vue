@@ -353,7 +353,7 @@ const navigationSections = ref<NavigationSection[]>([
             icon: "i-heroicons-key",
           },
           {
-            label: "Assign Roles",
+            label: "Role Assignment",
             to: "/admin/roles/assign",
             icon: "i-lucide-shield-user",
           },

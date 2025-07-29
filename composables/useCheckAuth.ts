@@ -1,7 +1,3 @@
-interface CheckAuth {
-  role: string;
-}
-
 export const useCheckAuth = () => {
   const { decodeToken, isTokenExpired } = useJWTDecoder();
 
@@ -47,7 +43,7 @@ export const useCheckAuth = () => {
   }
 
   const getUserPermissions = (): string[] => {
-    const { permissionMatrix } = usePermissionMatrix();
+    const { permissionMatrix } = usePermissionSystem();
     const payload = checkRole.value;
 
     if (!payload) {
@@ -98,31 +94,6 @@ export const useCheckAuth = () => {
     return !!(token && !isTokenExpired(token) && checkRole.value)
   }
 
-  const hasRole = (role: string | string[]): boolean => {
-    const payload = checkRole.value;
-    if (!payload || !payload?.realm_access?.roles) {
-      return false;
-    }
-
-    const roleArray = Array.isArray(role) ? role : [role];
-    const userRoles = payload.realm_access.roles.map(r => r.toLowerCase());
-    return roleArray.some(r => userRoles.includes(r.toLowerCase()));
-  }
-
-  const hasPermission = (permission: string): boolean => {
-    const permissions = getUserPermissions();
-    return permissions.some(p => p.toLowerCase() === permission.toLowerCase());
-  }
-
-  const hasAnyPermission = (permission: string[]): boolean => {
-    const userPermissions = getUserPermissions();
-    return permission.some(p => userPermissions.includes(p.toLowerCase()));
-  }
-
-  const hasAllPermission = (permission: string[]): boolean => {
-    const userPermissions = getUserPermissions();
-    return permission.every(p => userPermissions.includes(p.toLowerCase()));
-  }
 
   const getTokenInfo = () => {
     const token = useCookie('access_token').value;
@@ -150,10 +121,6 @@ export const useCheckAuth = () => {
     getUserPermissions,
     getUserProfile,
     isAuthenticated,
-    hasRole,
-    hasPermission,
-    hasAnyPermission,
-    hasAllPermission,
     getTokenInfo
   }
 

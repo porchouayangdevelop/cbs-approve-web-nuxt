@@ -1,3 +1,6 @@
+// composables/useRoleSession.ts - Updated to use usePermissionSystem
+import { usePermissionSystem } from '~/composables/usePermissionSystem'
+
 interface NavigationItem {
   label: string
   to?: string
@@ -48,26 +51,18 @@ interface RoleSessionData {
 }
 
 export const useRoleSession = () => {
-  const { user } = useAuth();
-  const { currentUserRole, getUserProfile } = useCheckAuth();
-  const { getUserPermissions } = usePermissions();
-  const route = useRoute();
+  const { user } = useAuth()
+  const { getUserProfile } = useCheckAuth()
+  const route = useRoute()
 
-  // Get the current role from user state or JWT token
-  const currentRole = computed(() => {
-    if (user.value?.role) {
-      return user.value.role.toLowerCase();
-    }
+  // Use consolidated permission system instead of duplicating logic
+  const {
+    getCurrentRole,
+    hasPermission,
+    getUserPermissions
+  } = usePermissionSystem()
 
-    const jwtRole = currentUserRole();
-    if (jwtRole) {
-      return jwtRole.toLowerCase();
-    }
-
-    return user.value?.role;
-  });
-
-  // Get enhanced user profile from JWT token
+  // Get enhanced user profile from JWT token or auth state
   const userProfile = computed(() => {
     // First try to get from auth state
     if (user.value) {
@@ -80,22 +75,22 @@ export const useRoleSession = () => {
         id: user.value.id || '',
         department: user.value.department || '',
         permissions: user.value.permissions || []
-      };
+      }
     }
 
     // Fallback to JWT token profile
-    const profile = getUserProfile();
+    const profile = getUserProfile()
     if (profile) {
       return {
-        name: profile.firstName,
-        avatar: profile.avatar,
+        name: `${profile.firstName} ${profile.lastName}`.trim(),
+        avatar: profile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.firstName)}+${encodeURIComponent(profile.lastName)}`,
         email: profile.email,
         roleTitle: getRoleTitle(profile.currentRole || ''),
         username: profile.username,
         id: profile.id,
         department: profile.department,
         permissions: profile.permissions
-      };
+      }
     }
 
     // Default profile
@@ -108,8 +103,29 @@ export const useRoleSession = () => {
       id: '1',
       department: '',
       permissions: []
-    };
-  });
+    }
+  })
+
+  // Helper function to get role title
+  const getRoleTitle = (role?: string) => {
+    const titles = {
+      admin: 'System Administrator',
+      checker: 'Approval Specialist',
+      user: 'Standard User',
+      manager: 'Team Manager'
+    }
+    return titles[role as keyof typeof titles] || 'Standard User'
+  }
+
+  // Handle logout functionality
+  const handleLogout = async () => {
+    try {
+      const { logout } = useAuth()
+      await logout()
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
 
   // Role configurations with dynamic data
   const roleConfigs: Record<string, RoleConfig> = {
@@ -153,7 +169,6 @@ export const useRoleSession = () => {
             }
           ]
         },
-
         {
           title: 'User & Role Management',
           items: [
@@ -176,7 +191,6 @@ export const useRoleSession = () => {
             }
           ]
         },
-
         {
           title: 'User Management',
           items: [
@@ -546,9 +560,10 @@ export const useRoleSession = () => {
     },
   }
 
-  // Get current role configuration
+  // Get current role configuration using usePermissionSystem
   const currentConfig = computed(() => {
-    return roleConfigs[currentRole.value || ''] || roleConfigs.user
+    const role = getCurrentRole()
+    return roleConfigs[role || ''] || roleConfigs.user
   })
 
   // Get page title based on current route
@@ -628,8 +643,7 @@ export const useRoleSession = () => {
 
   // Get role-specific notifications with real-time data
   const getNotifications = () => {
-    const role = currentRole.value
-    const userPermissions = getUserPermissions.value
+    const role = getCurrentRole()
 
     const notifications = {
       admin: [
@@ -762,30 +776,9 @@ export const useRoleSession = () => {
     })
   }
 
-  // Helper function to get role title
-  const getRoleTitle = (role?: string) => {
-    const titles = {
-      admin: 'System Administrator',
-      checker: 'Approval Specialist',
-      user: 'Standard User',
-      manager: 'Team Manager'
-    }
-    return titles[role as keyof typeof titles] || 'Standard User'
-  }
-
-  // Handle logout functionality
-  const handleLogout = async () => {
-    try {
-      const { logout } = useAuth()
-      await logout()
-    } catch (error) {
-      console.error('Logout error:', error)
-    }
-  }
-
   // Session management
   const sessionData = computed((): RoleSessionData => ({
-    role: currentRole.value ? currentRole.value : '',
+    role: getCurrentRole() || '',
     config: currentConfig.value,
     permissions: getUserPermissions.value,
     userProfile: userProfile.value
@@ -793,7 +786,7 @@ export const useRoleSession = () => {
 
   // Get role-specific dashboard metrics
   const getDashboardMetrics = () => {
-    const role = currentRole.value
+    const role = getCurrentRole()
 
     const metrics = {
       admin: [
@@ -827,7 +820,7 @@ export const useRoleSession = () => {
 
   // Get recent activity based on role
   const getRecentActivity = () => {
-    const role = currentRole.value
+    const role = getCurrentRole()
 
     const activities = {
       admin: [
@@ -851,8 +844,8 @@ export const useRoleSession = () => {
   }
 
   return {
-    // Current state
-    currentRole: readonly(currentRole),
+    // Current state - using usePermissionSystem for role
+    currentRole: computed(() => getCurrentRole()),
     currentConfig: readonly(currentConfig),
     pageTitle: readonly(pageTitle),
     breadcrumbs: readonly(breadcrumbs),

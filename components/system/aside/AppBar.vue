@@ -188,6 +188,13 @@ import { useRoleSession } from "~/composables/useRoleSession";
 import { useAuth } from "~/composables/useAuth";
 import { useCheckAuth } from "~/composables/useCheckAuth";
 
+interface BaseItems {
+  label: string;
+  icon: string;
+  to?: string;
+  click?: () => void;
+}
+
 defineEmits<{
   "toggle-sidebar": [];
   "toggle-theme": [];
@@ -199,24 +206,17 @@ const router = useRouter();
 const toast = useToast();
 const { user, logout: authLogout, isLoading } = useAuth();
 const { currentUserRole } = useCheckAuth();
+const { getCurrentRole } = usePermissionSystem();
 
 // Use role session composable
 const { currentConfig, userProfile, getNotifications } = useRoleSession();
 
 // Get the current user role - prioritize user.value.role, fallback to JWT token
 const displayRole = computed(() => {
-  // First try to get from authenticated user
-  if (user.value?.role) {
-    return user.value.role.charAt(0).toUpperCase() + user.value.role.slice(1);
+  const role = getCurrentRole();
+  if (role) {
+    return role.charAt(0).toUpperCase() + role.slice(1);
   }
-
-  // Fallback to JWT token role
-  const jwtRole = currentUserRole();
-  if (jwtRole) {
-    return jwtRole.charAt(0).toUpperCase() + jwtRole.slice(1);
-  }
-
-  // Default fallback
   return "User";
 });
 
@@ -262,63 +262,54 @@ const handleLogout = async () => {
       description: "Please wait while we sign you out.",
     });
 
-    // Clear all cookies and tokens first
-    const accessTokenCookie = useCookie("access_token");
-    const refreshTokenCookie = useCookie("refresh_token");
-
-    // Clear cookies immediately
-    accessTokenCookie.value = null;
-    refreshTokenCookie.value = null;
-
-    // Clear localStorage items
-    if (process.client) {
-      localStorage.removeItem("preferred-language");
-      localStorage.removeItem("preferredRole");
-      // Clear any request drafts
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith("request_draft_")) {
-          localStorage.removeItem(key);
-        }
-      });
-    }
-
-    // Call the logout function from useAuth (this will handle server-side logout)
-    try {
-      await authLogout();
-    } catch (logoutError) {
-      console.warn(
-        "Server logout failed, but continuing with local cleanup:",
-        logoutError
-      );
-    }
-
+    await authLogout();
     // Show success message
     toast.add({
       icon: "i-heroicons-check-circle",
       title: "Logged out successfully",
       description: "You have been signed out of your account.",
     });
-
-    // Force navigation to login page
-    await navigateTo("/auth/login", { replace: true });
   } catch (error) {
-    console.error("Logout error:", error);
+    console.error("❌ Logout error:", error);
 
-    // Even if logout fails, clear local data and redirect
-    const accessTokenCookie = useCookie("access_token");
-    const refreshTokenCookie = useCookie("refresh_token");
-    accessTokenCookie.value = null;
-    refreshTokenCookie.value = null;
+    // Force cleanup even if logout fails
+    try {
+      // Clear cookies manually
+      const accessTokenCookie = useCookie("access_token");
+      const refreshTokenCookie = useCookie("refresh_token");
+      accessTokenCookie.value = null;
+      refreshTokenCookie.value = null;
 
-    // Show error message
-    toast.add({
-      icon: "i-heroicons-exclamation-circle",
-      title: "Logout completed",
-      description: "You have been signed out (with local cleanup).",
-    });
+      // Clear localStorage
+      if (process.client) {
+        Object.keys(localStorage).forEach((key) => {
+          if (
+            key.startsWith("request_draft_") ||
+            key.startsWith("preferred-language") ||
+            key.startsWith("preferredRole")
+          ) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
 
-    // Force redirect regardless
-    await navigateTo("/auth/login", { replace: true });
+      // Show error but continue with logout
+      toast.add({
+        icon: "i-heroicons-exclamation-triangle",
+        title: "Logout completed with cleanup",
+        description: "You have been signed out (local cleanup performed).",
+      });
+
+      // Force navigation
+      await navigateTo("/auth/login", { replace: true });
+    } catch (cleanupError) {
+      console.error("❌ Cleanup error:", cleanupError);
+
+      // Last resort - force page reload
+      if (process.client) {
+        window.location.href = "/auth/login";
+      }
+    }
   } finally {
     loggingOut.value = false;
   }
@@ -384,22 +375,25 @@ const userMenuItems = computed(() => {
     },
   ]);
 
-  // FIXED: Proper logout menu item with loading state
-  baseItems.push([
-    {
-      label: loggingOut.value ? "Logging out..." : "Logout",
-      icon: loggingOut.value
-        ? "i-heroicons-arrow-path"
-        : "i-heroicons-arrow-right-on-rectangle",
-      click: handleLogout,
-      disabled: loggingOut.value || isLoading.value,
+  const logoutItem = {
+    label: loggingOut.value ? "Logging out..." : "Logout",
+    icon: loggingOut.value
+      ? "i-heroicons-arrow-path animate-spin"
+      : "i-heroicons-arrow-right-on-rectangle",
+    disabled: loggingOut.value || isLoading.value,
+    // CRITICAL FIX: Ensure the click handler is properly bound
+    click: (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("🎯 Logout menu item clicked!"); // Debug log
+      handleLogout();
     },
-  ]);
+  };
+  baseItems.push([logoutItem as any]);
 
   return baseItems;
 });
 
-// Watch for route changes to close mobile search
 watch(
   () => route.path,
   () => {
@@ -409,11 +403,21 @@ watch(
 
 // Debug logging for role changes
 watch(
-  () => user.value?.role,
+  () => displayRole.value,
   (newRole) => {
-    if (newRole) {
-      console.log("AppBar - User role changed to:", newRole);
-    }
+    console.log("🔄 AppBar - Display role changed to:", newRole);
+  },
+  { immediate: true }
+);
+
+// Debug user state
+watch(
+  () => user.value,
+  (newUser) => {
+    console.log(
+      "👤 AppBar - User state:",
+      newUser ? "Logged in" : "Not logged in"
+    );
   },
   { immediate: true }
 );

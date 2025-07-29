@@ -1,36 +1,7 @@
 export const useRoleNavigation = () => {
   const { user } = useAuth();
   const { currentUserRole } = useCheckAuth();
-  const { hasPermission, hasAnyPermission } = usePermissions();
-
-  // Get the current user's role from either auth state or JWT token
-  const getCurrentRole = (): string | null => {
-    // First try to get from user state
-    if (user.value?.role) {
-      return user.value.role.toLowerCase();
-    }
-
-    // Fallback to JWT token
-    return currentUserRole();
-  };
-
-  // Get default route based on user role
-  const getDefaultRoute = (): string => {
-    const role = getCurrentRole();
-
-    if (!role) {
-      return '/auth/login';
-    }
-
-    const defaultRoutes: Record<string, string> = {
-      'admin': '/admin',
-      'checker': '/checkers',
-      'user': '/users',
-      'manager': '/users' // Managers use the same interface as users but with elevated permissions
-    };
-
-    return defaultRoutes[role] || '/dashboard';
-  };
+  const { hasPermission, navigateToDefaultRoute, getDefaultRoute, hasAllPermissions, getCurrentRole } = usePermissionSystem();
 
   // Check if user can register new users (admin only)
   const canRegister = (): boolean => {
@@ -84,14 +55,6 @@ export const useRoleNavigation = () => {
           icon: 'i-heroicons-document-chart-bar',
           permission: 'reports:read'
         }
-      ],
-      'hq_it_checker': [
-        {
-          label: 'Dashboard',
-          path: '/admin',
-          icon: 'i-heroicons-home',
-          permission: 'admin:access'
-        },
       ],
       checker: [
         {
@@ -201,7 +164,7 @@ export const useRoleNavigation = () => {
 
     // Filter navigation items based on permissions
     return roleNavigation.filter(item =>
-      !item.permission || hasPermission(item.permission)
+      !item.permission || hasPermission(item.permission as any)
     );
   };
 
@@ -300,7 +263,7 @@ export const useRoleNavigation = () => {
 
     // Filter actions based on permissions
     return roleActions.filter(action =>
-      !action.permission || hasPermission(action.permission)
+      !action.permission || hasPermission(action.permission as any)
     );
   };
 
@@ -411,7 +374,7 @@ export const useRoleNavigation = () => {
 
     // Filter widgets based on permissions
     return roleWidgets.filter(widget =>
-      !widget.permission || hasPermission(widget.permission)
+      !widget.permission || hasPermission(widget.permission as any)
     );
   };
 
@@ -429,7 +392,7 @@ export const useRoleNavigation = () => {
     };
 
     const requiredPermissions = featurePermissions[feature] || [];
-    return hasAnyPermission(requiredPermissions);
+    return requiredPermissions.some(per => hasPermission(per as any))
   };
 
   // Get role-specific layout preferences
@@ -512,14 +475,18 @@ export const useRoleNavigation = () => {
 
   return {
     getCurrentRole,
-    getDefaultRoute,
-    canRegister,
+    getRoleDisplayInfo,
+
     getAccessibleNavigation,
     getQuickActions,
     getDashboardWidgets,
+
     canAccessFeature,
+    canRegister,
+
     getLayoutPreferences,
+    getDefaultRoute,
     navigateToHome,
-    getRoleDisplayInfo
+
   };
 };

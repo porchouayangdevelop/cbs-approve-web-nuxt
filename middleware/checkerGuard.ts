@@ -1,6 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const {hasRole, handledUnauthorized, hasPermission} = useGuards();
-  const {user, isAuthenticated, getCurrentUser} = useAuth();
+  const { redirectUnauthorized } = useRouteGuards();
+  const { user, isAuthenticated, getCurrentUser } = useAuth();
+  const { hasPermission, hasRole } = usePermissionSystem()
 
   if (!isAuthenticated.value) {
     console.log('Checker access denied: user not authenticated');
@@ -26,13 +27,13 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const hasCheckerRole = hasRole(['checker', 'admin']);
   if (!hasCheckerRole) {
     console.log('Checker access denied: insufficient role')
-    return handledUnauthorized(to.path);
+    return redirectUnauthorized(to.path);
   }
 
-  const hasApprovalPermission = hasPermission(['checker:access', 'approval:access']);
+  const hasApprovalPermission = hasPermission(["checkers:access", 'checker:approve']);
   if (!hasApprovalPermission) {
     console.log('Checker access denied: insufficient permissions')
-    return handledUnauthorized(to.path)
+    return redirectUnauthorized(to.path)
   }
 
   console.log('Checker access granted')

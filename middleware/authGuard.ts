@@ -4,9 +4,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
 
   const { getCurrentUser, user, isAuthenticated, logout, isInitialized, isLoading } = useAuth();
-  const { checkAuth, handledUnauthorized, canAccess } = useGuards();
+  const { redirectUnauthorized, canAccessRoute } = useRouteGuards();
   const { isTokenExpired } = useJWTDecoder();
   const { showTokenExpirationModal } = useTokenExpiration();
+  const { checkAuth } = usePermissionSystem();
 
   // const clearAuthAndRedirect = async () => {
   //   try {
@@ -63,38 +64,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/auth/login');
   }
 
-  // let decodedToken;
-  // try {
-  //   decodedToken = decodeToken(token);
-  //   if (!decodedToken) {
-  //     await clearAuthAndRedirect();
-  //     return;
-  //   }
-  // } catch (e) {
-  //   console.log('AuthGuard: error decoding token:', e);
-  //   await clearAuthAndRedirect();
-  //   return;
-  // }
-
   if (isTokenExpired(token)) {
     showTokenExpirationModal();
-
-
     return abortNavigation('Token expired - please refresh your session')
-
-    // console.log('AuthGuard: Access token is expired, attempting refresh...');
-    // try {
-    //   const { refreshToken } = useAuth();
-    //   const refreshed = await refreshToken();
-    //   if (!refreshed) {
-    //     console.log('Failed to refresh access token, redirecting to login');
-    //     return navigateTo('/auth/login');
-    //   }
-    // } catch (e) {
-    //   console.error('Error refreshing token:', e);
-    //   return navigateTo('/auth/login');
-    // }
-
   }
 
   if (!checkAuth()) {
@@ -103,27 +75,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/auth/login');
   }
 
-  // let attempts = 0;
-  // let maxAttempts = 10;
-  //
-  // while (!user.value && attempts < maxAttempts) {
-  //   try {
-  //     await getCurrentUser();
-  //     attempts += 1;
-  //
-  //     if (!user.value && attempts < maxAttempts) {
-  //       console.log(`Attempt ${attempts}: User data not available yet, retrying...`);
-  //       await new Promise(resolve => setTimeout(resolve, 100)); // Wait for 1 second before retrying
-  //     }
-  //   } catch (e) {
-  //     console.log(`Error fetching user data on attempt ${attempts}:`, e);
-  //     if (attempts >= maxAttempts) {
-  //       console.error('Max attempts reached, redirecting to login');
-  //       await clearAuthAndRedirect();
-  //       return;
-  //     }
-  //   }
-  // }
 
   if (!user.value && isLoading.value) {
     try {
@@ -140,7 +91,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/auth/login');
   }
 
-  if (!canAccess(to.path)) {
-    return handledUnauthorized(to.path);
+  if (!canAccessRoute(to.path)) {
+    return redirectUnauthorized(to.path);
   }
 })
