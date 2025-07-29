@@ -207,10 +207,10 @@ export const usePermissionSystem = () => {
 
     const defaultRoutes: Record<string, string> = {
       'admin': '/admin',
+      'hq_it_checker': '/admin',
       'checker': '/checkers',
       'user': '/users'
     }
-
     return defaultRoutes[role || ''] || '/auth/login'
   }
 

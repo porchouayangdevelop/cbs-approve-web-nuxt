@@ -26,8 +26,13 @@ export type PermissionResource =
     | 'bulk'
 
 
+
 export type Permission = `${PermissionResource}:${PermissionAction}`
 
+export interface RouteRules {
+
+
+}
 export interface UserPermissions {
     roles: string[]
     permissions: Permission[]
@@ -37,4 +42,4 @@ export interface RouteAccess {
     roles?: string[]
     permissions?: Permission[]
     requireAll?: boolean
-  }
+}

@@ -21,6 +21,10 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return navigateTo('/auth/login');
   }
 
+  const accessRoute = canAccessRoute(to.path);
+  console.log(accessRoute);
+
+
   if (!canAccessRoute(to.path)) {
     const defaultRoute = getDefaultRoute();
     if (to.path !== defaultRoute) {

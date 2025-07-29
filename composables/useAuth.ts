@@ -80,38 +80,9 @@ export const useAuth = () => {
 
     initializationPromise.value = _performInitialization();
     try {
-      // isLoading.value = true;
-
-      // const token = useCookie("access_token").value;
-      // if (!token) {
-      //   console.warn('No access token found, user is not authenticated');
-      //   isAuthenticated.value = false;
-      //   return;
-      // }
-
-      // if (isTokenExpired(token)) {
-      //   console.warn('Access token is expired, trying to refresh...');
-      //   const refreshed = await refreshToken();
-      //   if (!refreshed) {
-      //     console.warn('Failed to refresh access token, user is not authenticated');
-      //     clearCookies();
-      //     isAuthenticated.value = false;
-      //     return;
-      //   }
-      // }
-      // await getCurrentUser();
       await initializationPromise.value;
-
     }
-    // catch (e) {
-    //   console.error(`Error during auth initialization: ${e}`);
-    //   clearCookies();
-    //   user.value = null;
-    //   isAuthenticated.value = false;
-    // }
     finally {
-      // isLoading.value = false;
-      // isInitialized.value = false;
       initializationPromise.value = null;
     }
   }
@@ -222,8 +193,10 @@ export const useAuth = () => {
       roles.push(...roleData);
 
       const mapRole: string[] = roles.map((role: Roles) => role.name);
+      console.log(mapRole);
 
-      const validRole = ['default-roles-apb_teller', 'admin', 'checker', 'user'];
+
+      const validRole = ['default-roles-apb_teller', 'admin', 'checker', 'user', 'hq_it_checker'];
       // const validRole = mapRole;
 
       if (!validRole.includes(userProfile.role.toLowerCase())) {
