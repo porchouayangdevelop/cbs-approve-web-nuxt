@@ -216,7 +216,10 @@ const paginatedRoleData = computed(() => {
   const endIndex = startIndex + itemsPerPage.value;
   const result = filteredRoleData.value.slice(startIndex, endIndex);
   console.log(
-    `Showing items ${startIndex + 1} to ${Math.min(endIndex, filteredRoleData.value.length)} of ${filteredRoleData.value.length}`
+    `Showing items ${startIndex + 1} to ${Math.min(
+      endIndex,
+      filteredRoleData.value.length
+    )} of ${filteredRoleData.value.length}`
   );
   return result;
 });
@@ -501,6 +504,13 @@ if (process.dev) {
             th: 'py-1 px-3',
           }"
         >
+          >
+          <template #index-cell="{ row }">
+            <div class="w-[.1rem]">{{ row.getValue("index") }}</div>
+          </template>
+          <template #index-header="{ header }">
+            <div class="w-1">{{ header.id }}</div>
+          </template>
           <template #description-cell="{ row }">
             {{
               row.getValue("description") ? row.getValue("description") : "N/A"
