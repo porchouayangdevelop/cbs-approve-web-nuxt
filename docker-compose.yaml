@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # Main application service
+  cbs-approve-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cbs-approve-web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=5000
+      - NUXT_TELEMETRY_DISABLED=1
+      # Add your runtime config variables here
+      - NUXT_PUBLIC_AUTH_URL=${NUXT_PUBLIC_AUTH_URL:-http://10.151.146.155:33236}
+      - NUXT_PUBLIC_API_URL=${NUXT_PUBLIC_API_URL:-http://10.151.146.155:33236}
+      - NUXT_PUBLIC_LOGIN=${NUXT_PUBLIC_LOGIN:-/realms/apb_teller/protocol/openid-connect/token}
+      - NUXT_PUBLIC_LOGOUT=${NUXT_PUBLIC_LOGOUT:-/realms/apb_teller/protocol/openid-connect/logout}
+      - NUXT_PUBLIC_REFRESH_TOKEN=${NUXT_PUBLIC_REFRESH_TOKEN:-/realms/apb_teller/protocol/openid-connect/token}
+      - NUXT_PUBLIC_CHECK_TOKEN=${NUXT_PUBLIC_CHECK_TOKEN:-/realms/apb_teller/protocol/openid-connect/userinfo}
+      - NUXT_PUBLIC_ROLE_LIST=${NUXT_PUBLIC_ROLE_LIST:-/admin/realms/apb_teller/roles}
+      - NUXT_PUBLIC_GET_USERS=${NUXT_PUBLIC_GET_USERS:-/admin/realms/apb_teller/users}
+      - NUXT_PUBLIC_DELETE_USER=${NUXT_PUBLIC_DELETE_USER:-/admin/realms/apb_teller/users}
+      - NUXT_PUBLIC_EDIT_USER=${NUXT_PUBLIC_EDIT_USER:-/admin/realms/apb_teller/users}
+      - NUXT_PUBLIC_WEB_TITLE=${NUXT_PUBLIC_WEB_TITLE:-CBS Approve Web}
+      - NUXT_PUBLIC_WEB_DESCRIPTION=${NUXT_PUBLIC_WEB_DESCRIPTION:-Complete approval management system}
+      - NUXT_PUBLIC_OG_IMAGE=${NUXT_PUBLIC_OG_IMAGE:-/images/og-image.png}
+      - NUXT_PUBLIC_OG_TYPE=${NUXT_PUBLIC_OG_TYPE:-website}
+      - NUXT_PUBLIC_OG_URL=${NUXT_PUBLIC_OG_URL:-https://your-domain.com}
+    volumes:
+      # Mount logs directory for persistent logging
+      - ./logs:/app/logs
+    networks:
+      - cbs-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cbs-app.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.cbs-app.tls=true"
+      - "traefik.http.routers.cbs-app.tls.certresolver=letsencrypt"
+
+  # Redis for session storage and caching (optional but recommended)
+  redis:
+    image: redis:7-alpine
+    container_name: cbs-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-defaultpassword}
+    networks:
+      - cbs-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Nginx reverse proxy (optional, for production with SSL)
+  nginx:
+    image: nginx:alpine
+    container_name: cbs-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl/certs:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - cbs-approve-web
+    networks:
+      - cbs-network
+    profiles:
+      - production
+
+networks:
+  cbs-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local
+  nginx_logs:
+    driver: local

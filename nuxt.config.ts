@@ -176,7 +176,7 @@ export default defineNuxtConfig({
     experimental: {
       wasm: true,
     },
-    preset: "node-server", 
+    // preset: "node-server", 
     
   },
   alias: {}
