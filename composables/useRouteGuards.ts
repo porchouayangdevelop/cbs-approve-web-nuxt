@@ -25,6 +25,7 @@ export const useRouteGuards = () => {
       query: {
         route: routePath,
         reason: reason || `Insufficient permissions to access ${routePath}`
+
       }
     })
   }

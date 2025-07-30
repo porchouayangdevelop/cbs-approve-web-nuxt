@@ -303,20 +303,20 @@ const navigationSections = ref<NavigationSection[]>([
   },
   // User Management Section
   {
-    title: "Users Management",
+    title: "ຂໍ້ມູນຜູ້ໃຊ້ລະບົບ",
     items: [
       {
-        label: "All Users",
+        label: "ຜູ້ໃຊ້ທັງໝົດ",
         to: "/admin/users",
         icon: "i-heroicons-users",
       },
       {
-        label: "User Management",
+        label: "ຈັດຂໍ້ມູນຜູ້ໃຊ້ລະບົບ",
         icon: "i-heroicons-user-group",
         expanded: false,
         children: [
           {
-            label: "Create User",
+            label: "ເພີ່ມຜູ້ໃຊ້",
             to: "/admin/users/create",
             icon: "i-heroicons-user-plus",
           },
@@ -340,6 +340,16 @@ const navigationSections = ref<NavigationSection[]>([
             to: "/admin/users/pending",
             icon: "i-heroicons-clock",
           },
+          {
+            label:'Approved User',
+            to:'/admin/users/approved',
+            icon:'i-heroicons-cursor-arrow-ripple'
+          },
+          {
+            label:'History',
+            to:'/admin/users/history',
+            icon:'i-heroicons-beaker'
+          }
         ],
       },
       {
@@ -376,34 +386,34 @@ const navigationSections = ref<NavigationSection[]>([
   {
     title: "Workflow",
     items: [
-      {
-        label: "Checker Operations",
-        icon: "i-heroicons-clipboard-document-check",
-        expanded: false,
-        children: [
-          {
-            label: "Checkers",
-            to: "/admin/checkers",
-            icon: "i-heroicons-clipboard-document-check",
-          },
+      // {
+      //   label: "Checker Operations",
+      //   icon: "i-heroicons-clipboard-document-check",
+      //   expanded: false,
+      //   children: [
+      //     {
+      //       label: "Checkers",
+      //       to: "/admin/checkers",
+      //       icon: "i-heroicons-clipboard-document-check",
+      //     },
 
-          {
-            label: "Checker Assignments",
-            to: "/admin/checkers/assignments",
-            icon: "i-heroicons-user-group",
-          },
-          {
-            label: "Active Checkers",
-            to: "/admin/checkers/active",
-            icon: "i-heroicons-check-circle",
-          },
-          {
-            label: "Checker Performance",
-            to: "/admin/checkers/performance",
-            icon: "i-heroicons-chart-bar",
-          },
-        ],
-      },
+      //     {
+      //       label: "Checker Assignments",
+      //       to: "/admin/checkers/assignments",
+      //       icon: "i-heroicons-user-group",
+      //     },
+      //     {
+      //       label: "Active Checkers",
+      //       to: "/admin/checkers/active",
+      //       icon: "i-heroicons-check-circle",
+      //     },
+      //     {
+      //       label: "Checker Performance",
+      //       to: "/admin/checkers/performance",
+      //       icon: "i-heroicons-chart-bar",
+      //     },
+      //   ],
+      // },
       {
         label: "Approval Workflows",
         icon: "i-heroicons-arrow-path",

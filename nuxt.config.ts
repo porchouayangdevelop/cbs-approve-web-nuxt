@@ -69,17 +69,46 @@ export default defineNuxtConfig({
     '~/plugins/token-monitoring.client.ts'
   ],
   modules: [// '@nuxt/content',
-    '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', '@nuxtjs/color-mode',
-    // '@nuxtjs/i18n'
-  ],
+    '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', // '@nuxtjs/i18n'
+    '@nuxtjs/color-mode', '@nuxtjs/google-fonts'],
   lucide: {
     namePrefix: 'Icon'
   },
-  css: ['~/assets/css/main.css',
+  css: ['~/assets/css/main.css', '~/assets/css/google-fonts.css'
     // '~/assets/css/variables.css', '~/assets/css/typography.css', '~/assets/css/scrollbar.css'
   ],
   colorMode: {
     classSuffix: ''
+  },
+
+  fonts: {
+    defaults: {
+      weights: [400],
+      styles: ['normal', 'italic'],
+      subsets: [
+
+      ]
+    }
+  },
+
+  googleFonts: {
+    download: false,
+    base64: true,
+    outputDir: 'assets',
+    overwriting: true,
+    inject: false,
+    preload: true,
+    stylePath: 'css/google-fonts.css',
+    fontsDir: 'assets/fonts',
+    fontsPath: 'fonts',
+    families: {
+      Roboto: true,
+      'Noto Sans Lao': {
+        wght: '100..400',
+        regular: '400',
+      },
+      'Ubuntu': true,
+    }
   },
 
   ui: {
@@ -146,7 +175,9 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       wasm: true,
-    }
+    },
+    preset: "node-server", 
+    
   },
   alias: {}
 })

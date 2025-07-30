@@ -207,6 +207,7 @@ export const usePermissionSystem = () => {
 
     const defaultRoutes: Record<string, string> = {
       'admin': '/admin',
+      'default-roles-apb_teller': '/admin',
       'hq_it_checker': '/admin',
       'checker': '/checkers',
       'user': '/users'
