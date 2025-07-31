@@ -149,7 +149,8 @@ const requestColumns = computed((): TableColumn<RequestItem>[] => [
   {
     accessorKey: "action",
     id: "Action",
-    header: ({ column }) => h('div',getHeader(column, 'Action', 'right')),
+    header: ({ column }) =>
+      h("div", { class: "text-right" }, getHeader(column, "Action", "right")),
     // cell: ({ row }) => `${row.getValue("createdBy")}`,
   },
 ]);
@@ -214,14 +215,25 @@ const viewRequest = (id: string) => {
         >
           <template #Open="{ item }">
             <RequestUtableRequest :data="requestData" :columns="requestColumns">
+              <template #id-header="{ header }">
+                <div class="w-1">{{ header.id }}</div>
+              </template>
+              <template #id-cell="{ row }">
+                <div class="w-1">{{ row.getValue("id") }}</div>
+              </template>
+              <template #action-header="{ header }">
+                <div class="text-right"></div>
+              </template>
               <template #action-cell="{ row }">
-                <UButton
-                  icon="i-lucide-eye"
-                  variant="subtle"
-                  size="sm"
-                  class="cursor-pointer"
-                  @click="viewRequest(row.getValue('id'))"
-                />
+                <div class="flex justify-end">
+                  <UButton
+                    icon="i-lucide-eye"
+                    variant="ghost"
+                    size="sm"
+                    class="cursor-pointer"
+                    @click="viewRequest(row.getValue('id'))"
+                  />
+                </div>
               </template>
             </RequestUtableRequest>
           </template>
