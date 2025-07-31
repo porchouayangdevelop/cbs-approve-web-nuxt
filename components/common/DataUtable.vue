@@ -92,7 +92,7 @@
               <USelectMenu
                 v-if="filter.type === 'select'"
                 v-model="filterValues[filter.key]"
-                :options="filter.options"
+                :items="filter.options"
                 :placeholder="filter.placeholder"
                 class="w-48"
                 @update:model-value="handleFilterChange"
@@ -123,7 +123,7 @@
         <div class="overflow-x-auto">
           <UTable
             :columns="processedColumns"
-            :data="paginatedData"
+            :data="displayedData"
             :loading="loading"
             v-model:column-pinning="columnPinning"
             ref="tableRef"
@@ -235,7 +235,7 @@
               <span class="text-sm text-gray-600 dark:text-gray-400">Show:</span>
               <USelectMenu
                 v-model="currentItemsPerPage"
-                :options="itemsPerPageOptions"
+                :items="itemsPerPageOptions"
                 size="sm"
                 class="w-20"
                 @update:model-value="handleItemsPerPageChange"
@@ -315,7 +315,7 @@ import type { TableColumn, DropdownMenuItem } from "@nuxt/ui";
 interface ColumnConfig {
   accessorKey: string;
   header: string | ((column: any) => any);
-  cellType?: "text" | "badge" | "avatar" | "date" | "actions";
+  cellType?: "text" | "badge" | "avatar" | "date" | "actions" | "custom";
   colorMap?: Record<string, string>;
   subField?: string;
   sortable?: boolean;
@@ -418,7 +418,7 @@ const props = withDefaults(defineProps<Props>(), {
 
   tableUi: () => ({
     th: "py-2 px-3",
-    td: "py-2 px-3 border-b border-gray-200 dark:border-gray-700",
+    td: "py-[.1rem] px-3 border-b border-gray-200 dark:border-gray-700",
   }),
 });
 
@@ -514,8 +514,30 @@ const filteredData = computed(() => {
       const aValue = a[sortConfig.value!.key];
       const bValue = b[sortConfig.value!.key];
       
-      if (aValue < bValue) return sortConfig.value!.direction === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortConfig.value!.direction === "asc" ? 1 : -1;
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return sortConfig.value!.direction === "asc" ? 1 : -1;
+      if (bValue == null) return sortConfig.value!.direction === "asc" ? -1 : 1;
+      
+      // Handle dates
+      if (sortConfig.value!.key.includes('date') || sortConfig.value!.key.includes('time') || sortConfig.value!.key.includes('At')) {
+        const dateA = new Date(aValue).getTime();
+        const dateB = new Date(bValue).getTime();
+        if (!isNaN(dateA) && !isNaN(dateB)) {
+          return sortConfig.value!.direction === "asc" ? dateA - dateB : dateB - dateA;
+        }
+      }
+      
+      // Handle numbers
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortConfig.value!.direction === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      
+      // Handle strings
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+      if (aStr < bStr) return sortConfig.value!.direction === "asc" ? -1 : 1;
+      if (aStr > bStr) return sortConfig.value!.direction === "asc" ? 1 : -1;
       return 0;
     });
   }
@@ -536,9 +558,18 @@ const endItem = computed(() => {
   return Math.min(end, totalItems.value);
 });
 
-const paginatedData = computed(() => {
+// This is the key fix - make sure we're using this for the table data
+const displayedData = computed(() => {
   const startIndex = (currentPage.value - 1) * currentItemsPerPage.value;
   const endIndex = startIndex + currentItemsPerPage.value;
+  console.log('Pagination Debug:', {
+    currentPage: currentPage.value,
+    itemsPerPage: currentItemsPerPage.value,
+    startIndex,
+    endIndex,
+    totalFiltered: filteredData.value.length,
+    displayedCount: filteredData.value.slice(startIndex, endIndex).length
+  });
   return filteredData.value.slice(startIndex, endIndex);
 });
 
@@ -618,11 +649,13 @@ const handleSort = (column: any) => {
 };
 
 const handlePageChange = (page: number) => {
+  console.log('Page change requested:', page);
   currentPage.value = page;
   emit("update:currentPage", page);
 };
 
 const handleItemsPerPageChange = (value: number) => {
+  console.log('Items per page change:', value);
   currentItemsPerPage.value = value;
   currentPage.value = 1; // Reset to first page
   emit("update:itemsPerPage", value);
@@ -651,7 +684,7 @@ const handleExport = () => {
   emit("export", dataToExport);
 };
 
-// Watch for changes to reset pagination
+// Watch for changes to reset pagination when filters change
 watch([globalFilter, filterValues], () => {
   if (currentPage.value > totalPages.value && totalPages.value > 0) {
     currentPage.value = totalPages.value;
@@ -661,5 +694,14 @@ watch([globalFilter, filterValues], () => {
 // Watch for external itemsPerPage changes
 watch(() => props.itemsPerPage, (newValue) => {
   currentItemsPerPage.value = newValue;
+});
+
+// Debug watchers
+watch(currentPage, (newPage) => {
+  console.log('Current page changed to:', newPage);
+});
+
+watch(displayedData, (newData) => {
+  console.log('Displayed data changed, count:', newData.length);
 });
 </script>

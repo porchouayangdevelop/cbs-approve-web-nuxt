@@ -331,22 +331,22 @@ const navigationSections = ref<NavigationSection[]>([
             icon: "i-heroicons-check-circle",
           },
           {
-            label: "Inactive Users",
+            label: "InActive Users",
             to: "/admin/users/inactive",
             icon: "i-heroicons-x-circle",
           },
           {
-            label: "Pending Approval",
+            label: "ກຳລັງລໍຖ້າອະນຸມັດ",
             to: "/admin/users/pending",
             icon: "i-heroicons-clock",
           },
           {
-            label:'Approved User',
+            label:'ອະນຸມັດແລ້ວ',
             to:'/admin/users/approved',
             icon:'i-heroicons-cursor-arrow-ripple'
           },
           {
-            label:'History',
+            label:'ປະຫວັດຜູ້ໃຊ້ລະບົບ',
             to:'/admin/users/history',
             icon:'i-heroicons-beaker'
           }

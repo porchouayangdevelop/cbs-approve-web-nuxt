@@ -2,12 +2,7 @@
   <div class="p-6 space-y-6">
     <!-- Basic Usage Example -->
     <div>
-      <USelectMenu>
-
-      </USelectMenu>
-
-      <h2 class="text-xl font-semibold mb-4">Basic Usage</h2>
-      <UTable
+      <DataUtable
         title="Users Management"
         description="Manage system users and their permissions"
         :data="users"
@@ -18,11 +13,10 @@
         :row-actions="getUserRowActions"
         item-name="users"
         search-placeholder="Search users by name or email..."
-        :search-keys="['firstName', 'lastName', 'email', 'username']"
+        :search-keys="['firstName', 'lastName', 'email', 'username', 'status']"
         empty-title="No users found"
         empty-description="Get started by creating your first user"
         create-button-text="Add User"
-        
         @create="handleCreateUser"
         @refresh="handleRefreshUsers"
         @export="handleExportUsers"
@@ -34,27 +28,26 @@
         @update:currentPage="handlePageChange"
       >
         <!-- Custom cell templates -->
-        <template #firstName-cell="{ row,column,getValue,renderValue,cell }">
-          <div class="flex items-center space-x-3">
-            <UAvatar
+        <template #firstName-cell="{ row }">
+          <div class="">
+            <!-- <UAvatar
               :alt="`${row.original.firstName} ${row.original.lastName}`"
               size="sm"
               :src="generateAvatarUrl(row.original)"
-            />
-            <div>
-              <p class="font-medium text-gray-900 dark:text-white">
-                {{ row.original.firstName }} {{ row.original.lastName }}
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">
+            /> -->
+            <p class="font-medium text-gray-900 dark:text-white">
+              {{ row.original.firstName }} {{ row.original.lastName }}
+            </p>
+            <!-- <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ row.original.email }}
-              </p>
-            </div>
+              </p> -->
+            <div></div>
           </div>
         </template>
 
-        <template #username-cell="{ cell }">
-          <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm">
-            {{ cell.id }}
+        <template #username-cell="{ value }">
+          <code class=" bg-gray-100 dark:bg-gray-800 rounded text-sm">
+            {{ value }}
           </code>
         </template>
 
@@ -70,120 +63,13 @@
             {{ formatTimeAgo(value) }}
           </span>
         </template>
-
-        
-      </UTable>
-    </div>
-
-    <!-- Advanced Usage Example -->
-    <div>
-      <h2 class="text-xl font-semibold mb-4">Advanced Usage with Selection</h2>
-      <UTable
-        title="Products Inventory"
-        :data="products"
-        :columns="productColumns"
-        :loading="productsLoading"
-        :filters="productFilters"
-        :row-actions="getProductRowActions"
-        selectable
-        :selected-rows="selectedProducts"
-        selection-key="id"
-        show-export
-        :export-config="productExportConfig"
-        @update:selectedRows="handleProductSelection"
-        @row-click="handleProductClick"
-        @row-dblclick="handleProductDoubleClick"
-      >
-        <!-- Custom header for selection column -->
-        <template #selection-header>
-          <UCheckbox
-            :model-value="isAllSelected"
-            :indeterminate="isPartiallySelected"
-            @update:model-value="toggleSelectAll"
-          />
-        </template>
-
-        <!-- Custom selection cell -->
-        <template #selection-cell="{ row }">
-          <UCheckbox
-            :model-value="isRowSelected(row.original)"
-            @update:model-value="toggleRowSelection(row.original)"
-          />
-        </template>
-
-        <!-- Custom price cell with formatting -->
-        <template #price-cell="{ value }">
-          <span class="font-mono"> ${{ value }} </span>
-        </template>
-
-        <!-- Custom stock cell with status indicator -->
-        <template #stock-cell="{ value, row }">
-          <div class="flex items-center space-x-2">
-            <div
-              :class="['w-2 h-2 rounded-full', getStockStatusColor(value)]"
-            />
-            <span>{{ value }}</span>
-            <span class="text-xs text-gray-500">
-              {{ getStockStatus(value) }}
-            </span>
-          </div>
-        </template>
-      </UTable>
-    </div>
-
-    <!-- Bulk Actions for Selected Items -->
-    <div v-if="selectedProducts.length > 0" class="fixed bottom-4 right-4">
-      <UCard class="shadow-lg">
-        <div class="flex items-center space-x-4">
-          <span class="text-sm font-medium">
-            {{ selectedProducts.length }} selected
-          </span>
-          <div class="flex space-x-2">
-            <UButton
-              size="sm"
-              variant="outline"
-              icon="i-heroicons-pencil-square"
-              @click="handleBulkEdit"
-            >
-              Edit
-            </UButton>
-            <UButton
-              size="sm"
-              variant="outline"
-              icon="i-heroicons-archive-box"
-              @click="handleBulkArchive"
-            >
-              Archive
-            </UButton>
-            <UButton
-              size="sm"
-              variant="outline"
-              color="error"
-              icon="i-heroicons-trash"
-              @click="handleBulkDelete"
-            >
-              Delete
-            </UButton>
-          </div>
-        </div>
-      </UCard>
+      </DataUtable>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { pagination } from "#build/ui";
-import type {
-  UTableColumn,
-  UTableFilter,
-  UTableSort,
-  UTableExportConfig,
-} from "~/types/utable";
-import {
-  UTableColumnTypes,
-  UTableFilterTypes,
-  UTableUtils,
-} from "~/types/utable";
+import DataUtable from "~/components/common/DataUtable.vue";
 
 definePageMeta({
   layout: "admin-session",
@@ -225,96 +111,379 @@ const users = ref([
     lastLogin: null,
     createdAt: "2024-01-01T12:00:00Z",
   },
-   {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  }, {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  }, {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  }, {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  }, {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  }, {
-    id: 3,
-    firstName: "Bob",
-    lastName: "Johnson",
-    username: "bob.johnson",
-    email: "bob.johnson@example.com",
-    status: "pending",
-    role: "manager",
-    lastLogin: null,
-    createdAt: "2024-01-01T12:00:00Z",
-  },
-]);
-
-const products = ref([
   {
-    id: 1,
-    name: "Wireless Headphones",
-    sku: "WH001",
-    price: 99.99,
-    stock: 150,
-    category: "Electronics",
+    id: 4,
+    firstName: "Alice",
+    lastName: "Wilson",
+    username: "alice.wilson",
+    email: "alice.wilson@example.com",
     status: "active",
+    role: "user",
+    lastLogin: "2024-01-20T08:15:00Z",
+    createdAt: "2023-03-10T14:30:00Z",
   },
   {
-    id: 2,
-    name: "Smart Watch",
-    sku: "SW002",
-    price: 299.99,
-    stock: 5, // Low stock
-    category: "Electronics",
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
     status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
   },
   {
-    id: 3,
-    name: "Coffee Maker",
-    sku: "CM003",
-    price: 149.99,
-    stock: 0, // Out of stock
-    category: "Appliances",
-    status: "inactive",
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
+  },
+  {
+    id: 5,
+    firstName: "Charlie",
+    lastName: "Brown",
+    username: "charlie.brown",
+    email: "charlie.brown@example.com",
+    status: "active",
+    role: "manager",
+    lastLogin: "2024-01-18T16:45:00Z",
+    createdAt: "2023-04-05T11:20:00Z",
   },
 ]);
 
@@ -322,112 +491,95 @@ const products = ref([
 const loading = ref(false);
 const error = ref<string | null>(null);
 const productsLoading = ref(false);
-const selectedProducts = ref<any[]>([]);
 
 // User table configuration
-const userColumns: UTableColumn[] = [
-  UTableColumnTypes.index(),
+const userColumns = [
+  {
+    accessorKey: "id",
+    header: "ID",
+    cellType: "text",
+    sortable: true,
+  },
   {
     accessorKey: "firstName",
     header: "Name",
     cellType: "custom", // We'll use custom template
     sortable: true,
   },
-  UTableColumnTypes.text("username", "Username"),
+  {
+    accessorKey: "username",
+    header: "Username",
+    cellType: "custom",
+    sortable: true,
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cellType: "custom",
+    sortable: true,
+  },
   {
     accessorKey: "status",
     header: "Status",
     cellType: "custom", // Custom template for better styling
     sortable: true,
   },
-  UTableColumnTypes.text("role", "Role"),
+  {
+    accessorKey: "role",
+    header: "Role",
+    cellType: "text",
+    sortable: true,
+  },
   {
     accessorKey: "lastLogin",
     header: "Last Login",
     cellType: "custom", // Custom template for time ago
     sortable: true,
   },
-  UTableColumnTypes.actions(),
-];
-
-const userFilters: UTableFilter[] = [
-  UTableFilterTypes.status("status", ["active", "inactive", "pending"]),
-  UTableFilterTypes.role("role", ["admin", "manager", "user"]),
-];
-
-// Product table configuration
-const productColumns: UTableColumn[] = [
   {
-    accessorKey: "selection",
-    header: "",
-    cellType: "custom",
+    accessorKey: "actions",
+    header: "Actions",
+    cellType: "actions",
     sortable: false,
-    width: "50px",
   },
-  UTableColumnTypes.text("name", "Product Name"),
-  UTableColumnTypes.text("sku", "SKU"),
-  {
-    accessorKey: "price",
-    header: "Price",
-    cellType: "custom",
-    sortable: true,
-  },
-  {
-    accessorKey: "stock",
-    header: "Stock",
-    cellType: "custom",
-    sortable: true,
-  },
-  UTableColumnTypes.text("category", "Category"),
-  UTableColumnTypes.status("status", "Status"),
-  UTableColumnTypes.actions(),
 ];
 
-const productFilters: UTableFilter[] = [
+const userFilters = [
   {
-    key: "category",
+    key: "status",
     type: "select",
-    placeholder: "Filter by category",
+    placeholder: "Filter by status",
     options: [
-      { label: "All Categories", value: "" },
-      { label: "Electronics", value: "Electronics" },
-      { label: "Appliances", value: "Appliances" },
+      { label: "All Status", value: "all" },
+      { label: "Active", value: "active" },
+      { label: "Inactive", value: "inactive" },
+      { label: "Pending", value: "pending" },
     ],
   },
-  UTableFilterTypes.status("status"),
+  {
+    key: "role",
+    type: "select",
+    placeholder: "Filter by role",
+    options: [
+      { label: "All Roles", value: "all" },
+      { label: "Admin", value: "admin" },
+      { label: "Manager", value: "manager" },
+      { label: "User", value: "user" },
+    ],
+  },
 ];
-
-const productExportConfig: UTableExportConfig = {
-  format: "csv",
-  filename: "products-export.csv",
-  columns: ["name", "sku", "price", "stock", "category", "status"],
-};
-
-// Computed properties for selection
-const isAllSelected = computed(() => {
-  return (
-    products.value.length > 0 &&
-    selectedProducts.value.length === products.value.length
-  );
-});
-
-const isPartiallySelected = computed(() => {
-  return (
-    selectedProducts.value.length > 0 &&
-    selectedProducts.value.length < products.value.length
-  );
-});
 
 // Methods
 const generateAvatarUrl = (user: any) => {
-  return UTableUtils.generateAvatarUrl(`${user.firstName} ${user.lastName}`);
+  const name = `${user.firstName} ${user.lastName}`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`;
 };
 
 const getStatusColor = (status: string) => {
   const colors = {
-    active: "green",
-    inactive: "red",
-    pending: "yellow",
+    active: "success",
+    inactive: "error",
+    pending: "info",
   };
   return colors[status as keyof typeof colors] || "gray";
 };
@@ -444,11 +596,29 @@ const getStatusIcon = (status: string) => {
 };
 
 const formatDate = (date: string | null) => {
-  return UTableUtils.formatDate(date || new Date());
+  if (!date) return "Never";
+  try {
+    return new Date(date).toLocaleDateString();
+  } catch {
+    return "Invalid Date";
+  }
 };
 
 const formatTimeAgo = (date: string | null) => {
-  return UTableUtils.formatTimeAgo(date || new Date());
+  if (!date) return "Never";
+  try {
+    const now = new Date();
+    const past = new Date(date);
+    const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+  } catch {
+    return "Invalid Date";
+  }
 };
 
 const getStockStatusColor = (stock: number) => {
@@ -463,70 +633,81 @@ const getStockStatus = (stock: number) => {
   return "In Stock";
 };
 
-const isRowSelected = (row: any) => {
-  return selectedProducts.value.some((p) => p.id === row.id);
-};
-
-const toggleRowSelection = (row: any) => {
-  const index = selectedProducts.value.findIndex((p) => p.id === row.id);
-  if (index > -1) {
-    selectedProducts.value.splice(index, 1);
-  } else {
-    selectedProducts.value.push(row);
-  }
-};
-
-const toggleSelectAll = () => {
-  if (isAllSelected.value) {
-    selectedProducts.value = [];
-  } else {
-    selectedProducts.value = [...products.value];
-  }
-};
-
 // Event handlers
-const getUserRowActions = UTableUtils.defaultRowActions(
-  (row) => console.log("View user:", row),
-  (row) => console.log("Edit user:", row),
-  (row) => console.log("Delete user:", row)
-);
+const getUserRowActions = (row: any, index: number) => [
+  [
+    {
+      label: "View Details",
+      icon: "i-heroicons-eye",
+      click: () => console.log("View user:", row),
+    },
+  ],
+  [
+    {
+      label: "Edit User",
+      icon: "i-heroicons-pencil-square",
+      click: () => console.log("Edit user:", row),
+    },
+    {
+      label: "Reset Password",
+      icon: "i-heroicons-key",
+      click: () => console.log("Reset password:", row),
+    },
+  ],
+  [
+    {
+      label: "Disable User",
+      icon: "i-heroicons-no-symbol",
+      click: () => console.log("Disable user:", row),
+    },
+    {
+      label: "Delete User",
+      icon: "i-heroicons-trash",
+      click: () => console.log("Delete user:", row),
+    },
+  ],
+];
 
 const getProductRowActions = (row: any, index: number) => [
   [
     {
       label: "View Details",
       icon: "i-heroicons-eye",
-      click: () => handleProductView(row),
+      click: () => console.log("View product:", row),
     },
   ],
   [
     {
       label: "Edit Product",
       icon: "i-heroicons-pencil-square",
-      click: () => handleProductEdit(row),
+      click: () => console.log("Edit product:", row),
     },
     {
       label: "Duplicate",
       icon: "i-heroicons-document-duplicate",
-      click: () => handleProductDuplicate(row),
+      click: () => console.log("Duplicate product:", row),
     },
   ],
   [
     {
       label: "Archive",
       icon: "i-heroicons-archive-box",
-      click: () => handleProductArchive(row),
+      click: () => console.log("Archive product:", row),
     },
     {
       label: "Delete",
       icon: "i-heroicons-trash",
-      click: () => handleProductDelete(row),
+      click: () => console.log("Delete product:", row),
     },
   ],
 ];
 
 const handleCreateUser = () => {
   console.log("Create user clicked");
+};
+
+const handleCreateProduct = () => {
+  console.log("Create product clicked");
 };
 
 const handleRefreshUsers = () => {
@@ -537,12 +718,30 @@ const handleRefreshUsers = () => {
   }, 1000);
 };
 
+const handleRefreshProducts = () => {
+  productsLoading.value = true;
+  setTimeout(() => {
+    productsLoading.value = false;
+    console.log("Products refreshed");
+  }, 1000);
+};
+
 const handleExportUsers = (data: any[]) => {
-  UTableUtils.exportAsCSV(data, "users-export.csv");
+  console.log("Export users:", data);
+  // Implement CSV export logic here
+};
+
+const handleExportProducts = (data: any[]) => {
+  console.log("Export products:", data);
+  // Implement CSV export logic here
 };
 
 const handleUserAction = (action: string, row: any, index: number) => {
   console.log("User action:", action, row, index);
+};
+
+const handleProductAction = (action: string, row: any, index: number) => {
+  console.log("Product action:", action, row, index);
 };
 
 const handleSearchChange = (query: string) => {
@@ -553,7 +752,7 @@ const handleFiltersChange = (filters: Record<string, any>) => {
   console.log("Filters changed:", filters);
 };
 
-const handleSortChange = (sort: UTableSort | null) => {
+const handleSortChange = (sort: any) => {
   console.log("Sort changed:", sort);
 };
 
@@ -563,50 +762,5 @@ const handleItemsPerPageChange = (value: number) => {
 
 const handlePageChange = (page: number) => {
   console.log("Page changed:", page);
-};
-
-const handleProductSelection = (rows: any[]) => {
-  selectedProducts.value = rows;
-};
-
-const handleProductClick = (row: any, index: number) => {
-  console.log("Product clicked:", row);
-};
-
-const handleProductDoubleClick = (row: any, index: number) => {
-  console.log("Product double clicked:", row);
-  handleProductView(row);
-};
-
-const handleProductView = (product: any) => {
-  console.log("View product:", product);
-};
-
-const handleProductEdit = (product: any) => {
-  console.log("Edit product:", product);
-};
-
-const handleProductDuplicate = (product: any) => {
-  console.log("Duplicate product:", product);
-};
-
-const handleProductArchive = (product: any) => {
-  console.log("Archive product:", product);
-};
-
-const handleProductDelete = (product: any) => {
-  console.log("Delete product:", product);
-};
-
-const handleBulkEdit = () => {
-  console.log("Bulk edit:", selectedProducts.value);
-};
-
-const handleBulkArchive = () => {
-  console.log("Bulk archive:", selectedProducts.value);
-};
-
-const handleBulkDelete = () => {
-  console.log("Bulk delete:", selectedProducts.value);
 };
 </script>
