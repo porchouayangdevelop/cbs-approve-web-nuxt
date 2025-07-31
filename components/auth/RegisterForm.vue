@@ -115,9 +115,12 @@
         <div class="grid grid-cols-2 gap-1">
           <u-form-field label="BranchCode" name="branchCode" required>
             <u-select-menu
+              v-model="registerForm.branchCode"
               :placeholder="branchCodePlacehloder || 'select your branchcode'"
               class="w-full"
-              v-model="registerForm.branchCode"
+              @update:model-value="
+                handleChangeBranchCode(registerForm.branchCode)
+              "
             >
             </u-select-menu>
           </u-form-field>
@@ -322,8 +325,9 @@
 
 <script setup lang="ts">
 import { z } from "zod";
+import type { BranchCodeItems, SubBranchCodeItems } from "~/types/index";
 
-// Props
+// props
 interface Props {
   title?: string;
   subtitle?: string;
@@ -341,11 +345,17 @@ interface Props {
   loadingText?: string;
   showLoginLink?: boolean;
   showHelpLinks?: boolean;
+
+  branchCodeItems?: BranchCodeItems[];
+  subBranchCodeItems?: SubBranchCodeItems[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showLoginLink: true,
   showHelpLinks: true,
+
+  branchCodeItems: () => [],
+  subBranchCodeItems: () => [],
 });
 
 // Emits
@@ -356,6 +366,7 @@ const emit = defineEmits<{
   contact: [];
   "view-terms": [];
   "view-privacy": [];
+  "update:changeItem": [value: string];
 }>();
 
 // Types
@@ -449,6 +460,21 @@ const passwordStrength = computed(() => {
     label: labels[score] || "Very weak",
   };
 });
+
+const handleChangeBranchCode = (brancCode: string) => {
+  try {
+    if (!brancCode) {
+      errorMessage.value = "BranchCode is empty";
+    }
+    emit("update:changeItem", brancCode);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      errorMessage.value = error.errors[0].message;
+    } else {
+      errorMessage.value = "There was an error" + error;
+    }
+  }
+};
 
 // Methods
 const handleRegister = async () => {

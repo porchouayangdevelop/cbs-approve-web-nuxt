@@ -1,128 +1,136 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2025-05-15',
+  compatibilityDate: "2025-05-15",
   devtools: { enabled: false },
   ssr: false,
 
   imports: {
-    autoImport: true
+    autoImport: true,
   },
 
   $production: {
     routeRules: {
-      '/**': { isr: true }
-    }
+      "/**": { isr: true },
+    },
   },
   // $development: {},
   // $env: {},
 
   app: {
     head: {
-      titleTemplate: 'CBS Approve Web- %s',
+      titleTemplate: "CBS Approve Web- %s",
       link: [
         {
-          rel: 'icon',
-          href: '/images.jpg'
-        }
-      ]
+          rel: "icon",
+          href: "/images.jpg",
+        },
+      ],
     },
   },
 
   // Add router configuration
-  router: {
-
-  },
+  router: {},
   experimental: {
     payloadExtraction: false,
-
   },
   devServer: {
     port: 5000,
   },
 
   runtimeConfig: {
-
     public: {
-      auth_url: '',
-      api_url: '',
-      login: '',
-      logout: '',
-      refresh_token: '',
-      check_token: '',
-      role_list: '',
-      get_users: '',
-      delete_user: '',
-      edit_user: '',
-      webTitle: '',
-      webDescription: '',
-      ogImage: '',
-      ogType: 'website',
-      ogUrl: ''
+      auth_url: "",
+      api_url: "",
+      branch_url: "",
+      login: "",
+      logout: "",
+      refresh_token: "",
+      check_token: "",
+      role_list: "",
+      get_users: "",
+      delete_user: "",
+      edit_user: "",
+      webTitle: "",
+      webDescription: "",
+      ogImage: "",
+      ogType: "website",
+      ogUrl: "",
     },
-
   },
   plugins: [
-    '~/plugins/axios.ts',
-    '~/plugins/error-handler.ts',
-    '~/plugins/network-error.ts',
-    '~/plugins/auth-init.ts',
-    '~/plugins/token-monitoring.client.ts'
+    "~/plugins/axios.ts",
+    "~/plugins/error-handler.ts",
+    "~/plugins/network-error.ts",
+    "~/plugins/auth-init.ts",
+    "~/plugins/token-monitoring.client.ts",
   ],
-  modules: [// '@nuxt/content',
-    '@nuxt/fonts', '@nuxt/icon', '@nuxt/image', '@nuxt/scripts', '@nuxt/test-utils', '@nuxt/ui', '@pinia/nuxt', '@vueuse/nuxt', 'nuxt-swiper', 'nuxt-lucide-icons', // '@nuxtjs/i18n'
-    '@nuxtjs/color-mode', '@nuxtjs/google-fonts'],
+  modules: [
+    // '@nuxt/content',
+    "@nuxt/fonts",
+    "@nuxt/icon",
+    "@nuxt/image",
+    "@nuxt/scripts",
+    "@nuxt/test-utils",
+    "@nuxt/ui",
+    "@pinia/nuxt",
+    "@vueuse/nuxt",
+    "nuxt-swiper",
+    "nuxt-lucide-icons", // '@nuxtjs/i18n'
+    "@nuxtjs/color-mode",
+    "@nuxtjs/google-fonts",
+  ],
   lucide: {
-    namePrefix: 'Icon'
+    namePrefix: "Icon",
   },
-  css: ['~/assets/css/main.css', '~/assets/css/google-fonts.css'
+  css: [
+    "~/assets/css/main.css",
+    "~/assets/css/google-fonts.css",
     // '~/assets/css/variables.css', '~/assets/css/typography.css', '~/assets/css/scrollbar.css'
   ],
   colorMode: {
-    classSuffix: ''
+    classSuffix: "",
   },
 
   fonts: {
     defaults: {
       weights: [400],
-      styles: ['normal', 'italic'],
-      subsets: [
-
-      ]
-    }
+      styles: ["normal", "italic"],
+      subsets: [],
+    },
   },
 
   googleFonts: {
     download: false,
     base64: true,
-    outputDir: 'assets',
+    outputDir: "assets",
     overwriting: true,
     inject: false,
     preload: true,
-    stylePath: 'css/google-fonts.css',
-    fontsDir: 'assets/fonts',
-    fontsPath: 'fonts',
+    stylePath: "css/google-fonts.css",
+    fontsDir: "assets/fonts",
+    fontsPath: "fonts",
     families: {
       Roboto: true,
-      'Noto Sans Lao': {
-        wght: '100..400',
-        regular: '400',
+      "Noto Sans Lao": {
+        wght: "100..400",
+        regular: "400",
       },
-      'Ubuntu': true,
-    }
+      Ubuntu: true,
+    },
   },
 
   ui: {
     theme: {
       colors: [
-        'primary',
-        'secondary',
-        'tertiary',
-        'info',
-        'success',
-        'warning',
-        'error',
-      ]
-    }
+        "primary",
+        "secondary",
+        "tertiary",
+        "info",
+        "success",
+        "warning",
+        "error",
+      ],
+    },
   },
 
   // i18n: {
@@ -163,21 +171,19 @@ export default defineNuxtConfig({
   //   vueI18n: '../i18n.config.ts' // Optional: for advanced configuration
   // },
 
-
   vite: {
     optimizeDeps: {
-      include: []
+      include: [],
     },
     ssr: {
-      noExternal: []
-    }
+      noExternal: [],
+    },
   },
   nitro: {
     experimental: {
       wasm: true,
     },
-    // preset: "node-server", 
-    
+    // preset: "node-server",
   },
-  alias: {}
-})
+  alias: {},
+});
