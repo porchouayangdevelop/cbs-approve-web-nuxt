@@ -20,11 +20,11 @@
       >
         <!-- Personal Information -->
         <div class="grid grid-cols-2 gap-4">
-          <UFormField label="First Name" name="firstName" required>
+          <UFormField label="ຊຶ່ຜູ້ໃຊ້" name="firstName" required>
             <UInput
               v-model="registerForm.firstName"
               type="text"
-              :placeholder="firstNamePlaceholder || 'Enter your first name'"
+              :placeholder="firstNamePlaceholder || 'ປ້ອນຊື່ຜູ້ຊື່ໃຊ້'"
               icon="i-heroicons-user"
               size="lg"
               :loading="loading"
@@ -32,11 +32,11 @@
             />
           </UFormField>
 
-          <UFormField label="Last Name" name="lastName" required>
+          <UFormField label="ນາມສະກຸນ" name="lastName" required>
             <UInput
               v-model="registerForm.lastName"
               type="text"
-              :placeholder="lastNamePlaceholder || 'Enter your last name'"
+              :placeholder="lastNamePlaceholder || 'ປ້ອນນາມສະກຸນ'"
               icon="i-heroicons-user"
               size="lg"
               :loading="loading"
@@ -46,11 +46,11 @@
         </div>
 
         <!-- Username Field -->
-        <UFormField label="Username" name="username" required>
+        <UFormField label="ລະຫັດພະນັກງານ" name="username" required>
           <UInput
             v-model="registerForm.username"
             type="text"
-            :placeholder="usernamePlaceholder || 'Choose a username'"
+            :placeholder="usernamePlaceholder || 'ປ້ອນລະຫັດພະນັກງານ'"
             icon="i-heroicons-at-symbol"
             size="lg"
             :loading="loading"
@@ -59,11 +59,11 @@
         </UFormField>
 
         <!-- Email Field -->
-        <UFormField label="Email Address" name="email" required>
+        <UFormField label="ອີເມວ" name="email" required>
           <UInput
             v-model="registerForm.email"
             type="email"
-            :placeholder="emailPlaceholder || 'Enter your email'"
+            :placeholder="emailPlaceholder || 'ປ້ອນອີເມວ'"
             icon="i-heroicons-envelope"
             size="lg"
             :loading="loading"
@@ -72,13 +72,11 @@
         </UFormField>
 
         <!-- Phone Field (Optional) -->
-        <UFormField label="Phone Number" name="phone">
+        <UFormField label="ເບີໂທຕິດຕໍ່" name="phone">
           <UInput
             v-model="registerForm.phone"
             type="tel"
-            :placeholder="
-              phonePlaceholder || 'Enter your phone number (optional)'
-            "
+            :placeholder="phonePlaceholder || 'ປ້ອນເບີໂທຕິດຕໍ່ (optional)'"
             icon="i-heroicons-phone"
             size="lg"
             :loading="loading"
@@ -87,11 +85,11 @@
         </UFormField>
 
         <!-- Department Field (Optional) -->
-        <UFormField label="Department" name="department">
+        <UFormField label="ພະແນກ" name="department">
           <UInput
             v-model="registerForm.department"
             type="text"
-            :placeholder="departmentPlaceholder || 'Your department (optional)'"
+            :placeholder="departmentPlaceholder || 'ປ້ອນພະແນກ (optional)'"
             icon="i-heroicons-building-office"
             size="lg"
             :loading="loading"
@@ -100,11 +98,11 @@
         </UFormField>
 
         <!-- Position Field (Optional) -->
-        <UFormField label="Position" name="position">
+        <UFormField label="ຕຳແໜ່ງ" name="position">
           <UInput
             v-model="registerForm.position"
             type="text"
-            :placeholder="positionPlaceholder || 'Your position (optional)'"
+            :placeholder="positionPlaceholder || 'ປ້ອນຕຳແໜ່ງ (optional)'"
             icon="i-heroicons-briefcase"
             size="lg"
             :loading="loading"
@@ -113,11 +111,14 @@
         </UFormField>
 
         <div class="grid grid-cols-2 gap-1">
-          <u-form-field label="BranchCode" name="branchCode" required>
+          <u-form-field label="ເລກ | ລະຫັດສາຂາ" name="branchCode" required>
             <u-select-menu
               v-model="registerForm.branchCode"
-              :placeholder="branchCodePlacehloder || 'select your branchcode'"
+              :placeholder="branchCodePlacehloder || 'ເລືອກສາຂາ'"
               class="w-full"
+              value-key="branchCode"
+              label-key="branchName"
+              :items="branchCodeItems"
               @update:model-value="
                 handleChangeBranchCode(registerForm.branchCode)
               "
@@ -125,11 +126,9 @@
             </u-select-menu>
           </u-form-field>
 
-          <u-form-field label="SubBranchCode" name="subBranchCode" required>
+          <u-form-field label="ເລກ | ລະຫັດໜ່ວຍ" name="subBranchCode" required>
             <u-select-menu
-              :placeholder="
-                subBranchCodePlacehloder || 'select your subBranchCode'
-              "
+              :placeholder="subBranchCodePlacehloder || 'ເລືອກໜ່ວຍ'"
               class="w-full"
               v-model="registerForm.subBranchCode"
             >
@@ -138,11 +137,11 @@
         </div>
 
         <!-- Password Field -->
-        <UFormField label="Password" name="password" required>
+        <UFormField label="ລະຫັດ" name="password" required>
           <UInput
             v-model="registerForm.password"
             :type="showPassword ? 'text' : 'password'"
-            :placeholder="passwordPlaceholder || 'Create a password'"
+            :placeholder="passwordPlaceholder || 'ສ້າງລະຫັດຜ່ານ'"
             icon="i-heroicons-lock-closed"
             size="lg"
             :loading="loading"
@@ -200,23 +199,23 @@
           <UCheckbox v-model="registerForm.acceptTerms" class="cursor-pointer">
             <template #label>
               <span class="text-sm text-gray-700 dark:text-gray-300">
-                I agree to the
+                ຂ້ອຍຕົກລົງເຫັນດີກັບ
                 <UButton
                   variant="link"
                   size="xs"
                   @click="$emit('view-terms')"
                   class="p-0 h-auto text-blue-600 hover:text-blue-500"
                 >
-                  Terms of Service
+                  ເງື່ອນໄຂການໃຫ້ບໍລິການ
                 </UButton>
-                and
+                ແລະ
                 <UButton
                   variant="link"
                   size="xs"
                   @click="$emit('view-privacy')"
                   class="p-0 h-auto text-blue-600 hover:text-blue-500"
                 >
-                  Privacy Policy
+                  ນະໂຍບາຍຄວາມເປັນສ່ວນຕົວ
                 </UButton>
               </span>
             </template>
@@ -267,10 +266,10 @@
             class="w-4 h-4 text-blue-500 mt-0.5"
           />
           <div class="text-xs text-blue-700 dark:text-blue-300">
-            <p class="font-medium">Account Verification</p>
+            <p class="font-medium">ການຢັ້ງຢືນບັນຊີ</p>
             <p>
-              Your account will be reviewed and activated by an administrator.
-              You'll receive an email confirmation once approved.
+              ບັນຊີຂອງທ່ານຈະຖືກກວດສອບ ແລະເປີດໃຊ້ໂດຍຜູ້ເບິ່ງແຍງລະບົບ.
+              ທ່ານຈະໄດ້ຮັບອີເມວຢືນຢັນເມື່ອໄດ້ຮັບການອະນຸມັດ.
             </p>
           </div>
         </div>
@@ -283,7 +282,7 @@
       >
         <div class="text-center text-sm">
           <span class="text-gray-600 dark:text-gray-400"
-            >Already have an account?
+            >ມີບັນຊີຢູ່ແລ້ວບໍ?
           </span>
           <UButton
             variant="link"
@@ -291,13 +290,13 @@
             @click="$emit('login')"
             class="text-blue-600 hover:text-blue-500"
           >
-            Sign in here
+            ເຂົ້າສູ່ລະບົບທີ່ນີ້
           </UButton>
         </div>
       </div>
 
       <!-- Help Links -->
-      <div v-if="showHelpLinks" class="mt-4">
+      <!-- <div v-if="showHelpLinks" class="mt-4">
         <div class="flex justify-center space-x-6 text-sm">
           <UButton
             variant="link"
@@ -318,7 +317,7 @@
             Contact Support
           </UButton>
         </div>
-      </div>
+      </div> -->
     </UCard>
   </div>
 </template>
@@ -326,7 +325,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { BranchCodeItems, SubBranchCodeItems } from "~/types/index";
-
+import type { RegisterCredentials } from "~/types/user.client";
 // props
 interface Props {
   title?: string;
@@ -369,21 +368,6 @@ const emit = defineEmits<{
   "update:changeItem": [value: string];
 }>();
 
-// Types
-interface RegisterCredentials {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  phone?: string;
-  department?: string;
-  branchCode: string;
-  subBranchCode: string;
-  position?: string;
-  password: string;
-  acceptTerms: boolean;
-}
-
 // State
 const registerForm = ref({
   firstName: "",
@@ -396,6 +380,7 @@ const registerForm = ref({
   subBranchCode: "",
   position: "",
   password: "",
+  status: "PENDING",
   acceptTerms: false,
 });
 
@@ -428,6 +413,7 @@ const registerSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,
       "Password must include uppercase, lowercase, number, and special character"
     ),
+  status: z.string().optional(),
   acceptTerms: z
     .boolean()
     .refine((val) => val === true, "You must accept the terms and conditions."),
@@ -514,6 +500,7 @@ const resetForm = () => {
     subBranchCode: "",
     position: "",
     password: "",
+    status: "",
     acceptTerms: false,
   };
   errorMessage.value = "";

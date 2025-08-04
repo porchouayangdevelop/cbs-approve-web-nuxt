@@ -14,11 +14,11 @@
 
       <UForm :schema="loginSchema" :state="loginForm" @submit="handleLogin" class="space-y-6">
         <!-- Username/Email Field -->
-        <UFormField label="Username" name="username" required>
+        <UFormField label="ລະຫັດພະນັກງານ" name="username" required>
           <UInput
               v-model="loginForm.username"
               type="text"
-              :placeholder="usernamePlaceholder || 'Enter your username'"
+              :placeholder="usernamePlaceholder || 'ປ້ອນລະຫັດພະນັກງານ'"
               icon="i-heroicons-user"
               size="lg"
               :loading="loading"
@@ -27,11 +27,11 @@
         </UFormField>
 
         <!-- Password Field -->
-        <UFormField label="Password" name="password" required>
+        <UFormField label="ລະຫັດຜ່ານ" name="password" required>
           <UInput
               v-model="loginForm.password"
               :type="showPassword ? 'text' : 'password'"
-              :placeholder="passwordPlaceholder || 'Enter your password'"
+              :placeholder="passwordPlaceholder || 'ປ້ອນລະຫັດຜ່ານ'"
               icon="i-heroicons-lock-closed"
               size="lg"
               :loading="loading"
@@ -52,7 +52,7 @@
         <div class="flex items-center justify-between">
           <UCheckbox
               v-model="loginForm.remember"
-              label="Remember me"
+              label="ຈື່ຈຳຂ້ອຍ"
               class="cursor-pointer"
           />
           <UButton
@@ -61,7 +61,7 @@
               @click="$emit('forgot-password')"
               class="text-primary-600 hover:text-primary-500"
           >
-            Forgot password?
+            ລືມລະຫັດຜ່ານ?
           </UButton>
         </div>
 
@@ -85,8 +85,8 @@
           <template #leading>
             <UIcon v-if="!loading" name="i-heroicons-arrow-right-on-rectangle" />
           </template>
-          <span v-if="!loading">{{ submitText || 'Sign In' }}</span>
-          <span v-else>{{ loadingText || 'Signing in...' }}</span>
+          <span v-if="!loading">{{ submitText || 'ເຂົ້າສູ່ລະບົບ' }}</span>
+          <span v-else>{{ loadingText || 'ກຳລັງເຂົ້າສູ່ລະບົບ...' }}</span>
         </UButton>
       </UForm>
 
@@ -95,14 +95,14 @@
         <div class="flex items-start space-x-2">
           <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-blue-500 mt-0.5" />
           <div class="text-xs text-blue-700 dark:text-blue-300">
-            <p class="font-medium">Automatic Access Level Detection</p>
-            <p>Your role and permissions are automatically determined from your account credentials.</p>
+            <p class="font-medium">ການກວດຫາລະດັບການເຂົ້າເຖິງອັດຕະໂນມັດ</p>
+            <p>ບົດບາດ ແລະການອະນຸຍາດຂອງທ່ານຖືກກໍານົດໂດຍອັດຕະໂນມັດຈາກຂໍ້ມູນປະຈໍາບັນຊີຂອງທ່ານ.</p>
           </div>
         </div>
       </div>
 
       <!-- Help Links -->
-      <div v-if="showHelpLinks" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <!-- <div v-if="showHelpLinks" class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div class="flex justify-center space-x-6 text-sm">
           <UButton
               variant="link"
@@ -121,7 +121,7 @@
             Contact Support
           </UButton>
         </div>
-      </div>
+      </div> -->
     </UCard>
   </div>
 </template>

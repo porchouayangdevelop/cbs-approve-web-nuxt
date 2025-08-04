@@ -31,6 +31,14 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     },
   });
 
+  const userApi: AxiosInstance = axios.create({
+    baseURL: config.public.user_base_url,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+    },
+  });
+
   authApiInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       const token = useCookie("access_token");
@@ -78,6 +86,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       authApi: authApiInstance,
       api: apiInstance,
       branchAPI: branchAPI,
+      userAPI: userApi,
     },
   };
 });

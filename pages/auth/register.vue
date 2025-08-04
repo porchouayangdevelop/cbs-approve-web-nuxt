@@ -10,21 +10,24 @@
           <!-- Logo -->
           <div class="flex items-center mb-8">
             <div
-              class="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mr-4"
+              class="w-12 h-12 bg-opacity-20 rounded-lg flex items-center justify-center mr-4"
             >
-              <UIcon name="i-heroicons-user-plus" class="w-7 h-7 text-white" />
+              <UIcon
+                name="i-heroicons-user-plus"
+                size="100"
+                class="w-12 h-12 text-white"
+              />
             </div>
             <h1 class="text-2xl font-bold">CBS Approve Web</h1>
           </div>
 
           <!-- Hero Content -->
           <h2 class="text-4xl font-bold mb-6 leading-tight">
-            Join our
-            <span class="text-blue-200">Community</span>
+            ເຂົ້າຮ່ວມ
+            <span class="text-blue-200">ຊຸມຊົນຂອງພວກເຮົາ</span>
           </h2>
           <p class="text-xl text-blue-100 mb-8 leading-relaxed">
-            Create your account and become part of our efficient approval
-            management system.
+            ສ້າງບັນຊີຂອງທ່ານແລະກາຍເປັນສ່ວນຫນຶ່ງຂອງລະບົບການຄຸ້ມຄອງການອະນຸມັດທີ່ມີປະສິດທິພາບຂອງພວກເຮົາ.
           </p>
 
           <!-- Features -->
@@ -34,31 +37,29 @@
                 name="i-heroicons-check-circle"
                 class="w-5 h-5 text-blue-200 mr-3"
               />
-              <span class="text-blue-100">
-                Streamlined approval processes
-              </span>
+              <span class="text-blue-100"> ປັບປຸງຂະບວນການອະນຸມັດ </span>
             </div>
             <div class="flex items-center">
               <UIcon
                 name="i-heroicons-check-circle"
                 class="w-5 h-5 text-blue-200 mr-3"
               />
-              <span class="text-blue-100"> Real-time status tracking </span>
+              <span class="text-blue-100"> ການຕິດຕາມສະຖານະໃນເວລາຈິງ</span>
             </div>
             <div class="flex items-center">
               <UIcon
                 name="i-heroicons-check-circle"
                 class="w-5 h-5 text-blue-200 mr-3"
               />
-              <span class="text-blue-100"> Secure and reliable platform </span>
+              <span class="text-blue-100"> ເວທີທີ່ປອດໄພແລະເຊື່ອຖືໄດ້</span>
             </div>
-            <div class="flex items-center">
+            <!-- <div class="flex items-center">
               <UIcon
                 name="i-heroicons-check-circle"
                 class="w-5 h-5 text-blue-200 mr-3"
               />
-              <span class="text-blue-100"> 24/7 customer support </span>
-            </div>
+              <span class="text-blue-100"> ຊ່ວຍເຫຼືອລູກຄ້າ 24/7 </span>
+            </div> -->
           </div>
         </div>
       </div>
@@ -94,14 +95,18 @@
       <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <RegisterForm
           ref="registerFormRef"
-          title="Create Your Account"
-          subtitle="Join CBS Approve Web today"
+          title="ສະຫມັກບັນຊີເຂົ້າໃຊ້ລະບົບ"
+          subtitle="ເຂົ້າຮ່ວມລະບົບສົ່ງເອກະສານຂອງພວກເຮົາ"
+          :branch-code-items="getBranchItems"
+          :sub-branch-code-items="getSubBranchItems"
+          submit-text="ສະໝັກບັນຊີ"
           @register="handleRegister"
           @login="handleLogin"
           @help="handleHelp"
           @contact="handleContact"
           @view-terms="handleViewTerms"
           @view-privacy="handleViewPrivacy"
+          @update:change-item="handleChangeItem"
         />
       </div>
 
@@ -133,11 +138,12 @@
               class="w-5 h-5 text-blue-500 mt-0.5"
             />
             <div class="text-sm text-blue-700 dark:text-blue-300">
-              <p class="font-medium mb-1">Account Approval Process:</p>
+              <p class="font-medium mb-1">ຂັ້ນຕອນການອະນຸມັດບັນຊີ:</p>
               <p>
-                After registration, your account will be reviewed by our
-                administrators. You'll receive an email notification once your
-                account is approved and ready to use.
+                ຫຼັງຈາກການລົງທະບຽນ,
+                ບັນຊີຂອງທ່ານຈະຖືກກວດສອບໂດຍຜູ້ເບິ່ງແຍງລະບົບຂອງພວກເຮົາ.
+                ທ່ານຈະໄດ້ຮັບການແຈ້ງເຕືອນທາງອີເມລ໌ເມື່ອບັນຊີຂອງທ່ານໄດ້ຮັບການອະນຸມັດ
+                ແລະພ້ອມນຳໃຊ້ແລ້ວ.
               </p>
             </div>
           </div>
@@ -152,29 +158,33 @@
             variant="link"
             size="xs"
             @click="handleHelp"
+            icon="i-heroicons-question-mark-circle"
             class="text-blue-600 hover:text-blue-500"
-            >Help</UButton
+            >ຊ່ວຍເຫຼືອ</UButton
           >
           <UButton
             variant="link"
             size="xs"
             @click="handleContact"
+            icon="i-heroicons-phone"
             class="text-blue-600 hover:text-blue-500"
-            >Contact</UButton
+            >ຕິດຕໍ່</UButton
           >
           <UButton
             variant="link"
             size="xs"
+            icon="i-lucide-file-type"
             @click="handleViewTerms"
             class="text-blue-600 hover:text-blue-500"
-            >Terms</UButton
+            >ເງື່ອນໄຂ</UButton
           >
           <UButton
             variant="link"
             size="xs"
+            icon="i-lucide-shield-check"
             @click="handleViewPrivacy"
             class="text-blue-600 hover:text-blue-500"
-            >Privacy</UButton
+            >ນະໂຍບາຍຄວາມເປັນສ່ວນຕົວ</UButton
           >
         </div>
       </div>
@@ -184,29 +194,53 @@
 
 <script setup lang="ts">
 import RegisterForm from "~/components/auth/RegisterForm.vue";
-
+import { useBranchStore } from "~/store/branchStore";
+import { useUserRegisterStore } from "~/store/registerStore";
+import type { RegisterCredentials } from "~/types/user.client";
 definePageMeta({
   layout: false,
   middleware: [],
 });
 
-// Types
-interface RegisterCredentials {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  phone?: string;
-  department?: string;
-  position?: string;
-  password: string;
-  acceptTerms: boolean;
-}
 
 // State
 const registerFormRef = ref();
 const isLoading = ref(false);
 const loadingMessage = ref("Creating account...");
+
+const store = useBranchStore();
+const {
+  //call state
+  branchItems,
+  subBranchItems,
+  error,
+  loading,
+  initalized,
+
+  //call getter
+  getBranchItems,
+  getSubBranchItems,
+  isError,
+  isLoading: storeLoading,
+  isInitialized,
+} = storeToRefs(useBranchStore());
+//call method from store
+const { fetchBranchItem, fetchSubBranchItem } = store;
+
+
+const registerStore = useUserRegisterStore();
+const {
+//states
+loading: registerLoading,
+error: registerError,
+initalized: registerInitalized,
+
+//getters
+getError,
+getInitialized,
+
+} = storeToRefs(useUserRegisterStore());
+const { registerUser} = registerStore;
 
 // Event handlers
 const handleRegister = async (credentials: RegisterCredentials) => {
@@ -289,6 +323,34 @@ const handleViewPrivacy = () => {
   // You can open in new tab or navigate to privacy page
   window.open("/privacy-policy", "_blank");
 };
+
+const handleChangeItem = () => {};
+
+const initialFetchingData = async () => {
+  try {
+    loading.value = true;
+    if (initalized.value) {
+      await new Promise((_) => setTimeout(_, 100));
+      await fetchBranchItem();
+    }
+  } catch (error) {
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  initialFetchingData();
+});
+
+// wathers
+watch([branchItems, subBranchItems], ([newBranchItems, newSubBranchItems]) => {
+  console.log(`changed: ${newBranchItems} : ${newSubBranchItems}`);
+});
+
+watch(fetchBranchItem(), (fetch) => {
+  fetchBranchItem();
+});
 
 // SEO
 useSeoMeta({

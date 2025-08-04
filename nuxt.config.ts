@@ -42,6 +42,7 @@ export default defineNuxtConfig({
       auth_url: "",
       api_url: "",
       branch_url: "",
+      user_base_url: "",
       login: "",
       logout: "",
       refresh_token: "",
