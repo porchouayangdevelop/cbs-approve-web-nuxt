@@ -156,6 +156,32 @@ export const useUserRegisterStore = defineStore("userRegisterStore", () => {
     }
   };
 
+  const approveUser = async (
+    credential: RegisterCredentials
+  ): Promise<void> => {
+    try {
+      loading.value = true;
+      clearError();
+
+      const authReady = await waitForAuth();
+      if (!authReady) {
+        throw new Error("User is not authenticated");
+      }
+
+      const { $userAPI } = useNuxtApp();
+      await $userAPI.post<RegisterCredentials>(
+        `updateRegisterData`,
+        credential
+      );
+      initalized.value = true;
+    } catch (error: any) {
+      error.value = error.message || "An error occurred while approving user";
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const updateRegister = async (
     credentials: RegisterCredentials
   ): Promise<void> => {
@@ -224,6 +250,7 @@ export const useUserRegisterStore = defineStore("userRegisterStore", () => {
     registerUser,
     getRegisterUsers,
     getRegisterUsersById,
+    approveUser,
     updateRegister,
     deleteRegister,
   };

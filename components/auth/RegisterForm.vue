@@ -19,7 +19,7 @@
         class="space-y-4"
       >
         <!-- Personal Information -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-2">
           <UFormField label="ຊຶ່ຜູ້ໃຊ້" name="firstName" required>
             <UInput
               v-model="registerForm.firstName"
@@ -84,41 +84,20 @@
           />
         </UFormField>
 
-        <!-- Department Field (Optional) -->
-        <UFormField label="ພະແນກ" name="department">
-          <UInput
-            v-model="registerForm.department"
-            type="text"
-            :placeholder="departmentPlaceholder || 'ປ້ອນພະແນກ (optional)'"
-            icon="i-heroicons-building-office"
-            size="lg"
-            :loading="loading"
-            class="w-full"
-          />
-        </UFormField>
-
-        <!-- Position Field (Optional) -->
-        <UFormField label="ຕຳແໜ່ງ" name="position">
-          <UInput
-            v-model="registerForm.position"
-            type="text"
-            :placeholder="positionPlaceholder || 'ປ້ອນຕຳແໜ່ງ (optional)'"
-            icon="i-heroicons-briefcase"
-            size="lg"
-            :loading="loading"
-            class="w-full"
-          />
-        </UFormField>
-
-        <div class="grid grid-cols-2 gap-1">
+        <div class="grid grid-cols-2 gap-2">
           <u-form-field label="ເລກ | ລະຫັດສາຂາ" name="branchCode" required>
             <u-select-menu
+              :search-input="{
+                placeholder: 'ເລືອກສາຂາ',
+                icon: 'i-heroicons-magnifying-glass',
+              }"
               v-model="registerForm.branchCode"
               :placeholder="branchCodePlacehloder || 'ເລືອກສາຂາ'"
               class="w-full"
               value-key="branchCode"
               label-key="branchName"
               :items="branchCodeItems"
+              @change=""
               @update:model-value="
                 handleChangeBranchCode(registerForm.branchCode)
               "
@@ -128,6 +107,11 @@
 
           <u-form-field label="ເລກ | ລະຫັດໜ່ວຍ" name="subBranchCode" required>
             <u-select-menu
+              :search-input="{
+                placeholder: 'ເລືອກໜ່ວຍ',
+                icon: 'i-heroicons-magnifying-glass',
+              }"
+              :disabled="enabledSelect"
               :placeholder="subBranchCodePlacehloder || 'ເລືອກໜ່ວຍ'"
               class="w-full"
               v-model="registerForm.subBranchCode"
@@ -135,6 +119,44 @@
             </u-select-menu>
           </u-form-field>
         </div>
+
+        <!-- Department Field (Optional) -->
+        <UFormField label="ພະແນກ" name="department" required>
+          <u-select-menu
+            :search-input="{
+              placeholder: 'ເລືອກພະແນກ',
+              icon: 'i-lucide-user-search',
+            }"
+            v-model="registerForm.department"
+            :placeholder="departmentPlaceholder || 'ເລືອກພະແນກ'"
+            icon="i-heroicons-building-office"
+            value-key="depCode"
+            label-key="depDesc_local"
+            :items="departmentItems"
+            size="lg"
+            :loading="loading"
+            class="w-full"
+          />
+        </UFormField>
+
+        <!-- Position Field (Optional) -->
+        <UFormField label="ຕຳແໜ່ງ" name="position" required>
+          <u-select-menu
+            :search-input="{
+              placeholder: 'ເລືອກຕຳແໜ່ງ',
+              icon: 'i-lucide-user-search',
+            }"
+            v-model="registerForm.position"
+            :placeholder="positionPlaceholder || 'ເລືອກຕຳແໜ່ງ'"
+            icon="i-heroicons-briefcase"
+            value-key="local_position"
+            label-key="local_position"
+            :items="positionItems"
+            size="lg"
+            :loading="loading"
+            class="w-full"
+          />
+        </UFormField>
 
         <!-- Password Field -->
         <UFormField label="ລະຫັດ" name="password" required>
@@ -325,6 +347,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { BranchCodeItems, SubBranchCodeItems } from "~/types/index";
+import type { Positions, Departments } from "~/types";
 import type { RegisterCredentials } from "~/types/user.client";
 // props
 interface Props {
@@ -347,6 +370,8 @@ interface Props {
 
   branchCodeItems?: BranchCodeItems[];
   subBranchCodeItems?: SubBranchCodeItems[];
+  departmentItems?: Departments[];
+  positionItems?: Positions[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -355,6 +380,8 @@ const props = withDefaults(defineProps<Props>(), {
 
   branchCodeItems: () => [],
   subBranchCodeItems: () => [],
+  departmentItems: () => [],
+  positionItems: () => [],
 });
 
 // Emits
@@ -366,6 +393,7 @@ const emit = defineEmits<{
   "view-terms": [];
   "view-privacy": [];
   "update:changeItem": [value: string];
+  'change':[evt:Event]
 }>();
 
 // State
@@ -375,9 +403,9 @@ const registerForm = ref({
   username: "",
   email: "",
   phone: "",
-  department: "",
   branchCode: "",
   subBranchCode: "",
+  department: "",
   position: "",
   password: "",
   status: "PENDING",
@@ -387,6 +415,7 @@ const registerForm = ref({
 const loading = ref(false);
 const showPassword = ref(false);
 const errorMessage = ref("");
+const enabledSelect = ref(false);
 
 // Validation schema
 const registerSchema = z.object({
@@ -402,10 +431,10 @@ const registerSchema = z.object({
     ),
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().optional(),
-  department: z.string().optional(),
   branchCode: z.string().min(6, "BranchCode must be not invalid"),
-  subBranchCode: z.string().min(6, "subBranchCode must be be not invalid"),
-  position: z.string().optional(),
+  subBranchCode: z.string().optional(),
+  department: z.string().min(1, "Department must be not invalid"),
+  position: z.string().min(1, "Position must be not invalid"),
   password: z
     .string()
     .min(8, "Password must contain at least 8 characters.")
@@ -495,9 +524,9 @@ const resetForm = () => {
     username: "",
     email: "",
     phone: "",
-    department: "",
     branchCode: "",
     subBranchCode: "",
+    department: "",
     position: "",
     password: "",
     status: "",

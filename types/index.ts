@@ -50,3 +50,20 @@ export interface SubBranchCodeItems {
   branch_local_name: string;
   branch_code_name: string;
 }
+
+export interface PageSize {
+  page: number;
+  size: number;
+}
+
+export interface Positions {
+  id: string;
+  eng_position: string;
+  local_position: string;
+}
+
+export interface Departments {
+  depCode: string;
+  depDesc_e: string;
+  depDesc_local: string;
+}

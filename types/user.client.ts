@@ -4,9 +4,9 @@ export interface RegisterCredentials {
   username: string;
   email: string;
   phone?: string;
-  department?: string;
   branchCode: string;
-  subBranchCode: string;
+  subBranchCode?: string;
+  department?: string;
   position?: string;
   password: string;
   status?: string | "PENDING" | "APPROVED" | "REJECTED";

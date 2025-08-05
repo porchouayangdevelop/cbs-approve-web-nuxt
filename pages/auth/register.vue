@@ -97,6 +97,8 @@
           ref="registerFormRef"
           title="ສະຫມັກບັນຊີເຂົ້າໃຊ້ລະບົບ"
           subtitle="ເຂົ້າຮ່ວມລະບົບສົ່ງເອກະສານຂອງພວກເຮົາ"
+          :department-items="getDepartments"
+          :position-items="getPostitions"
           :branch-code-items="getBranchItems"
           :sub-branch-code-items="getSubBranchItems"
           submit-text="ສະໝັກບັນຊີ"
@@ -195,13 +197,13 @@
 <script setup lang="ts">
 import RegisterForm from "~/components/auth/RegisterForm.vue";
 import { useBranchStore } from "~/store/branchStore";
+import { usePositionStore } from "~/store/positionStore";
 import { useUserRegisterStore } from "~/store/registerStore";
 import type { RegisterCredentials } from "~/types/user.client";
 definePageMeta({
   layout: false,
   middleware: [],
 });
-
 
 // State
 const registerFormRef = ref();
@@ -214,8 +216,8 @@ const {
   branchItems,
   subBranchItems,
   error,
-  loading,
-  initalized,
+  loading: branchLoading,
+  initalized: branchInitialized,
 
   //call getter
   getBranchItems,
@@ -227,20 +229,30 @@ const {
 //call method from store
 const { fetchBranchItem, fetchSubBranchItem } = store;
 
-
 const registerStore = useUserRegisterStore();
 const {
-//states
-loading: registerLoading,
-error: registerError,
-initalized: registerInitalized,
+  //states
+  loading: registerLoading,
+  error: registerError,
+  initalized: registerInitalized,
 
-//getters
-getError,
-getInitialized,
-
+  //getters
+  getError,
+  getInitialized,
 } = storeToRefs(useUserRegisterStore());
-const { registerUser} = registerStore;
+const { registerUser } = registerStore;
+
+const positionStore = usePositionStore();
+const {
+  positions,
+  departments,
+  getPostitions,
+  getDepartments,
+  loading: positionLoading,
+  error: positionError,
+  initialized: positionInitialized,
+} = storeToRefs(usePositionStore());
+const { fetchPositions, fetchDepartments } = positionStore;
 
 // Event handlers
 const handleRegister = async (credentials: RegisterCredentials) => {
@@ -328,19 +340,24 @@ const handleChangeItem = () => {};
 
 const initialFetchingData = async () => {
   try {
-    loading.value = true;
-    if (initalized.value) {
+    branchInitialized.value = true;
+    positionLoading.value = true;
+    if (branchInitialized.value && positionInitialized.value) {
       await new Promise((_) => setTimeout(_, 100));
       await fetchBranchItem();
     }
   } catch (error) {
+    console.error("Initial fetching data error:", error);
   } finally {
-    loading.value = false;
+    branchInitialized.value = false;
+    positionLoading.value = false;
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   initialFetchingData();
+  await fetchPositions();
+  await fetchDepartments();
 });
 
 // wathers
